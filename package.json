@@ -1,0 +1,21 @@
+{
+    "name": "shm-core",
+    "version": "1.0.0",
+    "description": "The core functionalities for Shenhe Mains, including the Discord bot and website",
+    "main": "src/main.js",
+    "private": true,
+    "type": "commonjs",
+    "scripts": {
+        "start": "node src/main.js"
+    },
+    "dependencies": {
+        "@discordjs/rest": "^0.2.0-canary.0",
+        "clear-module": "^4.1.2",
+        "discord-api-types": "^0.26.1",
+        "discord.js": "^13.6.0",
+        "optionator": "^0.9.1",
+        "pg": "^8.7.1",
+        "semver": "^7.3.5",
+        "shlex": "^2.1.0"
+    }
+}
