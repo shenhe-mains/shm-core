@@ -1,6 +1,6 @@
-const { UserError } = require("./errors.js");
-const { checkCount } = require("./utils.js");
-const config = require("../config.json");
+const { UserError } = require("./errors");
+const { checkCount } = require("./utils");
+const { config } = require("./core/config");
 
 var command_registry = {
     load: load,
@@ -8,14 +8,25 @@ var command_registry = {
     reload: reload,
 };
 
+var listener_registry = {};
+
 var modules = {};
 
-function get_command(key) {
+exports.get_command = function (key) {
     if (command_registry.hasOwnProperty(key)) {
         return command_registry[key];
     }
     return undefined;
-}
+};
+
+exports.handle_event = function (key, ...event) {
+    if (!listener_registry.hasOwnProperty(key)) return;
+    for (var module in listener_registry[key]) {
+        for (var listener of listener_registry[key][module]) {
+            listener(...event);
+        }
+    }
+};
 
 async function load(ctx, args) {
     checkCount(args, 1);
@@ -50,14 +61,23 @@ function _load(module) {
         throw new UserError(`The \`${module}\` module is already loaded.`);
     }
 
-    const { commands } = require(`./modules/${module}/main.js`);
+    const { commands, listeners } = require(`./modules/${module}/main.js`);
 
-    for (var key in commands) {
-        if (command_registry.hasOwnProperty(key)) {
-            throw `Duplicate key \`${key}\`.`;
+    if (commands) {
+        for (var key in commands) {
+            if (command_registry.hasOwnProperty(key)) {
+                throw `Duplicate key \`${key}\`.`;
+            }
+
+            command_registry[key] = commands[key];
         }
+    }
 
-        command_registry[key] = commands[key];
+    if (listeners) {
+        for (var key in listeners) {
+            listener_registry[key] ||= {};
+            listener_registry[key][module] = listeners[key];
+        }
     }
 
     modules[module] = commands;
@@ -74,6 +94,12 @@ function _unload(module) {
         }
     }
 
+    for (var key in listener_registry) {
+        if (listener_registry[key].hasOwnProperty(module)) {
+            delete listener_registry[key][module];
+        }
+    }
+
     delete require.cache[require.resolve(`./modules/${module}/main.js`)];
     delete modules[module];
 }
@@ -81,5 +107,3 @@ function _unload(module) {
 for (var module of config.startup) {
     _load(module);
 }
-
-exports.get_command = get_command;

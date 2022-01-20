@@ -1,33 +1,68 @@
-class CommandSyntaxError extends Error {
+exports.StatusError = StatusError = class extends Error {
+    constructor(message) {
+        super(message);
+        this.has_message = message !== undefined;
+    }
+};
+
+exports.CommandSyntaxError = class extends StatusError {
     constructor(message) {
         super(message);
         this.name = "CommandSyntaxError";
     }
-}
+};
 
-class ArgumentError extends Error {
+exports.ArgumentError = class extends StatusError {
     constructor(message) {
         super(message);
         this.name = "ArgumentError";
     }
-}
+};
 
-class UserError extends Error {
+exports.UserError = class extends StatusError {
     constructor(message) {
         super(message);
         this.name = "UserError";
     }
-}
+};
 
-class Success extends Error {
-    constructor(title, message) {
+exports.PermissionError = class extends StatusError {
+    constructor(message) {
+        super(message);
+        this.name = "PermissionError";
+    }
+};
+
+exports.Info = class extends StatusError {
+    constructor(title, message, modify) {
         super(message);
         this.title = title;
+        this.modify = modify;
+        this.name = "Info";
+    }
+};
+
+exports.Canceled = class extends StatusError {
+    constructor(message) {
+        super(message);
+        this.name = "Canceled";
+    }
+};
+
+exports.PartialSuccess = class extends StatusError {
+    constructor(title, message, modify) {
+        super(message);
+        this.title = title;
+        this.modify = modify;
+        this.name = "PartialSuccess";
+    }
+};
+
+exports.Success = class extends StatusError {
+    constructor(title, message, modify) {
+        super(message);
+        this.title = title;
+        this.modify = modify;
         this.name = "Success";
     }
-}
-
-exports.CommandSyntaxError = CommandSyntaxError;
-exports.ArgumentError = ArgumentError;
-exports.UserError = UserError;
-exports.Success = Success;
+};

@@ -1,45 +1,63 @@
-const { CommandSyntaxError } = require("./errors.js");
+const { MessageEmbed } = require("discord.js");
+const { config } = require("./core/config");
+const { CommandSyntaxError } = require("./errors");
 
-function pluralize(x, a, b) {
+exports.pluralize = pluralize = function (x, a, b) {
     return x == 1 ? b || "" : a || "s";
-}
+};
 
-class Context {
-    constructor(message) {
-        this.message = message;
-        this.channel = message.channel;
-        this.guild = message.guild;
+exports.inline_code = inline_code = function (string) {
+    return string.indexOf("\n") == -1
+        ? `\`${string.replace("`", "\u200B`")}\``
+        : `\`\`\`\n${string.replace("`", "\u200B`")}\n\`\`\``;
+};
+
+exports.for_duration = for_duration = function (duration) {
+    if (duration <= 0) {
+        return "";
     }
-
-    async reply() {
-        await this._reply(false, ...arguments);
-    }
-
-    async replyPing() {
-        await this._reply(true, ...arguments);
-    }
-
-    async _reply(ping) {
-        const last = arguments[arguments.length - 1];
-        if (last instanceof Object) {
-            last.allowedMentions ||= {};
-            if (last.allowedMentions.repliedUser === undefined) {
-                last.allowedMentions.repliedUser = false;
-            }
+    var components = [];
+    for (var [cap, name] of [
+        [60, "second"],
+        [60, "minute"],
+        [24, "hour"],
+    ]) {
+        var amt = duration % cap;
+        duration = Math.floor(duration / cap);
+        if (amt > 0) {
+            components.push(`${amt} ${name}${pluralize(amt)}`);
         }
-        await this.message.reply(...arguments.slice(1));
     }
-
-    async delete() {
-        await this.message.delete();
+    if (duration > 0) {
+        components.push(`${duration} day${pluralize(duration)}`);
     }
+    return " for " + english_list(components);
+};
 
-    async edit() {
-        await this.message.edit(...arguments);
+exports.english_list = english_list = function (values, joiner) {
+    joiner ||= "and";
+    if (values.length == 0) {
+        return "";
+    } else if (values.length == 1) {
+        return values[0];
+    } else if (values.length == 2) {
+        return values.join(` ${joiner} `);
+    } else {
+        return (
+            values.slice(0, values.length - 1).join(", ") +
+            `, ${joiner} ` +
+            values[values.length - 1]
+        );
     }
-}
+};
 
-function checkCount(args, min, max) {
+exports.shorten = function (string, length) {
+    return string.length <= length
+        ? string
+        : string.substring(0, length - 3) + "...";
+};
+
+exports.checkCount = checkCount = function (args, min, max) {
     if (max === undefined) max = min;
     if (args.length != min && min == max) {
         throw new CommandSyntaxError(
@@ -58,8 +76,24 @@ function checkCount(args, min, max) {
             }.`
         );
     }
-}
+};
 
-exports.pluralize = pluralize;
-exports.Context = Context;
-exports.checkCount = checkCount;
+exports.dm = async function (member, title, description, footer) {
+    if (footer === undefined) {
+        footer = true;
+    }
+    return await member.send({
+        embeds: [
+            {
+                color: config.color,
+                title: title,
+                description: description,
+                footer: footer
+                    ? {
+                          text: "You can respond here to open a modmail thread.",
+                      }
+                    : null,
+            },
+        ],
+    });
+};
