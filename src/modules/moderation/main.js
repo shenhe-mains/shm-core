@@ -1,7 +1,8 @@
 const { DiscordAPIError } = require("discord.js");
+const fetch = require("node-fetch");
 const { schedule_undo } = require("../../core/moderation");
 const { parse_duration } = require("../../core/parsing");
-const { has_permission } = require("../../core/privileges");
+const { has_permission, assert_hierarchy } = require("../../core/privileges");
 const { client } = require("../../db");
 const {
     PartialSuccess,
@@ -22,6 +23,7 @@ const {
 
 exports.commands = {
     slowmode: slowmode,
+    verbal: moderate("verbal", true),
     warn: moderate("warn", true),
     mute: moderate("mute", true),
     kick: moderate("kick", true),
@@ -34,6 +36,7 @@ exports.commands = {
     "ban-silent": moderate("ban", false),
     "unmute-silent": unmoderate("mute", false),
     massban: massban,
+    "massban-from-url": massban_from_url,
     remove: remove,
     "clear-history": clear_history,
     history: history,
@@ -63,16 +66,46 @@ async function slowmode(ctx, args) {
 function moderate(t, d) {
     return ((type, dm) =>
         async function (ctx, args) {
-            if (!has_permission(ctx.author, type)) {
+            const past_tense =
+                type == "verbal"
+                    ? "verbally warned"
+                    : type == "mute"
+                    ? "muted"
+                    : type == "ban"
+                    ? "banned"
+                    : type + "ed";
+            if (!has_permission(ctx.author, type.replace("verbal", "warn"))) {
                 throw new PermissionError(
                     `You do not have permission to ${type} users.`
                 );
             }
-            checkCount(args, type == "warn" ? 2 : 1, Infinity);
+            checkCount(
+                args,
+                type == "warn" || type == "verbal" ? 2 : 1,
+                Infinity
+            );
             const member = await (type == "ban"
                 ? ctx.parse_user
                 : ctx.parse_member
             ).bind(ctx)(args.shift());
+            if (type != "verbal") {
+                var guild_member;
+                if (type == "ban") {
+                    try {
+                        guild_member = await ctx.guild.members.fetch(member.id);
+                    } catch {}
+                } else {
+                    guild_member = member;
+                }
+                if (guild_member !== undefined) {
+                    await assert_hierarchy(ctx.author, guild_member);
+                    if (has_permission(guild_member, "immunity")) {
+                        throw new PermissionError(
+                            `${guild_member} is not able to be ${past_tense}.`
+                        );
+                    }
+                }
+            }
             const user = type == "ban" ? member : member.user;
             var duration;
             if (type == "mute" || type == "ban") {
@@ -82,11 +115,17 @@ function moderate(t, d) {
             await (
                 await ctx.confirmOrCancel({
                     title: `Confirm ${type}`,
-                    description: `This operation will ${type} ${member}${
+                    description: `This operation will ${type.replace(
+                        "verbal",
+                        "verbally warn"
+                    )} ${member}${
                         duration === undefined ? "" : for_duration(duration)
                     } with ${
                         reason ? "reason " + inline_code(reason) : "no reason"
                     }`,
+                    thumbnail: {
+                        url: user.avatarURL({ dynamic: true }),
+                    },
                     color: {
                         warn: "YELLOW",
                         mute: "ORANGE",
@@ -97,7 +136,9 @@ function moderate(t, d) {
             ).message.delete();
             var fail = false;
             try {
-                await (type == "warn"
+                await (type == "verbal"
+                    ? ctx.verbal
+                    : type == "warn"
                     ? ctx.warn
                     : type == "mute"
                     ? ctx.mute
@@ -106,7 +147,12 @@ function moderate(t, d) {
                     : ctx.ban
                 ).bind(ctx)(
                     ...(type == "mute" || type == "ban"
-                        ? [member, duration, reason, !dm]
+                        ? [
+                              type == "ban" ? member.id : member,
+                              duration,
+                              reason,
+                              !dm,
+                          ]
                         : [member, reason, !dm])
                 );
             } catch (error) {
@@ -120,15 +166,9 @@ function moderate(t, d) {
                 await schedule_undo(type, ctx.guild, member.id);
             }
             throw new (fail ? PartialSuccess : Success)(
-                `${user.username}#${user.discriminator} has been ${
-                    type == "mute"
-                        ? "muted"
-                        : type == "ban"
-                        ? "banned"
-                        : type + "ed"
-                }${duration === undefined ? "" : for_duration(duration)}${
-                    fail ? " (DM failed)" : ""
-                }`,
+                `${user.username}#${user.discriminator} has been ${past_tense}${
+                    duration === undefined ? "" : for_duration(duration)
+                }${fail ? " (DM failed)" : ""}`,
                 reason
             );
         })(t, d);
@@ -184,6 +224,26 @@ async function massban(ctx, args) {
     }
     const reason = args.join(" ");
     await _massban(ctx, user_ids, reason);
+}
+
+async function massban_from_url(ctx, args) {
+    checkCount(args, 1, Infinity);
+    var url = args.shift();
+    if (url.startsWith("<") && url.endsWith(">")) {
+        url = url.substring(1, url.length - 1);
+    }
+    const reason = args.join(" ");
+    var text;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw 0;
+        text = await response.text();
+    } catch {
+        throw new ArgumentError(
+            "Failed to fetch data from that URL; please make sure you have entered it correctly."
+        );
+    }
+    await _massban(ctx, text.split(/\s+/).map(ctx.parse_user_id), reason);
 }
 
 async function _massban(ctx, user_ids, reason) {

@@ -6,10 +6,18 @@ exports.pluralize = pluralize = function (x, a, b) {
     return x == 1 ? b || "" : a || "s";
 };
 
-exports.inline_code = inline_code = function (string) {
-    return string.indexOf("\n") == -1
-        ? `\`${string.replace("`", "\u200B`")}\``
-        : `\`\`\`\n${string.replace("`", "\u200B`")}\n\`\`\``;
+function substring_if(string, length) {
+    if (length === undefined || isNaN(length)) return string;
+    return string.substring(0, length);
+}
+
+exports.inline_code = inline_code = function (string, max_length) {
+    return string.indexOf("\n") == -1 && string.indexOf("`") == -1
+        ? `\`${substring_if(string, max_length - 2)}\``
+        : `\`\`\`\n${substring_if(
+              string.replaceAll("`", "\u200B`"),
+              max_length - 8
+          )}\n\`\`\``;
 };
 
 exports.for_duration = for_duration = function (duration) {

@@ -42,7 +42,7 @@ exports.confirmationPrompt = async function (
     });
 };
 
-exports.confirmationInteraction = async function (interaction) {
+exports.confirmationInteraction = async function (client, interaction) {
     if (!interaction instanceof ButtonInteraction) return;
     if (authors.hasOwnProperty(interaction.message.id)) {
         if (authors[interaction.message.id] != interaction.user.id) {
@@ -60,12 +60,5 @@ exports.confirmationInteraction = async function (interaction) {
         }
         delete resolves[interaction.message.id];
         delete rejects[interaction.message.id];
-    } else if (interaction.customId.startsWith("confirm.")) {
-        await interaction.message.edit({ components: [] });
-        await interaction.reply({
-            content:
-                "This confirmation prompt is no longer in my cache. Please run the command again.",
-            ephemeral: true,
-        });
     }
 };

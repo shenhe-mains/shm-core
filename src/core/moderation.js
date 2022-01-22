@@ -12,11 +12,26 @@ const { for_duration, dm } = require("../utils");
 const { config } = require("./config");
 const { assert_hierarchy, has_permission } = require("./privileges");
 
+exports.verbal = async function (ctx, member, reason) {
+    if (!has_permission(ctx.author, "warn")) {
+        throw new PermissionError("You do not have permission to warn users.");
+    }
+    await dm(
+        member,
+        `Verbal warning from ${ctx.guild.name}`,
+        `Hello, ${member}! You were given a verbal warning by a moderator in ${ctx.guild.name}. This does not go on your record.\n\n` +
+            reason
+    );
+};
+
 exports.warn = async function (ctx, member, reason, no_dm) {
     if (!has_permission(ctx.author, "warn")) {
         throw new PermissionError("You do not have permission to warn users.");
     }
-    assert_hierarchy(ctx.author, member);
+    await assert_hierarchy(ctx.author, member);
+    if (has_permission(member, "immunity")) {
+        throw new PermissionError(`${member} is not able to be warned.`);
+    }
     await add_warn(ctx.author.id, member.id, reason, ctx.url);
     if (!no_dm) {
         await dm(member, `You were warned in ${ctx.guild.name}`, reason);
@@ -27,7 +42,10 @@ exports.mute = async function (ctx, member, duration, reason, no_dm) {
     if (!has_permission(ctx.author, "mute")) {
         throw new PermissionError("You do not have permission to mute users.");
     }
-    assert_hierarchy(ctx.author, member);
+    await assert_hierarchy(ctx.author, member);
+    if (has_permission(member, "immunity")) {
+        throw new PermissionError(`${member} is not able to be muted.`);
+    }
     await add_mute(ctx.author.id, member.id, duration, reason, ctx.url);
     await member.roles.add(await ctx.guild.roles.fetch(config.mute));
     if (!no_dm) {
@@ -43,7 +61,10 @@ exports.kick = async function (ctx, member, reason, no_dm) {
     if (!has_permission(ctx.author, "kick")) {
         throw new PermissionError("You do not have permission to kick users.");
     }
-    assert_hierarchy(ctx.author, member);
+    await assert_hierarchy(ctx.author, member);
+    if (has_permission(member, "immunity")) {
+        throw new PermissionError(`${member} is not able to be kicked.`);
+    }
     if (!member.kickable) {
         throw new PermissionError(
             `I do not have permission to kick ${member}.`
@@ -67,8 +88,9 @@ exports.ban = async function (ctx, user_id, duration, reason, no_dm, days) {
     try {
         member = await ctx.guild.members.fetch(user_id);
     } catch {}
-    if (member !== undefined) {
-        assert_hierarchy(ctx.author, member);
+    await assert_hierarchy(ctx.author, { id: user_id });
+    if (member !== undefined && has_permission(member, "immunity")) {
+        throw new PermissionError(`${member} is not able to be banned.`);
     }
     if (member !== undefined && !member.bannable) {
         throw new PermissionError(
@@ -117,7 +139,8 @@ exports.massban = async function (
         } catch {}
         try {
             if (member !== undefined) {
-                assert_hierarchy(ctx.author, member);
+                await assert_hierarchy(ctx.author, member);
+                if (has_permission(member, "immunity")) throw 0;
             }
             if (member === undefined || member.bannable) {
                 await add_ban(

@@ -39,7 +39,7 @@ exports.pagify = async function (ctx, embed, fields, page_size) {
     }
 };
 
-exports.pageInteraction = async function (interaction) {
+exports.pageInteraction = async function (client, interaction) {
     if (!interaction instanceof ButtonInteraction) return;
     if (items.hasOwnProperty(interaction.message.id)) {
         const item = items[interaction.message.id];
@@ -67,11 +67,5 @@ exports.pageInteraction = async function (interaction) {
         );
         embed.footer = { text: `Page ${item.page + 1} / ${item.pages}` };
         await interaction.update({ embeds: [embed] });
-    } else if (interaction.customId.startsWith("pagify.")) {
-        await interaction.reply({
-            content:
-                "This paged embed is no longer in my cache so I cannot fetch the other pages anymore.",
-            ephemeral: true,
-        });
     }
 };

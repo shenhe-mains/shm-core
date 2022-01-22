@@ -1,6 +1,7 @@
-const { UserError } = require("./errors");
+const { UserError, PermissionError } = require("./errors");
 const { checkCount } = require("./utils");
 const { config } = require("./core/config");
+const { has_permission } = require("./core/privileges");
 
 var command_registry = {
     load: load,
@@ -29,6 +30,11 @@ exports.handle_event = function (key, ...event) {
 };
 
 async function load(ctx, args) {
+    if (!has_permission(ctx.author, "settings")) {
+        throw new PermissionError(
+            "You do not have permission to modify bot settings."
+        );
+    }
     checkCount(args, 1);
     _load(args[0]);
     return {
@@ -38,6 +44,11 @@ async function load(ctx, args) {
 }
 
 async function unload(ctx, args) {
+    if (!has_permission(ctx.author, "settings")) {
+        throw new PermissionError(
+            "You do not have permission to modify bot settings."
+        );
+    }
     checkCount(args, 1);
     _unload(args[0]);
     return {
@@ -47,6 +58,11 @@ async function unload(ctx, args) {
 }
 
 async function reload(ctx, args) {
+    if (!has_permission(ctx.author, "settings")) {
+        throw new PermissionError(
+            "You do not have permission to modify bot settings."
+        );
+    }
     checkCount(args, 1);
     _unload(args[0]);
     _load(args[0]);

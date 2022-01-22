@@ -1,7 +1,9 @@
+const { GuildMember, ClientUser } = require("discord.js");
 const { PermissionError } = require("../errors");
 const { config } = require("./config");
 
 exports.ranks = ranks = function (user) {
+    if (user instanceof ClientUser) return ["bot"];
     var ranks = [];
     for (var rank in config.ranks) {
         if (
@@ -24,7 +26,14 @@ exports.rank_level = rank_level = function (user) {
         .reduce((a, b) => Math.max(a, b));
 };
 
-exports.assert_hierarchy = function (mod, user) {
+exports.assert_hierarchy = async function (mod, user) {
+    if (!(user instanceof GuildMember)) {
+        try {
+            user = await mod.guild.members.fetch(user.id);
+        } catch {
+            return;
+        }
+    }
     const mrank = rank_level(mod);
     const urank = rank_level(user);
     if (mrank < urank) {

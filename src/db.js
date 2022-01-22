@@ -65,6 +65,13 @@ client.query(
     )`
 );
 
+client.query(
+    `CREATE TABLE IF NOT EXISTS custom_roles (
+        user_id VARCHAR(32) PRIMARY KEY,
+        role_id VARCHAR(32)
+    )`
+);
+
 exports.add_warn = async function (mod_id, user_id, reason, origin) {
     await client.query(
         `INSERT INTO warns (time, mod_id, user_id, reason, origin) VALUES ($1, $2, $3, $4, $5)`,
@@ -122,4 +129,28 @@ exports.remove_mute = async function (user_id) {
 
 exports.remove_ban = async function (user_id) {
     await client.query(`DELETE FROM unbans WHERE user_id = $1`, [user_id]);
+};
+
+exports.get_custom_role = get_custom_role = async function (user_id) {
+    const result = (
+        await client.query(
+            `SELECT role_id FROM custom_roles WHERE user_id = $1`,
+            [user_id]
+        )
+    ).rows;
+    return result && result.length > 0 ? result[0].role_id : undefined;
+};
+
+exports.set_custom_role = async function (user_id, role_id) {
+    if ((await get_custom_role(user_id)) === undefined) {
+        await client.query(
+            `INSERT INTO custom_roles (user_id, role_id) VALUES ($1, $2)`,
+            [user_id, role_id]
+        );
+    } else {
+        await client.query(
+            `UPDATE custom_roles SET role_id = $2 WHERE user_id = $1`,
+            [user_id, role_id]
+        );
+    }
 };

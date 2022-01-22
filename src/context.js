@@ -8,6 +8,7 @@ const {
     unmute,
     unban,
     massban,
+    verbal,
 } = require("./core/moderation");
 const {
     parse_member,
@@ -47,6 +48,10 @@ exports.Context = class {
 
     async edit() {
         return await this.message.edit(...arguments);
+    }
+
+    async verbal(member, reason) {
+        return await verbal(this, member, reason);
     }
 
     async warn(member, reason, no_dm) {
@@ -131,8 +136,8 @@ exports.Context = class {
     }
 
     async log() {
-        return await (
-            await this.client.channels.fetch(config.command_logs)
+        await (
+            await this.client.channels.fetch(config.channels.logs)
         ).send(...arguments);
     }
 };

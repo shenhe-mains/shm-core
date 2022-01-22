@@ -1,5 +1,6 @@
 const { Client, Intents, MessageEmbed } = require("discord.js");
 const { config } = require("./core/config");
+const data = require("../data.json");
 
 const { get_command, handle_event } = require("./module_handler");
 const db = require("./db");
@@ -30,19 +31,20 @@ client.on("ready", async () => {
     handle_event("ready", client);
 });
 
-for (var key of ["interactionCreate"]) {
+for (var key of ["interactionCreate", "messageUpdate", "guildMemberUpdate"]) {
     client.on(
         key,
         (
             (k) =>
             async (...event) => {
-                handle_event(k, ...event);
+                handle_event(k, client, ...event);
             }
         )(key)
     );
 }
 
 client.on("messageCreate", async (message) => {
+    handle_event("messageCreate", client, message);
     if (
         message.guild !== undefined &&
         message.author != client.user &&
@@ -51,7 +53,7 @@ client.on("messageCreate", async (message) => {
         const args = message.content
             .substring(config.prefix.length)
             .trim()
-            .split(/ +/);
+            .split(/\s+/);
         const command = args.shift().toLowerCase();
         const fn = get_command(command);
         var ctx, color, title, description, status, reaction;
@@ -155,11 +157,12 @@ ${error.stack.toString().substring(0, 4000)}
                             color: color,
                         },
                     ],
+                    allowedMentions: { repliedUser: false },
                 });
                 try {
                     await message.react("❕");
                 } catch {
-                    //user probably blocked me
+                    // user probably blocked me
                 }
             }
         }
@@ -196,4 +199,4 @@ ${error.stack.toString().substring(0, 4000)}
     }
 });
 
-client.login(config.discord_token);
+client.login(data.discord_token);

@@ -6,13 +6,15 @@
     "private": true,
     "type": "commonjs",
     "scripts": {
-        "start": "node src/main.js"
+        "start": "node src/main.js",
+        "test": "node src/main.js test-config"
     },
     "dependencies": {
         "@discordjs/rest": "^0.2.0-canary.0",
         "clear-module": "^4.1.2",
         "discord-api-types": "^0.26.1",
         "discord.js": "^13.6.0",
+        "node-fetch": "^2.6.7",
         "optionator": "^0.9.1",
         "pg": "^8.7.1",
         "semver": "^7.3.5",
