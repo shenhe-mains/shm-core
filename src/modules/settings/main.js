@@ -1,5 +1,6 @@
 const { modify, config } = require("../.././core/config");
 const { has_permission } = require("../../core/privileges");
+const { add_protect, remove_protect } = require("../../db");
 const { PermissionError, Success } = require("../../errors");
 const { checkCount } = require("../../utils");
 
@@ -7,6 +8,8 @@ exports.commands = {
     prefix: prefix,
     "log-ignore": log_ignore,
     "log-unignore": log_unignore,
+    protect: protect,
+    unprotect: unprotect,
 };
 
 function assert_perms(ctx) {
@@ -15,6 +18,10 @@ function assert_perms(ctx) {
             "You do not have permission to modify bot settings."
         );
     }
+}
+
+function parse_channel_ids(ctx, args) {
+    return args.map(ctx.parse_channel_id.bind(ctx));
 }
 
 async function prefix(ctx, args) {
@@ -37,8 +44,7 @@ async function log_ignore(ctx, args) {
     assert_perms(ctx);
 
     const ignoring = config.log_ignore;
-    for (var arg of args) {
-        const id = ctx.parse_channel_id(arg);
+    for (var id of parse_channel_ids(ctx, args)) {
         if (ignoring.indexOf(id) == -1) ignoring.push(id);
     }
     modify({ log_ignore: ignoring });
@@ -47,8 +53,24 @@ async function log_ignore(ctx, args) {
 async function log_unignore(ctx, args) {
     assert_perms(ctx);
 
-    const ids = args.map(ctx.parse_channel_id.bind(ctx));
+    const ids = parse_channel_ids(ctx, args);
     modify({
         log_ignore: config.log_ignore.filter((x) => ids.indexOf(x) == -1),
     });
+}
+
+async function protect(ctx, args) {
+    assert_perms(ctx);
+
+    for (var id of parse_channel_ids(ctx, args)) {
+        await add_protect(id);
+    }
+}
+
+async function unprotect(ctx, args) {
+    assert_perms(ctx);
+
+    for (var id of parse_channel_ids(ctx, args)) {
+        await remove_protect(id);
+    }
 }

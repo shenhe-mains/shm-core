@@ -1,12 +1,7 @@
 delete require.cache[require.resolve("./utils")];
 
-const { ArgumentError, Success, UserError } = require("../../errors");
-const {
-    assert_supporter,
-    get_role,
-    remove_role,
-    ratelimit,
-} = require("./utils");
+const { ArgumentError, Success } = require("../../errors");
+const { assert_supporter, get_role, remove_role } = require("./utils");
 const { inline_code } = require("../../utils");
 const { config } = require("../../core/config");
 

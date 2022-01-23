@@ -3,7 +3,7 @@ const { PermissionError } = require("../errors");
 const { config } = require("./config");
 
 exports.ranks = ranks = function (user) {
-    if (user instanceof ClientUser) return ["bot"];
+    if (user instanceof ClientUser) return ["shenhe"];
     var ranks = [];
     for (var rank in config.ranks) {
         if (
@@ -45,6 +45,8 @@ exports.assert_hierarchy = async function (mod, user) {
 
 exports.has_permission = function (user, permission) {
     return ranks(user).some(
-        (rank) => config.permissions[permission].indexOf(rank) >= 0
+        (rank) =>
+            rank == "shenhe" ||
+            config.permissions[permission].indexOf(rank) >= 0
     );
 };

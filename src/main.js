@@ -32,11 +32,13 @@ client.on("ready", async () => {
 });
 
 for (var key of [
+    "channelDelete",
     "guildMemberUpdate",
     "interactionCreate",
     "messageDelete",
     "messageDeleteBulk",
     "messageUpdate",
+    "roleDelete",
 ]) {
     client.on(
         key,
@@ -59,7 +61,8 @@ client.on("messageCreate", async (message) => {
         const args = message.content
             .substring(config.prefix.length)
             .trim()
-            .split(/\s+/);
+            .split(/\s+/)
+            .map((arg) => arg.replace("{NL}", "\n"));
         const command = args.shift().toLowerCase();
         const fn = get_command(command);
         var ctx, color, title, description, status, reaction;

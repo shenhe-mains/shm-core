@@ -16,6 +16,8 @@ const {
     parse_user,
     parse_channel,
     parse_channel_id,
+    parse_role,
+    parse_role_id,
 } = require("./core/parsing");
 const { Canceled } = require("./errors");
 
@@ -92,6 +94,14 @@ exports.Context = class {
 
     parse_user_id(string) {
         return parse_user_id(this, string);
+    }
+
+    async parse_role(string) {
+        return await parse_role(this, string);
+    }
+
+    parse_role_id(string) {
+        return parse_role_id(this, string);
     }
 
     async parse_channel(string) {

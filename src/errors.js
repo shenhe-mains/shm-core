@@ -66,3 +66,12 @@ exports.Success = class extends StatusError {
         this.name = "Success";
     }
 };
+
+exports.PollError = class extends StatusError {
+    constructor(title, message, modify) {
+        super(message);
+        this.title = title;
+        this.modify = modify;
+        this.name = "PollError";
+    }
+};

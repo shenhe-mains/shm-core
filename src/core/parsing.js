@@ -37,6 +37,29 @@ exports.parse_user = async function (ctx, string) {
     }
 };
 
+exports.parse_role_id = parse_role_id = function (ctx, string) {
+    if (string.match(/^(<@&\d+>|\d+)$/)) {
+        return /\d+/.exec(string)[0];
+    } else {
+        throw new ArgumentError(
+            `${inline_code(
+                string
+            )} is not a valid representation of a role (you can use its ID or mention it directly, but beware of unnecessary pinging)`
+        );
+    }
+};
+
+exports.parse_role = async function (ctx, string) {
+    const id = parse_role_id(ctx, string);
+    try {
+        return await ctx.guild.roles.fetch(id);
+    } catch {
+        throw new ArgumentError(
+            "Error fetching role; I could not find it in this server."
+        );
+    }
+};
+
 exports.parse_channel_id = parse_channel_id = function (ctx, string) {
     if (string == "here") {
         return ctx.channel.id;

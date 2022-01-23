@@ -35,36 +35,33 @@ async function log_update(client, before, after) {
     if (!is_loggable(before)) return;
     const hook = await get_log_webhook(client);
     if (before.content == after.content) return;
-    console.log(
-        await hook.send({
-            embeds: [
-                new MessageEmbed({
-                    title: "Message Edited",
-                    description: `Sent by ${before.author} in ${
-                        before.channel
-                    } on <t:${Math.floor(before.createdTimestamp / 1000)}>`,
-                    url: before.url,
-                    fields: [
-                        {
-                            name: "Before",
-                            value: shorten(before.content, 1024),
-                        },
-                        {
-                            name: "After",
-                            value: shorten(after.content, 1024),
-                        },
-                    ],
-                    color: "YELLOW",
-                }),
-            ],
-        })
-    );
+    await hook.send({
+        embeds: [
+            new MessageEmbed({
+                title: "Message Edited",
+                description: `Sent by ${before.author} in ${
+                    before.channel
+                } on <t:${Math.floor(before.createdTimestamp / 1000)}>`,
+                url: before.url,
+                fields: [
+                    {
+                        name: "Before",
+                        value: shorten(before.content, 1024),
+                    },
+                    {
+                        name: "After",
+                        value: shorten(after.content, 1024),
+                    },
+                ],
+                color: "YELLOW",
+            }),
+        ],
+    });
 }
 
 async function log_delete(client, message) {
     if (!is_loggable(message)) return;
     const hook = await get_log_webhook(client);
-    console.log(message.attachments);
     await hook.send({
         embeds: [
             {

@@ -6,12 +6,18 @@
         "internals",
         "messagelogs",
         "moderation",
+        "nukeguard",
+        "polls",
         "settings",
         "utility"
     ],
     "guild": "805458032908959804",
     "mute": "805458032908959805",
     "ranks": {
+        "shenhe": {
+            "level": 1000000,
+            "ids": []
+        },
         "owner": {
             "level": 10000,
             "ids": [
@@ -222,6 +228,7 @@
         "927319922676219924": {}
     },
     "channels": {
+        "admin": "912781727087341618",
         "boosts": "808065247260704839",
         "logs": "922888612054454302",
         "mod": "841857695265980466",
