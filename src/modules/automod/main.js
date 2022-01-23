@@ -94,7 +94,6 @@ async function automod_scan(client, message) {
         match = undefined;
         if (term instanceof RegExp) {
             match = term.exec(message.content);
-            console.log(match);
             match &&= match[0];
         } else {
             if (message.content.match(term)) {

@@ -31,7 +31,13 @@ client.on("ready", async () => {
     handle_event("ready", client);
 });
 
-for (var key of ["interactionCreate", "messageUpdate", "guildMemberUpdate"]) {
+for (var key of [
+    "guildMemberUpdate",
+    "interactionCreate",
+    "messageDelete",
+    "messageDeleteBulk",
+    "messageUpdate",
+]) {
     client.on(
         key,
         (

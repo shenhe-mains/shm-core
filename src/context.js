@@ -98,7 +98,7 @@ exports.Context = class {
         return await parse_channel(this, string);
     }
 
-    async parse_channel_id(string) {
+    parse_channel_id(string) {
         return parse_channel_id(this, string);
     }
 

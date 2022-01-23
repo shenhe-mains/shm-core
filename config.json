@@ -4,6 +4,7 @@
         "automod",
         "customroles",
         "internals",
+        "messagelogs",
         "moderation",
         "settings",
         "utility"
@@ -227,6 +228,10 @@
         "watchlist": "899332321583464478",
         "message_logs": "922671895495733278"
     },
+    "webhooks": {
+
+    },
+    "log_ignore": [],
     "prefix": "!!/",
     "db_options": {
         "user": "shenhe",
