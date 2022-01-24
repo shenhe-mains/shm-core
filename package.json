@@ -14,9 +14,13 @@
         "clear-module": "^4.1.2",
         "discord-api-types": "^0.26.1",
         "discord.js": "^13.6.0",
+        "express": "^4.17.2",
+        "http-terminator": "^3.0.4",
+        "js-yaml": "^4.1.0",
         "node-fetch": "^2.6.7",
         "optionator": "^0.9.1",
         "pg": "^8.7.1",
+        "pug": "^3.0.2",
         "semver": "^7.3.5",
         "shlex": "^2.1.0"
     }

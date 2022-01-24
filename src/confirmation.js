@@ -43,7 +43,7 @@ exports.confirmationPrompt = async function (
 };
 
 exports.confirmationInteraction = async function (client, interaction) {
-    if (!interaction instanceof ButtonInteraction) return;
+    if (!(interaction instanceof ButtonInteraction)) return;
     if (authors.hasOwnProperty(interaction.message.id)) {
         if (authors[interaction.message.id] != interaction.user.id) {
             await interaction.reply({

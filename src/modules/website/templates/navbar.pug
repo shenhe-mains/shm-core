@@ -1,0 +1,15 @@
+include mixins
+
++importCSS("/static/styles/navbar.css")
+
+#navbar.navbar-fixed
+    #nav-container
+        #sidebar-trigger
+            a.sidenav-trigger.navbutton(href="#", data-target="sidenav"): i#navbar-menu.material-icons menu
+
+ul#sidenav.sidenav(style="z-index: 1000; padding-top: 2.5%; max-width: 50vw; background-color: #142326")
+    li: img(src="/static/images/logo.png", style="width: 100%; padding: 0 5%")
+    for page, index in navpages
+        if index != 0
+            li: img(src="/static/images/navbar/divider.png" + version, style="width: 100%; padding: 0 10%")
+        li: a(style="outline: none", href=page.url): img(src=`/static/images/navbar/${page.name}.png` + version, style="width: 100%; padding: 0 10%")

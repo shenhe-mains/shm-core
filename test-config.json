@@ -1,22 +1,14 @@
 {
     "port": 5101,
-    "startup": [
-        "automod",
-        "customroles",
-        "internals",
-        "messagelogs",
-        "moderation",
-        "nukeguard",
-        "polls",
-        "settings",
-        "utility"
-    ],
     "guild": "805458032908959804",
     "mute": "805458032908959805",
+    "verify": "805458032929538061",
     "ranks": {
         "shenhe": {
             "level": 1000000,
-            "ids": []
+            "ids": [
+                "920844890563305472"
+            ]
         },
         "owner": {
             "level": 10000,
@@ -177,7 +169,22 @@
             "trial",
             "staff"
         ],
+        "modmail": [
+            "owner",
+            "admin",
+            "bot",
+            "bypass",
+            "mod",
+            "tcmod",
+            "trial"
+        ],
         "clear": [
+            "owner",
+            "admin",
+            "bot",
+            "bypass"
+        ],
+        "poll": [
             "owner",
             "admin",
             "bot",
@@ -187,6 +194,15 @@
             "owner",
             "admin",
             "dev"
+        ],
+        "sticky": [
+            "owner",
+            "admin",
+            "bot",
+            "bypass",
+            "mod",
+            "tcmod",
+            "trial"
         ],
         "immunity": [
             "owner",
@@ -229,11 +245,16 @@
     },
     "channels": {
         "admin": "934652954785497159",
+        "boost_count": "829803392447545404",
         "boosts": "934340754321571882",
         "logs": "934140487613415494",
+        "member_count": "927057269064085504",
+        "message_logs": "934545591705407598",
         "mod": "934140549227741214",
+        "modmail_category": "935215609527009321",
+        "modmail_logs": "935215711406661682",
         "watchlist": "934140589702774784",
-        "message_logs": "934545591705407598"
+        "welcome": "934942125647339531"
     },
     "webhooks": {
         "message_logs": "934578218097328158"

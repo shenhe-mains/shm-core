@@ -1,7 +1,8 @@
+const fs = require("fs");
 const { UserError, PermissionError } = require("./errors");
 const { checkCount } = require("./utils");
-const { config } = require("./core/config");
 const { has_permission } = require("./core/privileges");
+const path = require("path");
 
 var command_registry = {
     load: load,
@@ -10,6 +11,8 @@ var command_registry = {
 };
 
 var listener_registry = {};
+
+var shutdowns = {};
 
 var modules = {};
 
@@ -36,7 +39,7 @@ async function load(ctx, args) {
         );
     }
     checkCount(args, 1);
-    _load(args[0]);
+    await _load(args[0]);
     return {
         title: "Loaded Module",
         description: `Successfully loaded the \`${args[0]}\` module.`,
@@ -50,7 +53,7 @@ async function unload(ctx, args) {
         );
     }
     checkCount(args, 1);
-    _unload(args[0]);
+    await _unload(args[0]);
     return {
         title: "Unloaded Module",
         description: `Successfully unloaded the \`${args[0]}\` module.`,
@@ -64,20 +67,24 @@ async function reload(ctx, args) {
         );
     }
     checkCount(args, 1);
-    _unload(args[0]);
-    _load(args[0]);
+    await _unload(args[0]);
+    await _load(args[0]);
     return {
         title: "Reloaded Module",
         description: `Successfully reloaded the \`${args[0]}\` module.`,
     };
 }
 
-function _load(module) {
+async function _load(module) {
     if (modules.hasOwnProperty(module)) {
         throw new UserError(`The \`${module}\` module is already loaded.`);
     }
 
-    const { commands, listeners } = require(`./modules/${module}/main.js`);
+    const {
+        commands,
+        listeners,
+        shutdown,
+    } = require(`./modules/${module}/main.js`);
 
     if (commands) {
         for (var key in commands) {
@@ -96,10 +103,14 @@ function _load(module) {
         }
     }
 
+    if (shutdown) {
+        shutdowns[module] = shutdown;
+    }
+
     modules[module] = commands;
 }
 
-function _unload(module) {
+async function _unload(module) {
     if (!modules.hasOwnProperty(module)) {
         throw new UserError(`The \`${module}\` module is not loaded.`);
     }
@@ -116,10 +127,15 @@ function _unload(module) {
         }
     }
 
+    if (shutdowns.hasOwnProperty(module)) {
+        await shutdowns[module]();
+        delete shutdowns[module];
+    }
+
     delete require.cache[require.resolve(`./modules/${module}/main.js`)];
     delete modules[module];
 }
 
-for (var module of config.startup) {
-    _load(module);
-}
+fs.readdir(path.join(__dirname, "modules"), function (error, items) {
+    items.forEach(_load);
+});

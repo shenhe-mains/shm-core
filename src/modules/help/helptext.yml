@@ -1,0 +1,42 @@
+aliases:
+    mute-silent: mute
+text:
+    __all:
+        title: Shenhe Bot Help
+        body: |
+            The bot's prefix is `{prefix}`.
+            You can get help for a particular module using `{prefix}help <module>`. The following modules exist:
+
+            `automod` - Automoderation features (banned words, spam detection, etc.)
+            `customroles` - Custom roles for server supporters
+            `help` - This module
+            `messagelogs` - Logging for message edits / deletions
+            `moderation` - Mod commands (muting, banning, etc.)
+            `nukeguard` - Anti-nuking features
+            `polls` - Poll-related commands
+            `settings` - Bot settings
+            `statschannels` - Server stats channels like member count and boosters
+            `utility` - Utility and info commands like user info
+            `verification` - Captcha verification system
+            `website` - https://shenhemains.com
+            `welcome` - Welcome messages for new users
+
+            Alternatively, if you have a specific command you want help for, you can run `{prefix}help <command>` (don't include the prefix in the command name).
+    automod:
+        title: Automoderator Help
+        body: >
+            The automoderator scans all new messages in this server. Messages sent by bots and certain staff members will not be scanned to allow mods to explain
+            why certain words are bad without needing to dodge the censor; however, they are held to higher standards than regular users and may be demoted for
+            offences rather than just warned or muted for a few days.
+
+
+            To request for automod terms to be added, removed, or changed, please visit <#805458033471782974>, or, if you are a staff member, you may just mention
+            it in <#840864247373103114>.
+
+
+            To view a list of banned terms, you can run `{prefix}help automod-terms`. Sensitive or offensive words will be spoilered and most terms will be explained
+            without mentioning the term itself if possible.
+    automod-terms:
+        title: "Automoderator: Banned Words"
+        body: |
+            Right now, nothing is really here...

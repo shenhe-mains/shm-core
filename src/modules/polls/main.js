@@ -1,3 +1,298 @@
-exports.commands = { poll: create_poll };
+const { ButtonInteraction } = require("discord.js");
+const { config } = require("../../core/config");
+const { has_permission } = require("../../core/privileges");
+const {
+    create_poll,
+    poll_type,
+    has_vote,
+    remove_vote,
+    add_vote,
+    poll_options,
+    poll_votes,
+    clear_votes,
+    has_any_vote,
+    fetch_poll,
+} = require("../../db");
+const {
+    PermissionError,
+    ArgumentError,
+    UserError,
+    Info,
+} = require("../../errors");
+const { checkCount } = require("../../utils");
 
-async function create_poll(ctx, args) {}
+exports.commands = {
+    poll: setup_poll,
+    "open-poll": open_poll,
+    "close-poll": close_poll,
+    "poll-results": show_results,
+    disclose: disclose,
+};
+
+exports.listeners = { interactionCreate: [observe_vote] };
+
+const poll_types = {
+    normal: 0,
+    unique: 1,
+    commit: 2,
+    hidden: 3,
+    hidden_unique: 4,
+    hidden_commit: 5,
+    show_on_commit: 6,
+};
+
+const footers = [
+    "",
+    "You may only select one option.",
+    "You may only select one option, and cannot change it later.",
+    "Results will be hidden until the poll is closed.",
+    "You may only select one option. Results will be hidden until the poll is closed.",
+    "You may only select one option, and cannot change it later. Results will be hidden until the poll is closed.",
+    "You may only select one option, and cannot change it later. Once you lock in your vote, you will be able to see the results.",
+];
+
+async function setup_poll(ctx, args) {
+    if (!has_permission(ctx.author, "poll")) {
+        throw new PermissionError(
+            "You do not have permission to create polls."
+        );
+    }
+    checkCount(args, 2, Infinity);
+    const channel = await ctx.parse_channel(args.shift());
+    const type = poll_types[args.shift()];
+    if (type === undefined) {
+        throw new ArgumentError("Invalid poll type.");
+    }
+    const values = args
+        .join(" ")
+        .split(";;")
+        .map((s) => s.trim());
+    if (values.length < 2) {
+        throw new ArgumentError(
+            "You must provide the poll body and at least one option."
+        );
+    }
+    if (values.some((s) => s.length == 0)) {
+        throw new ArgumentError(
+            "The poll body and poll options must be non-empty."
+        );
+    }
+    if (values.slice(1).some((s) => s.length > 100)) {
+        throw new ArgumentError(
+            "Poll options must be at most 100 characters long."
+        );
+    }
+    const message = await channel.send({
+        embeds: [
+            {
+                title: "Poll",
+                description: values[0],
+                color: config.color,
+                footer: { text: footers[type] },
+            },
+        ],
+        components: values.slice(1).map((value) => ({
+            type: "ACTION_ROW",
+            components: [
+                {
+                    type: "BUTTON",
+                    style: "PRIMARY",
+                    customId: value,
+                    label: value,
+                },
+            ],
+        })),
+    });
+    await create_poll(message.id, channel.id, type, values.slice(1));
+}
+
+async function open_poll(ctx, args) {
+    await set_poll_disabled(ctx, args, false);
+}
+
+async function close_poll(ctx, args) {
+    await set_poll_disabled(ctx, args, true);
+}
+
+async function get_message(ctx, id) {
+    poll = await fetch_poll(id);
+    if (poll === undefined) {
+        throw new ArgumentError(
+            "I could not find a poll with that message ID."
+        );
+    }
+    try {
+        return await (
+            await ctx.guild.channels.fetch(poll.channel_id)
+        ).messages.fetch(id);
+    } catch {
+        throw new UserError(
+            "I have a poll with that ID in my database but I could not fetch the message itself."
+        );
+    }
+}
+
+async function set_poll_disabled(ctx, args, disabled) {
+    if (!has_permission(ctx.author, "poll")) {
+        throw new PermissionError(
+            "You do not have permission to modify polls."
+        );
+    }
+    checkCount(args, 1);
+
+    const message = await get_message(ctx, args[0]);
+    await message.edit({
+        components: message.components.map(
+            (component) => (
+                component.components.forEach(
+                    (button) => (button.disabled = disabled)
+                ),
+                component
+            )
+        ),
+    });
+}
+
+async function results(message) {
+    const votes = {};
+    var options = [];
+    var total = 0;
+    for (var option of (options = await poll_options(message.id))) {
+        total += votes[option] = await poll_votes(message.id, option);
+    }
+    return options
+        .map(
+            (option) =>
+                `${option} - ${votes[option]} / ${total} (${
+                    total == 0 ? 0 : ((votes[option] / total) * 100).toFixed(2)
+                }%)`
+        )
+        .join("\n");
+}
+
+async function show_results(ctx, args) {
+    if (!has_permission(ctx.author, "poll")) {
+        throw new PermissionError(
+            "You do not have permission to view poll results."
+        );
+    }
+    checkCount(args, 1);
+
+    const message = await get_message(ctx, args[0]);
+    throw new Info("Poll Results", await results(message));
+}
+
+async function disclose(ctx, args) {
+    if (!has_permission(ctx.author, "poll")) {
+        throw new PermissionError(
+            "You do not have permission to show poll results"
+        );
+    }
+    checkCount(args, 1);
+
+    const message = await get_message(ctx, args[0]);
+    const embed = message.embeds[0];
+    embed.fields = [{ name: "Results", value: await results(message) }];
+    await message.edit({ embeds: [embed] });
+}
+
+const cooldown = {};
+
+function ratelimit(message) {
+    if (
+        cooldown.hasOwnProperty(message.id) &&
+        +new Date() - cooldown[message.id] < 2000
+    ) {
+        return false;
+    }
+    cooldown[message.id] = +new Date();
+    return true;
+}
+
+async function observe_vote(client, interaction) {
+    if (!(interaction instanceof ButtonInteraction)) return;
+    var type;
+    try {
+        type = await poll_type(interaction.message.id);
+    } catch {
+        return;
+    }
+    const id = interaction.customId;
+    const args = [interaction.message.id, interaction.user.id, id];
+
+    if (type == poll_types.normal || type == poll_types.hidden) {
+        if (await has_vote(...args)) {
+            await remove_vote(...args);
+            await interaction.reply({
+                content: `Your vote for "${id}" has been removed.`,
+                ephemeral: true,
+            });
+        } else {
+            await add_vote(...args);
+            await interaction.reply({
+                content: `Your vote for "${id}" has been added.`,
+                ephemeral: true,
+            });
+        }
+    } else if (type == poll_types.unique || type == poll_types.hidden_unique) {
+        if (await has_vote(...args)) {
+            await remove_vote(...args);
+            await interaction.reply({
+                content: `Your vote has been cleared.`,
+                ephemeral: true,
+            });
+        } else {
+            await clear_votes(...args);
+            await add_vote(...args);
+            await interaction.reply({
+                content: `Your vote has been set to "${id}".`,
+                ephemeral: true,
+            });
+        }
+    } else if (
+        type == poll_types.commit ||
+        type == poll_types.hidden_commit ||
+        type == poll_types.show_on_commit
+    ) {
+        if (await has_any_vote(...args)) {
+            await interaction.reply({
+                content: `Your vote is locked in and can no longer be changed.`,
+                ephemeral: true,
+            });
+            return;
+        } else {
+            await add_vote(...args);
+            await interaction.reply({
+                content: `Your vote has been locked in as "${id}".`,
+                embeds:
+                    type == poll_types.show_on_commit
+                        ? [
+                              {
+                                  title: "Results",
+                                  description: await results(
+                                      interaction.message
+                                  ),
+                                  color: config.color,
+                              },
+                          ]
+                        : [],
+                ephemeral: true,
+            });
+        }
+    }
+    if (
+        type == poll_types.normal ||
+        type == poll_types.unique ||
+        type == poll_types.commit
+    ) {
+        if (!ratelimit(interaction.message)) return;
+        const embed = interaction.message.embeds[0];
+        embed.fields = [
+            {
+                name: "Results",
+                value: await results(interaction.message),
+            },
+        ];
+        await interaction.message.edit({ embeds: [embed] });
+    }
+}

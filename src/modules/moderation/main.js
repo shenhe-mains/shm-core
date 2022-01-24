@@ -76,7 +76,10 @@ function moderate(t, d) {
                     : type + "ed";
             if (!has_permission(ctx.author, type.replace("verbal", "warn"))) {
                 throw new PermissionError(
-                    `You do not have permission to ${type} users.`
+                    `You do not have permission to ${type.replace(
+                        "verbal",
+                        "verbally warn"
+                    )} users.`
                 );
             }
             checkCount(

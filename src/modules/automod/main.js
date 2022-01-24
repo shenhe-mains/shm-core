@@ -2,8 +2,7 @@ const { config } = require("../../core/config");
 const { mute, kick, ban } = require("../../core/moderation");
 const { has_permission } = require("../../core/privileges");
 const { add_warn } = require("../../db");
-const { Info } = require("../../errors");
-const { inline_code, checkCount } = require("../../utils");
+const { inline_code } = require("../../utils");
 
 const DEFER = 0;
 const DELETE = 1;
@@ -12,8 +11,6 @@ const WARN = 3;
 const MUTE = 4;
 const KICK = 5;
 const BAN = 6;
-
-const CASE_SENSITIVE = 4;
 
 const severities = ["defer", "delete", "verbal", "warn", "mute", "kick", "ban"];
 
@@ -37,21 +34,9 @@ const terms = [
     ["amtestban", BAN],
 ];
 
-const info_header =
-    "The automoderator will scan messages for potential bad words and take appropriate actions, such as warnings or muting if necessary.";
-const banned_words = `
-- hello
-- world
-`;
-
-function word(term, case_sensitive) {
-    return new RegExp(
-        `(^|\b|(?<=[^A-Za-z]))${term}(?=\b|[^A-Za-z]|$)`,
-        case_sensitive ? "" : "i"
-    );
+function word(term) {
+    return new RegExp(`(^|\b|(?<=[^A-Za-z]))${term}(?=\b|[^A-Za-z]|$)`, "i");
 }
-
-exports.commands = { "automod-info": automod_info };
 
 exports.listeners = {
     messageCreate: [automod_scan],
@@ -60,32 +45,7 @@ exports.listeners = {
     ],
 };
 
-async function automod_info(ctx, args) {
-    checkCount(args, 0);
-    throw new Info(
-        "Automod Information",
-        info_header,
-        (embed) => (
-            ((embed.fields = [{ name: "Banned Words", value: banned_words }]),
-            (embed.footer = {
-                text: "Feel free to suggest any changes to this.",
-            })),
-            embed
-        )
-    );
-}
-
-async function automod_scan(client, message) {
-    if (!message.guild || message.guild.id != config.guild) return;
-    if (message.author.id == client.user.id) return;
-    var author;
-    try {
-        author = await message.guild.members.fetch(message.author.id);
-    } catch {
-        return;
-    }
-    if (has_permission(author, "automod_immunity")) return;
-
+function scan(content) {
     var result = -1;
     var matches = [];
     var match;
@@ -93,10 +53,10 @@ async function automod_scan(client, message) {
     for (var [term, severity] of terms) {
         match = undefined;
         if (term instanceof RegExp) {
-            match = term.exec(message.content);
+            match = term.exec(content);
             match &&= match[0];
         } else {
-            if (message.content.match(term)) {
+            if (content.toLowerCase().match(term)) {
                 match = term;
             }
         }
@@ -106,7 +66,37 @@ async function automod_scan(client, message) {
         }
     }
 
+    return {
+        result: result,
+        matches: matches,
+    };
+}
+
+async function automod_scan(client, message) {
+    if (!message.guild || message.guild.id != config.guild) return;
+    if (message.author.id == client.user.id) return;
+    var author;
+    if (message.webhookId === undefined) {
+        try {
+            author = await message.guild.members.fetch(message.author.id);
+        } catch {
+            return;
+        }
+    }
+    if (author !== undefined && has_permission(author, "automod_immunity")) {
+        return;
+    }
+
+    const { result, matches } = scan(message.content);
+
     if (result == -1) return;
+
+    if (author === undefined) {
+        if (result != DEFER) {
+            await message.delete();
+        }
+        return;
+    }
 
     const fields = [
         {

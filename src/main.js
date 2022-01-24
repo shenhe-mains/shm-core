@@ -17,13 +17,15 @@ const {
 } = require("./errors");
 const { Context } = require("./context");
 const { shorten, inline_code } = require("./utils");
-require("./server");
 
 process.on("uncaughtException", (error) => {
     console.error(error);
 });
 
-const client = new Client({ intents: new Intents(32767) });
+const client = new Client({
+    intents: new Intents(32767),
+    partials: ["CHANNEL"],
+});
 
 client.on("ready", async () => {
     await db.client.connect();
@@ -33,6 +35,8 @@ client.on("ready", async () => {
 
 for (var key of [
     "channelDelete",
+    "guildMemberAdd",
+    "guildMemberRemove",
     "guildMemberUpdate",
     "interactionCreate",
     "messageDelete",
@@ -58,19 +62,19 @@ client.on("messageCreate", async (message) => {
         message.author != client.user &&
         message.content.startsWith(config.prefix)
     ) {
-        const args = message.content
-            .substring(config.prefix.length)
-            .trim()
-            .split(/\s+/)
-            .map((arg) => arg.replace("{NL}", "\n"));
-        const command = args.shift().toLowerCase();
-        const fn = get_command(command);
+        const text = message.content.substring(config.prefix.length).trim();
+        const [key] = text.split(/\s/, 1);
+        const body = text.substring(key.length).trim();
+        const args = body
+            ? body.split(/\s+/).map((arg) => arg.replace("{NL}", "\n"))
+            : [];
+        const fn = get_command(key.toLowerCase());
         var ctx, color, title, description, status, reaction;
         try {
             if (fn !== undefined) {
                 ctx = new Context(client, message);
                 await ctx.init();
-                const response = await fn(ctx, args);
+                const response = await fn(ctx, args, body, key);
                 if (response === undefined) throw new Success();
                 throw new Success(response.title, response.description);
             }

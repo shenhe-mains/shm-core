@@ -1,0 +1,46 @@
+doctype html
+html
+    head
+        script(src="https://www.google.com/recaptcha/api.js", async, defer)
+        title SHM Verification
+    body(style="background-color: #333; color: #eee; padding: 5%;")
+        h2 Captcha Verification
+        p Welcome to Shenhe Mains! Before you join us, please verify yourself by clicking on the checkbox below and then clicking VERIFY. Thanks!
+        p Note: Your IP address is not recorded by this action and is not sent to Google during the verification process.
+        form(action="#", method="POST")
+            #captcha.g-recaptcha(
+                data-sitekey=sitekey,
+                data-callback="captcha_ok",
+                data-expired-callback="captcha_expired",
+                data-error-callback="captcha_error"
+            )
+            br
+            input#submit(
+                type="submit",
+                value="VERIFY",
+                style="font-family: monospace; font-weight: bold; padding: 10px; border: none; outline: none; border-radius: 5px;",
+                disabled
+            )
+    style.
+        input[disabled] {
+            background-color: #666;
+            color: #ddd;
+        }
+
+        input:not([disabled]) {
+            background-color: #444;
+            color: #fff;
+        }
+    script.
+        function captcha_ok() {
+            document.getElementById("submit").disabled = false
+        }
+        function captcha_expired() {
+            alert("The Google ReCaptcha has expired; please reload the page.");
+        }
+
+        function captcha_error() {
+            alert("The Google ReCaptcha encountered an error; this may be caused by network connectivity issues. Please check your connection and reload the page.")
+        }
+    if captcha_failed
+        script alert("Sorry, captcha verification failed. Your token may have timed out; please try again. If this persists, please contact a developer.");

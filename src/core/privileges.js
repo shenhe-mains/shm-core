@@ -3,7 +3,6 @@ const { PermissionError } = require("../errors");
 const { config } = require("./config");
 
 exports.ranks = ranks = function (user) {
-    if (user instanceof ClientUser) return ["shenhe"];
     var ranks = [];
     for (var rank in config.ranks) {
         if (

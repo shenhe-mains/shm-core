@@ -1,0 +1,137 @@
+@import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300&display=swap");
+
+@font-face {
+    font-family: "SHM";
+    src: url(../zh-cn.ttf);
+}
+
+:root {
+    --background: #0b3646;
+    --background-dark: #105363;
+
+    --logo-color: #f9e9d9;
+}
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+html {
+    position: relative;
+    min-height: 100vh;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    background-color: #fff8;
+    color: var(--logo-color);
+    font-family: "Rubik", sans-serif;
+}
+
+.genshin {
+    font-family: "SHM", serif;
+}
+
+a,
+a:hover,
+a:active {
+    text-decoration: none;
+}
+
+a.btn {
+    background-color: #115c;
+    color: #ccf;
+    padding: 1em;
+    line-height: 4em;
+}
+
+#main-container {
+    flex: 1 1 auto;
+    padding-top: 1em;
+    padding-bottom: 2em;
+    background-color: #ddf8;
+}
+
+main {
+    display: flex !important;
+    flex-direction: column;
+    flex: 1 0 auto;
+}
+
+#main-logo {
+    position: absolute;
+    top: 31vh;
+    left: 10vw;
+    width: 50vw;
+    opacity: 0;
+}
+
+#main-logo.animated {
+    transition-delay: 0.25s;
+    transition-duration: 0.75s;
+    -webkit-transition-delay: 0.25s;
+    -webkit-transition-duration: 0.75s;
+}
+
+#main-logo.shown {
+    top: 30vh;
+    opacity: 0.95;
+}
+.main-background {
+    background-size: cover;
+    width: 100vw;
+}
+
+#top-background {
+    background-image: url(/static/images/top-background.png);
+    height: calc(100vw / 1920 * 793);
+    margin-top: -16vw;
+    margin-bottom: calc(-100vw / 1920 * 793 + 16vw);
+    z-index: 500;
+}
+
+#mid-background {
+    background-image: url(/static/images/mid-background.png);
+    padding-top: 28vw;
+    padding-bottom: 16vw;
+}
+
+#bot-background {
+    background-image: url(/static/images/bot-background.png);
+    height: calc(100vw / 1920 * 793);
+    margin-top: -16vw;
+    z-index: 500;
+}
+
+#scroll-button:hover {
+    animation: wobble 1s infinite;
+}
+
+@keyframes wobble {
+    0% {
+        margin-top: 0;
+    }
+    50% {
+        margin-top: 10px;
+    }
+    100% {
+        margin-top: 0;
+    }
+}
+
+.strip {
+    width: 100%;
+    margin: 0;
+    position: relative;
+}
+
+#footer {
+    padding: 0.5em 0 0.5em 0;
+    background-color: var(--background-dark);
+    color: var(--logo-color);
+}
