@@ -31,9 +31,9 @@ async function pull(ctx, args) {
     checkCount(args, 0);
     exec("git pull", (error, stdout, stderr) => {
         if (error) {
-            await ctx.reply("Pulling failed.");
+            ctx.reply("Pulling failed.");
         } else {
-            await ctx.reply("Pulling succeeded.");
+            ctx.reply("Pulling succeeded.");
         }
     });
 }
