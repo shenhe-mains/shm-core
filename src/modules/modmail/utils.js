@@ -136,7 +136,7 @@ function translate_content(message, content) {
     if (files.length > 0) {
         content += "\n\nAttachments:";
         for (const file of files) {
-            content += `\n<a href="${file.url}">${file.url}</a>`;
+            content += `\n<a href="${file.url}" target="_blank">${file.url}</a>`;
         }
     }
     return content;

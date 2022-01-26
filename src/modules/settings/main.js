@@ -1,3 +1,4 @@
+const { exec } = require("child_process");
 const { modify, config } = require("../.././core/config");
 const { has_permission } = require("../../core/privileges");
 const { add_protect, remove_protect } = require("../../db");
@@ -5,6 +6,7 @@ const { PermissionError, Success } = require("../../errors");
 const { checkCount } = require("../../utils");
 
 exports.commands = {
+    pull: pull,
     prefix: prefix,
     "log-ignore": log_ignore,
     "log-unignore": log_unignore,
@@ -22,6 +24,18 @@ function assert_perms(ctx) {
 
 function parse_channel_ids(ctx, args) {
     return args.map(ctx.parse_channel_id.bind(ctx));
+}
+
+async function pull(ctx, args) {
+    assert_perms(ctx);
+    checkCount(args, 0);
+    exec("git pull", (error, stdout, stderr) => {
+        if (error) {
+            await ctx.reply("Pulling failed.");
+        } else {
+            await ctx.reply("Pulling succeeded.");
+        }
+    });
 }
 
 async function prefix(ctx, args) {
