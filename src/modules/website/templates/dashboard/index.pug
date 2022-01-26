@@ -1,0 +1,24 @@
+extends layout
+
+block main
+    if permissions.modmail
+        +dashboard-card("Modmail", [["view modmail for a specific user", "#", "view_modmail()"]])
+            case modmail
+                when "0"
+                    p There are no modmail threads open right now.
+                when "1"
+                    p There is 1 modmail thread open right now.
+                default
+                    p There are #{modmail} modmail threads open right now.
+    if permissions.application
+        +dashboard-card("Staff Applications", [["view application history for a specific user", "#", "view_applications()"]])
+            for info, key in applications
+                p
+                    | #{key}'s application to: 
+                    for team, index in info.teams
+                        if index != 0
+                            | , 
+                        a(href=`/dashboard/applications/${team}/${info.id}`)
+                            != team_info[team].title
+            else
+                p There are no pending staff applications right now.

@@ -534,6 +534,11 @@ exports.client = client;
         )`
     );
 
+    exports.get_modmail_threads = async function () {
+        return (await client.query(`SELECT COUNT(1) FROM modmail_channels`))
+            .rows[0].count;
+    };
+
     exports.get_modmail_channel = async function (user_id) {
         return (
             await client.query(
@@ -607,5 +612,226 @@ exports.client = client;
                 content,
             ]
         );
+    };
+
+    exports.get_modmail_messages = async function (user_id) {
+        return (
+            await client.query(
+                `SELECT * FROM modmail_messages WHERE user_id = $1 ORDER BY time ASC`,
+                [user_id]
+            )
+        ).rows;
+    };
+}
+
+// staff applications
+{
+    client.query(
+        `CREATE TABLE IF NOT EXISTS mod_applications (
+            id SERIAL PRIMARY KEY,
+            user_id VARCHAR(32),
+            time TIMESTAMP,
+            status INT,
+            timezone INT,
+            mod_intro VARCHAR(4096),
+            mod_strengths VARCHAR(4096),
+            mod_scenarios VARCHAR(4096),
+            time_dedication VARCHAR(1024),
+            motivation VARCHAR(1024),
+            advocate VARCHAR(1024)
+        )`
+    );
+
+    client.query(
+        `CREATE TABLE IF NOT EXISTS tcmod_applications (
+            id SERIAL PRIMARY KEY,
+            user_id VARCHAR(32),
+            time TIMESTAMP,
+            status INT,
+            timezone INT,
+            mod_intro VARCHAR(4096),
+            tc_experience VARCHAR(4096),
+            mod_scenarios VARCHAR(4096),
+            time_dedication VARCHAR(1024),
+            motivation VARCHAR(1024),
+            advocate VARCHAR(1024)
+        )`
+    );
+
+    client.query(
+        `CREATE TABLE IF NOT EXISTS dev_applications (
+            id SERIAL PRIMARY KEY,
+            user_id VARCHAR(32),
+            time TIMESTAMP,
+            status INT,
+            timezone INT,
+            dev_experience VARCHAR(4096),
+            dev_languages VARCHAR(1024),
+            dev_databases VARCHAR(1024),
+            dev_portfolio VARCHAR(1024),
+            time_dedication VARCHAR(1024),
+            motivation VARCHAR(1024),
+            advocate VARCHAR(1024)
+        )`
+    );
+
+    client.query(
+        `CREATE TABLE IF NOT EXISTS art_applications (
+            id SERIAL PRIMARY KEY,
+            user_id VARCHAR(32),
+            time TIMESTAMP,
+            status INT,
+            timezone INT,
+            art_forms VARCHAR(1024),
+            art_uploads VARCHAR(1024),
+            art_portfolio VARCHAR(1024),
+            time_dedication VARCHAR(1024),
+            motivation VARCHAR(1024),
+            advocate VARCHAR(1024)
+        )`
+    );
+
+    client.query(
+        `CREATE TABLE IF NOT EXISTS tc_applications (
+            id SERIAL PRIMARY KEY,
+            user_id VARCHAR(32),
+            time TIMESTAMP,
+            status INT,
+            timezone INT,
+            tc_experience VARCHAR(4096),
+            tc_shenhe VARCHAR(4096),
+            time_dedication VARCHAR(1024),
+            motivation VARCHAR(1024),
+            advocate VARCHAR(1024)
+        )`
+    );
+
+    client.query(
+        `CREATE TABLE IF NOT EXISTS tl_applications (
+            id SERIAL PRIMARY KEY,
+            user_id VARCHAR(32),
+            time TIMESTAMP,
+            status INT,
+            timezone INT,
+            tl_intro VARCHAR(4096),
+            tl_chinese VARCHAR(4096),
+            tl_leaks VARCHAR(16),
+            time_dedication VARCHAR(1024),
+            motivation VARCHAR(1024),
+            advocate VARCHAR(1024)
+        )`
+    );
+
+    client.query(
+        `CREATE TABLE IF NOT EXISTS event_applications (
+            id SERIAL PRIMARY KEY,
+            user_id VARCHAR(32),
+            time TIMESTAMP,
+            status INT,
+            timezone INT,
+            event_experience VARCHAR(4096),
+            event_ideas VARCHAR(4096),
+            time_dedication VARCHAR(1024),
+            motivation VARCHAR(1024),
+            advocate VARCHAR(1024)
+        )`
+    );
+
+    client.query(
+        `CREATE TABLE IF NOT EXISTS media_applications (
+            id SERIAL PRIMARY KEY,
+            user_id VARCHAR(32),
+            time TIMESTAMP,
+            status INT,
+            timezone INT,
+            media_profiles VARCHAR(1024),
+            media_post_ideas VARCHAR(4096),
+            media_reach_ideas VARCHAR(4096),
+            time_dedication VARCHAR(1024),
+            motivation VARCHAR(1024),
+            advocate VARCHAR(1024)
+        )`
+    );
+
+    exports.has_application = has_application = async function (team, user_id) {
+        return (
+            (
+                await client.query(
+                    `SELECT 1 FROM ${team}_applications WHERE user_id = $1 AND status = 0`,
+                    [user_id]
+                )
+            ).rows.length > 0
+        );
+    };
+
+    exports.get_application = async function (team, user_id) {
+        return (
+            await client.query(
+                `SELECT * FROM ${team}_applications WHERE user_id = $1 AND status = 0`,
+                [user_id]
+            )
+        ).rows[0];
+    };
+
+    exports.resolve_application = async function (team, user_id, accept) {
+        await client.query(
+            `UPDATE ${team}_applications SET status = $1 WHERE user_id = $2 AND status = 0`,
+            [accept ? 1 : 2, user_id]
+        );
+    };
+
+    exports.get_application_by_id = async function (team, id) {
+        return (
+            await client.query(
+                `SELECT * FROM ${team}_applications WHERE id = $1`,
+                [id]
+            )
+        ).rows[0];
+    };
+
+    exports.apply = async function (team, user_id, keys, values) {
+        var query_string;
+        if (await has_application(team, user_id)) {
+            query_string =
+                `UPDATE ${team}_applications SET ` +
+                keys.map((key, index) => `${key} = $${index + 2}`).join(", ") +
+                ` WHERE user_id = $1`;
+        } else {
+            query_string = `INSERT INTO ${team}_applications (user_id, status, time, ${keys.join(
+                ", "
+            )}) VALUES ($1, 0, $2, ${keys
+                .map((key, index) => `$${index + 3}`)
+                .join(", ")})`;
+        }
+        await client.query(query_string, [user_id, new Date(), values].flat());
+    };
+
+    exports.get_applications = async function (user_id) {
+        const applications = [];
+        for (const team in config.staff_teams) {
+            for (const entry of (
+                await client.query(
+                    `SELECT * FROM ${team}_applications WHERE user_id = $1`,
+                    [user_id]
+                )
+            ).rows) {
+                applications.push([team, entry]);
+            }
+        }
+        return applications.sort((a, b) => b[1].time - a[1].time);
+    };
+
+    exports.get_open_applications = async function () {
+        const applications = [];
+        for (const team in config.staff_teams) {
+            for (const entry of (
+                await client.query(
+                    `SELECT * FROM ${team}_applications WHERE status = 0`
+                )
+            ).rows) {
+                applications.push([team, entry]);
+            }
+        }
+        return applications;
     };
 }

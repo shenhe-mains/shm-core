@@ -58,6 +58,12 @@
                 "905624291326959660"
             ]
         },
+        "leader": {
+            "level": 1,
+            "ids": [
+                "805458032929538062"
+            ]
+        },
         "art": {
             "level": 1,
             "ids": [
@@ -169,15 +175,6 @@
             "trial",
             "staff"
         ],
-        "modmail": [
-            "owner",
-            "admin",
-            "bot",
-            "bypass",
-            "mod",
-            "tcmod",
-            "trial"
-        ],
         "clear": [
             "owner",
             "admin",
@@ -229,6 +226,23 @@
             "mod",
             "tcmod",
             "trial"
+        ],
+        "modmail": [
+            "owner",
+            "admin",
+            "bot",
+            "bypass",
+            "mod",
+            "tcmod",
+            "trial"
+        ],
+        "application": [
+            "owner",
+            "admin",
+            "bot",
+            "bypass",
+            "mod",
+            "leader"
         ]
     },
     "support_anchor": "903686165792706580",
@@ -268,5 +282,71 @@
         "password": "shenhe",
         "port": 5432
     },
-    "color": "d9e9f9"
+    "color": "d9e9f9",
+    "website": {
+        "domain": "http://localhost:5101",
+        "carousel": [
+            "/static/images/events/christmas-2021.png"
+        ]
+    },
+    "staff_teams": {
+        "mod": {
+            "roles": [
+                "805458032938188838",
+                "905624291326959660"
+            ],
+            "channel": "935657097339764786",
+            "open": false
+        },
+        "tcmod": {
+            "roles": [
+                "912397080947986462",
+                "905624291326959660"
+            ],
+            "channel": "935657097339764786",
+            "open": true
+        },
+        "dev": {
+            "roles": [
+                "912873387347554345"
+            ],
+            "channel": "935657097339764786",
+            "open": false
+        },
+        "art": {
+            "roles": [
+                "906609595554873464"
+            ],
+            "channel": "935657097339764786",
+            "open": true
+        },
+        "tc": {
+            "roles": [
+                "889040956228263966"
+            ],
+            "channel": "935657097339764786",
+            "open": false
+        },
+        "tl": {
+            "roles": [
+                "900037988518608978"
+            ],
+            "channel": "935657097339764786",
+            "open": true
+        },
+        "event": {
+            "roles": [
+                "838128715204263988"
+            ],
+            "channel": "935657097339764786",
+            "open": true
+        },
+        "media": {
+            "roles": [
+                "920748102288302081"
+            ],
+            "channel": "935657097339764786",
+            "open": false
+        }
+    }
 }

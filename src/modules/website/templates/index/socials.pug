@@ -1,0 +1,4 @@
+#socials.flex-column
+    for social in socials
+        a(href=social.link, target="_blank")
+            img.icon(src=`/static/images/${social.name}-icon.svg` + version, style="width: max(6vh, 3vw)")

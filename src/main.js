@@ -1,10 +1,6 @@
-const { Client, Intents, MessageEmbed } = require("discord.js");
 const { config } = require("./core/config");
-const data = require("../data.json");
-
-const { get_command, handle_event } = require("./module_handler");
 const db = require("./db");
-
+const { get_command, handle_event } = require("./module_handler");
 const {
     CommandSyntaxError,
     ArgumentError,
@@ -15,16 +11,16 @@ const {
     PartialSuccess,
     Canceled,
 } = require("./errors");
+const { client } = require("./client");
 const { Context } = require("./context");
 const { shorten, inline_code } = require("./utils");
 
-process.on("uncaughtException", (error) => {
-    console.error(error);
-});
+const data = require("../data.json");
 
-const client = new Client({
-    intents: new Intents(32767),
-    partials: ["CHANNEL"],
+process.on("uncaughtException", (error) => {
+    console.error("UNEXPECTED UNCAUGHT EXCEPTION");
+    console.error("=============================");
+    console.error(error.stack);
 });
 
 client.on("ready", async () => {

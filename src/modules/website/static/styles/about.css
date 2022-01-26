@@ -1,0 +1,17 @@
+.team-card {
+    border-radius: 5px;
+
+    background-color: #0002;
+
+    transition-duration: 0.25s;
+    -webkit-transition-duration: 0.25s;
+}
+
+.team-card:hover {
+    background-color: #0004;
+}
+
+.team-card li {
+    list-style-type: disc !important;
+    margin-left: 1em;
+}

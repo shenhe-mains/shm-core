@@ -1,0 +1,15 @@
+extends layout
+
+block main
+    if applicant_member
+        h3 Application history for #{applicant_member.user.username}##{applicant_member.user.discriminator}
+    else if applicant_user
+        h3 Application history for #{applicant_user.username}##{applicant_user.discriminator} (user is no longer a member)
+    else
+        h3 Application history for Unknown User (id #{applicant_id})
+    if applications.length == 0
+        p This user has never applied to any staff positions.
+    for application in applications
+        +dashboard-card(`Application to the ${info[application.team].title}`, [["view", `/dashboard/applications/${application.team}/${application.entry.id}`]])
+            p!= application.entry.time
+            p!= ["PENDING", "ACCEPTED", "REJECTED"][application.entry.status]

@@ -1,0 +1,55 @@
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@300&display=swap");
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+
+    background-color: #333;
+    color: #eee;
+
+    font-family: Inconsolata, monospace;
+}
+
+html {
+    position: relative;
+    min-height: 100vh;
+}
+
+body {
+    min-height: 100vh;
+}
+
+header {
+    padding: 0.5em 0;
+    font-size: 150%;
+}
+
+main {
+    flex: 1 0 auto;
+    padding: 0 10vw;
+}
+
+input {
+    color: #eee;
+    font-family: Inconsolata, monospace !important;
+}
+
+textarea {
+    color: #eee;
+    font-family: Inconsolata, monospace !important;
+    line-height: 1.25em !important;
+}
+
+hr {
+    border: 1px solid #aaa;
+    width: 100%;
+}
+
+.response {
+    border: none;
+    outline: none;
+    background-color: #222;
+    border-radius: 5px;
+    padding: 5px;
+}

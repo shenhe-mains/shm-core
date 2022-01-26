@@ -1,0 +1,37 @@
+extends ../main/layout
+
+include apply-mixins
+
+block dependencies
+    +importCSS("/static/styles/apply.css")
+
+block main
+    .container(style="color: var(--logo-color); background-color: #0005; border-radius: 5px; padding: 2em")
+        h3
+            | Apply for 
+            b= info.name
+        br
+        form(method="post")
+            .row
+                .input-field.col.s12.l6
+                    select#timezone(name="timezone", required)
+                        option(value="", disabled, selected=!appl || !appl.timezone) Choose your timezone
+                        for tz in timezones
+                            option(value=tz[0], selected=appl && appl.timezone == tz[0])!= tz[1]
+            for field in fields
+                - var data = field_data[field]
+                .row!= data.title
+                case data.type
+                    when "textarea"
+                        +textarea(field, data.label, data.maxlen, data.required)
+                    when "radio"
+                        +radio(field, data.options, data.required)
+            .row
+                button.btn.waves-effect.waves-light(name="action", type="submit")
+                    if appl
+                        | UPDATE
+                    else
+                        | SUBMIT
+                    i.material-icons.right send
+    script $(document).ready(function(){$("select").formSelect();$(".charcount").characterCounter();})
+    +spacer

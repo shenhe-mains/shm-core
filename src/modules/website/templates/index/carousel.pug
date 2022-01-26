@@ -1,0 +1,20 @@
+mixin carousel_button(direction, delta)
+    .valign-fix(style=`width: ${mode.width / 10}vw; margin: 0; height: ${mode.width * 0.45}vw; text-align: center; white-space: nowrap`)
+        span(style="display: inline-block; height: 100%; vertical-align: middle")
+        img.carousel-button(src=`/static/images/${direction}button.png` + version, style=`vertical-align: middle; max-height: ${mode.width * 0.45}vw; max-width: ${mode.width / 10}vw`, onclick=`carousel_move(${delta})`)
+
+.strip.flex-row
+    .flex-column
+        .flex-row(style=`width: ${mode.width}vw`)
+            +carousel_button("left", -1)
+            .carousel-container(style=`width: ${mode.width / 5 * 4}vw; height: ${mode.width * 0.45}vw`)
+                for url, index in carousel
+                    div.carousel(
+                        class="carousel-" + index, class={hidden: index != 0},
+                        style=`width: ${mode.width / 5 * 4}vw; height: ${mode.width * 0.45}vw; background: url(${url}); border: 5px double var(--logo-color); background-size: cover; position: absolute; margin: 0; padding: 0`
+                    )
+            +carousel_button("right", 1)
+        div(style="height: 1vh")
+        .flex-row
+            for url, index in carousel
+                div.slide-button(class="slide-index-" + index, class={"slide-button-unselected": index != 0}, onclick=`carousel_set(${index})`)

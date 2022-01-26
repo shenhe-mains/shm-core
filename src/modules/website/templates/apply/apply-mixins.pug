@@ -1,0 +1,13 @@
+mixin textarea(id, desc, maxlen, required)
+    .row
+        .input-field.col.s12
+            textarea.materialize-textarea(id=id, name=id, class={charcount: maxlen}, data-length=maxlen, required=required)!= appl && appl[id]
+            label(for=id)!= desc
+
+mixin radio(id, options, required)
+    .row
+        for option in options
+            p
+                label
+                    input.with-gap(name=id, value=option[0], type="radio", checked=appl && appl[id] == option[0], required=required)
+                    span!= option[1]

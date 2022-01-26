@@ -1,2 +1,24 @@
 mixin importCSS(file)
     link(rel="stylesheet", type="text/css", href=file)
+
+mixin header(file)
+    .strip.flex-row
+        img.hide-on-med-and-down(src=`/static/images/headers/${file}.png` + version, style="width: 50vw")
+        img.hide-on-large-only(src=`/static/images/headers/${file}.png` + version, style="width: 95vw")
+
+mixin spacer
+    div(style="height: 20vh")
+
+mixin dashboard-card(title, actions, footer)
+    .row
+        .card.grey.darken-3.col.s12.z-depth-1
+            .card-content.white-text
+                span.card-title!= title
+                if block
+                    block
+            if (actions && actions.length) || footer
+                .card-action
+                    for action in actions
+                        a.btn.grey.darken-2.waves-effect.waves-light.z-depth-2(href=action[1], onclick=action[2])!= action[0]
+                    if footer
+                        != footer

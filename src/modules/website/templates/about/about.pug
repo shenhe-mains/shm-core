@@ -1,0 +1,124 @@
+extends ../main/layout
+
+block dependencies
+    +importCSS("/static/styles/about.css" + version)
+
+block main
+
+    .strip.flex-column(style="color: var(--logo-color)")
+        .container
+            +header("about")
+            .row
+                p(style="font-size: 120%")
+                    | Welcome to Shenhe Mains (SHM)! We are a community based on the Genshin Impact character Shenhe.
+                    | Together, our staff strive to create a friendly environment through fun events, theorycrafting, and more.
+            +header("staff-teams")
+            .row
+                .col.s12.l6
+                    .col.s11.team-card
+                        h5.genshin ✧ Moderation Team
+                        p
+                            | Moderators are responsible for upholding civility and order. They help members that require aid as
+                            | well as punish members who don't abide by the server's rules.
+                        p
+                            b Requirements
+                            | :
+                            ul
+                                li experience moderating Discord servers or other moderation experience
+                                li level-headedness and problem solving / conflict handling skills
+                .col.s12.l6
+                    .col.s11.team-card
+                        h5.genshin ✧ Theorycrafting Moderation Team
+                        p
+                            | TC moderators are responsible for theorycrafting channels, keeping conversations civil and in check
+                            | to maintain a safe environment for theorycrafting.
+                        p
+                            b Requirements
+                            | :
+                            ul
+                                li experience moderating Genshin Impact theorycrafting and moderating Discord servers or other moderation experience
+                                li level-headedness and problem solving / conflict handling skills
+                                li theorycrafting experience
+            .row
+                .col.s12.l6
+                    .col.s11.team-card
+                        h5.genshin ✧ Dev Team
+                        p
+                            | With extensive knowledge on coding and web design, they are responsible for maintaining @Shenhe and
+                            | other bots, as well as taking care of our website in order to keep the server and assets functioning 
+                            | in a proper fashion.
+                        p
+                            b Requirements 
+                            | (one of the following):
+                            ul
+                                li experience handling Discord bots
+                                li web development experience
+                                li Python, TypeScript, JavaScript, HTML, or CSS proficiency
+                .col.s12.l6
+                    .col.s11.team-card
+                        h5.genshin ✧ Art Team
+                        p
+                            | Talented members who create original emojis, stickers, banners and role icons for the server. They
+                            | also have the authority to accept or reject emoji submissions from outside parties, as well as being
+                            | the judges for art related events.
+                        p
+                            b Requirements 
+                            | (one of the following):
+                            ul
+                                li can draw
+                                li can make edits using Photoshop or other software
+                                li can animate
+            .row
+                .col.s12.l6
+                    .col.s11.team-card
+                        h5.genshin ✧ Theorycrafting Team
+                        p
+                            | Our TC Team is responsible for delving into the game's mechanics, creating optimized builds, team
+                            | compositions, and discussing playstyles best suited for each character in Genshin Impact.
+                        p
+                            b Requirements
+                            | :
+                            ul
+                                li theorycrafting experience
+                                li sufficient math and spreadsheet skills and experience for theorycrafting and calculations
+                .col.s12.l6
+                    .col.s11.team-card
+                        h5.genshin ✧ Translation Team
+                        p
+                            | This team includes members with a great comprehension in Chinese with the ability to fluently 
+                            | translate into English. They help communicate game resources such as events, character skills, 
+                            | and outside discussions (bilibili) to our community.
+                        p
+                            b Requirements
+                            | :
+                            ul
+                                li fluent in both Chinese and English
+                                li experience translating content from Chinese to English, specifically in relation to Genshin Impact content
+            .row
+                .col.s12.l6
+                    .col.s11.team-card
+                        h5.genshin ✧ Event Team
+                        p
+                            | This team is responsible for planning and executing server events. Through joint collaboration these
+                            | members create fun and interactive occasions for the community.
+                        p
+                            b Requirements
+                            | :
+                            ul
+                                li experience organizing events
+                                li potential event ideas
+                                li basic Google Docs and Google Forms proficiency
+                .col.s12.l6
+                    .col.s11.team-card
+                        h5.genshin ✧ Media Team
+                        p
+                            | The media team is in charge of creating posts across SHM's various social media platforms. This
+                            | includes shouting out any current in game or server exclusive events, to simply retweeting Shenhe
+                            | related art.
+                        p
+                            b Requirements
+                            | :
+                            ul
+                                li ideas for content to post
+                                li streaming knowledge and/or experience
+    +spacer

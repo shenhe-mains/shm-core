@@ -1,4 +1,4 @@
-include mixins
+include ../mixins
 
 doctype html
 html
@@ -9,7 +9,7 @@ html
         meta(name="author", content="Shenhe Mains Dev Team")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
 
-        // Discord Embed Stuff
+        //- Discord Embed Stuff
         meta(property="og:title", content="Shenhe Mains")
         meta(property="og:description", content="Official site of Shenhe Mains; discord.gg/shenhe; r/ShenheMains")
         meta(property="og:url", content="https://shenhemains.com")
@@ -17,27 +17,27 @@ html
         meta(name="theme-color", data-react-helmet="true", content="#b9dff9")
         meta(name="twitter:card", content="summary_large_image")
 
-        // Favicon
+        //- Favicon
         link(rel="shortcut icon", type="image/png", href="/static/images/favicon.png" + version)
 
-        // CSS
+        //- CSS
         +importCSS("/static/styles/global.css" + version)
         +importCSS("/static/styles/main.css" + version)
 
-        // External Styling
+        //- External Styling
         +importCSS("https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css")
         +importCSS("https://fonts.googleapis.com/icon?family=Material+Icons")
 
-        // External Scripts
+        //- External Scripts
         script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js")
         script(src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js")
         script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js")
 
-        // JavaScript
+        //- JavaScript
         script(src="/static/scripts/global.js" + version)
         script(src="/static/scripts/main.js" + version)
 
-        // Extra Dependencies
+        //- Extra Dependencies
         block dependencies
 
         title= title
@@ -45,7 +45,7 @@ html
         include navbar
         header
             for flash in flashes
-                span.flash(style="display: none", data-category=flash.category) flash.message
+                span.flash(style="display: none", data-category=flash.category)!= flash.message
             block header
         main
             block premain

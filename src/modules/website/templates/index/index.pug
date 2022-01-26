@@ -1,0 +1,28 @@
+extends ../main/layout
+
+block dependencies
+    +importCSS("/static/styles/index.css" + version)
+    script(src="/static/scripts/index.js" + version)
+
+block premain
+    div(style=`background-image: url(/static/images/background.png${version}); background-size: cover; width: 100vw; height: calc(100vw / 1920 * 1080)`)
+
+block main
+    for mode in [{width: 50, key: "hide-on-med-and-down"}, {width: 95, key: "hide-on-large-only"}]
+        div.flex-column(class=mode.key)
+            .head.strip.flex-row
+                img(src="/static/images/headers/about-shenhe.png" + version, style=`width: ${mode.width}vw`)
+            if mode.key == "hide-on-med-and-down"
+                .strip(style=`background-image: url(/static/images/quote-strip.png${version}); background-size: cover; background-position: center 18.33%; height: calc(100vw / 3840 * 2160); z-index: 500; margin-top: calc(-100vw / 3840 * 2160 * 0.075); margin-bottom: calc(-100vw / 3840 * 2160 * 0.1296)`)
+            else
+                .strip(style=`background-image: url(/static/images/quote-strip-mobile.png${version}); background-size: cover; height: calc(100vw / 2160 * 3686)`)
+            div(style="height: 7.5vw")
+            .strip.flex-row
+                img(src="/static/images/headers/events.png" + version, style=`width: ${mode.width}vw`)
+            include carousel
+    include kofi
+    include socials
+
+block postmain
+    .hide-on-med-and-down.flex-row(style="z-index: 900")
+        img#scroll-button(src="/static/images/arrow.png" + version, style="position: absolute; top: 80vh; width: 100px; height: 100px", onclick="scroll_down()")

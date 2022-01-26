@@ -14,17 +14,20 @@ app.param("captchakey", (req, res, next, id) => {
 app.get("/captcha/:captchakey", (req, res) => {
     res.send(
         req.captchakey
-            ? render(req, "captcha.pug", {
+            ? render(req, "captcha/captcha.pug", {
+                  title: "Captcha Verification",
                   key: req.captchakey,
                   sitekey: data.captcha_site_key,
               })
-            : render(req, "captcha-no-key.pug")
+            : render(req, "captcha/captcha-no-key.pug", {
+                  title: "Captcha Verification",
+              })
     );
 });
 
 app.post("/captcha/:captchakey", (req, res, next) => {
     if (req.captchakey === undefined) {
-        res.send(render(req, "captcha-no-key.pug"));
+        res.send(render(req, "captcha/captcha-no-key.pug"));
         next();
     }
 
@@ -40,10 +43,15 @@ app.post("/captcha/:captchakey", (req, res, next) => {
         .then((response) => {
             if (response.success) {
                 verify(req.captchakey);
-                res.send(render(req, "captcha-success.pug"));
+                res.send(
+                    render(req, "captcha/captcha-success.pug", {
+                        title: "Captcha Success",
+                    })
+                );
             } else {
                 res.send(
-                    render(req, "captcha.pug", {
+                    render(req, "captcha/captcha.pug", {
+                        title: "Captcha Verification",
                         key: req.captchakey,
                         sitekey: data.captcha_site_key,
                         captcha_failed: true,

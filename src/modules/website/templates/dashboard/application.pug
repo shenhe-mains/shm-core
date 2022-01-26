@@ -1,0 +1,24 @@
+extends layout
+
+block main
+    +dashboard-card((applicant ? `${applicant.user.username}#${applicant.user.discriminator}` : "Unknown Member") + "'s application to the " + info.title)
+        div(style="padding: 4em")
+            .row
+                | Submitted #{application.time}
+            .row
+                b Timezone
+                | : #{timezone}
+            for field in fields
+                .row
+                    b!= field_data[field].title
+                    br
+                    br
+                    .response!= application[field].replaceAll("<", "&lt;").replace("\n", "<br />")
+        if applicant && application.status == 0
+            a.btn.green.waves-effect.waves-light.z-depth-2(href=`/dashboard/resolve-application/${team}/${applicant.id}/accept`) ACCEPT
+            | 
+            a.btn.red.waves-effect.waves-light.z-depth-2(href=`/dashboard/resolve-application/${team}/${applicant.id}/reject`) REJECT
+        if application.status == 1
+            | This application has been accepted.
+        if application.status == 2
+            | This application has been rejected.

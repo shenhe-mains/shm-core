@@ -1,0 +1,66 @@
+table,
+tr,
+th,
+td {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+td:first-child {
+    padding-right: 1vw;
+}
+
+.carousel-button {
+    transition-duration: 0.25s;
+    -webkit-transition-duration: 0.25s;
+}
+
+.carousel-button:hover,
+.carousel-button:active {
+    filter: brightness(0.85);
+}
+
+.slide-button {
+    height: max(2vw, 4vh);
+    width: max(2vw, 4vh);
+    background-size: cover;
+
+    background-image: url(/static/images/slide-selected.png);
+}
+
+.slide-button-unselected {
+    background-image: url(/static/images/slide-unselected.png);
+}
+
+.valign-fix {
+    font-size: 0;
+}
+
+#discord-left {
+    transition-duration: 0.75s;
+
+    -webkit-transition-duration: 0.75s;
+}
+
+#discord-left.off-screen {
+    transform: translateX(-50vw);
+    opacity: 0;
+}
+
+.hidden {
+    opacity: 0;
+}
+
+.carousel {
+    transition-duration: 0.5s;
+
+    -webkit-transition-duration: 0.5s;
+}
+
+#socials {
+    z-index: 950;
+    position: fixed;
+    bottom: 5vh;
+    right: 2vw;
+}

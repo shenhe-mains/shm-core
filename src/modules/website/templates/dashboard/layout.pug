@@ -1,0 +1,54 @@
+include ../mixins
+
+doctype html
+html
+    head
+        meta(charset="utf-8")
+        meta(name="author", content="Shenhe Mains Dev Team")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+
+        //- Favicon
+        link(rel="shortcut icon", type="image/png", href="/static/images/favicon2.png" + version)
+
+        //- CSS
+        +importCSS("/static/styles/global.css" + version)
+        +importCSS("/static/styles/dashboard.css" + version)
+
+        //- External Styling
+        +importCSS("https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css")
+        +importCSS("https://fonts.googleapis.com/icon?family=Material+Icons")
+
+        //- External Scripts
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js")
+        script(src="https://cdn.jsdelivr.net/npm/marked/marked.min.js")
+
+        //- JavaScript
+        script(src="/static/scripts/global.js" + version)
+        script(src="/static/scripts/dashboard.js" + version)
+
+        //- Extra Dependencies
+        block dependencies
+
+        title= title
+    body
+        header
+            for flash in flashes
+                span.flash(style="display: none", data-category=flash.category)!= flash.message
+            center
+                p
+                    | Logged in as 
+                    span(style="color: #aae") #{req.member.user.username}##{req.member.user.discriminator}
+                    | . 
+                    a(href="/logout/") Log Out
+                p
+                    | Times are all listed in UTC. 
+                    span#offset
+        main
+            #container
+                a(href="/") &lt; Return to Main Site
+                |  | 
+                a(href="/dashboard/") &lt; Return to Dashboard
+                br
+                br
+                block main

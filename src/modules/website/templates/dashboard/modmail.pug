@@ -1,0 +1,23 @@
+extends layout
+
+block main
+    if modmail_target
+        h3 Modmail with #{modmail_target.username}##{modmail_target.discriminator}
+    else
+        h3 Modmail with Unknown User
+    if !messages.length
+        p This user has never interacted with modmail before.
+    else
+        for message in messages
+            +dashboard-card(message.sender_name + " <span style='color: #aaa'>" + [
+                "Incoming",
+                "Outgoing",
+                "Outgoing (anonymous)",
+                "(Opened Thread)",
+                "(Closed Thread)"
+            ][message.message_type] + "</span>", [], "<span style='color: #aaa'>" + message.sender_id + "</span> &middot; " + message.time)
+                case message.message_type
+                    when 0
+                    when 1
+                    when 2
+                        p!= message.content

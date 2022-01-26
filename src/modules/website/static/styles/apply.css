@@ -1,0 +1,12 @@
+input,
+textarea {
+    color: var(--logo-color) !important;
+}
+
+.select-wrapper .caret {
+    fill: var(--logo-color) !important;
+}
+
+.team-card {
+    background-color: #056;
+}

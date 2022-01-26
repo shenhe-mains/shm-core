@@ -1,0 +1,24 @@
+extends ../main/layout
+
+block dependencies
+    +importCSS("/static/styles/apply.css")
+
+block main
+    .container
+        +header("staff-applications")
+        .row
+            h4
+                | You are logged in as #{req.member.user.username}##{req.member.user.discriminator}. 
+                a(href="/logout/", style="color: #55a") Log Out
+        for team in team_keys
+            .row
+                .card.team-card
+                    .card-content.white-text
+                        span.card-title= team_info[team].title
+                        p= team_info[team].description
+                    .card-action
+                        case statuses[team]
+                            when "open": a(href="/apply/" + team) Apply for #{team_info[team].name}
+                            when "applied": a(href="/apply/" + team) Update your application
+                            when "closed": span This team is not open for applications at this time.
+                            when "in": span You are already in this team.
