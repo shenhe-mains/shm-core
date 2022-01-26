@@ -136,7 +136,7 @@ function translate_content(message, content) {
     if (files.length > 0) {
         content += "\n\nAttachments:";
         for (const file of files) {
-            content += "\n" + file.url;
+            content += `\n<a href="${file.url}">${file.url}</a>`;
         }
     }
     return content;
@@ -227,7 +227,7 @@ exports.relay_outgoing = async function (
             member.id,
             sender,
             show_identity ? 1 : 2,
-            content
+            translate_content(message, content)
         );
     }
 };
