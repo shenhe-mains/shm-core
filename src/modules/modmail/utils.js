@@ -114,7 +114,7 @@ function translate_content(message, content) {
     if (files.length > 0) {
         content += "\n\nAttachments:";
         for (const file of files) {
-            content += "\n- " + file.url;
+            content += "\n" + file.url;
         }
     }
     return content;
