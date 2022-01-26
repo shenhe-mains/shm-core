@@ -98,7 +98,7 @@ async function automod_rm(ctx, args, body) {
 }
 
 async function bisect(ctx, args, body) {
-    const { result } = await scan();
+    const { result } = await scan(body, true);
     throw new Info(
         "Automod Scan Result",
         result == -1
