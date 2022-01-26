@@ -18,7 +18,8 @@ exports.commands = {
     modmail: modmail,
     reply: reply(true),
     anonreply: reply(false),
-    close: close,
+    close: close(true),
+    silentclose: close(false),
 };
 
 exports.listeners = {
@@ -75,16 +76,18 @@ function reply(show_identity) {
     };
 }
 
-async function close(ctx, args) {
-    await assert_modmail(ctx);
-    checkCount(args, 0);
-    await close_modmail_channel(
-        ctx.client,
-        ctx.author.user,
-        await get_modmail_for_channel(ctx.channel.id)
-    );
-    await ctx.channel.delete();
-}
+close = (announce) =>
+    async function (ctx, args) {
+        await assert_modmail(ctx);
+        checkCount(args, 0);
+        await close_modmail_channel(
+            ctx.client,
+            ctx.author.user,
+            announce,
+            await get_modmail_for_channel(ctx.channel.id)
+        );
+        await ctx.channel.delete();
+    };
 
 async function check_modmail_confirm(client, interaction) {
     if (!(interaction instanceof ButtonInteraction)) return;

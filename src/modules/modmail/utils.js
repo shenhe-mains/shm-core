@@ -93,7 +93,28 @@ exports.get_modmail_channel = _get_modmail_channel = async function (
     }
 };
 
-exports.close_modmail_channel = async function (client, closer, user_id) {
+exports.close_modmail_channel = async function (
+    client,
+    closer,
+    announce,
+    user_id
+) {
+    if (announce) {
+        try {
+            await (
+                await client.users.fetch(user_id)
+            ).send({
+                embeds: [
+                    {
+                        title: "Modmail Thread Closed",
+                        description:
+                            "Your modmail channel with the Shenhe Mains staff has been closed. We hope we were able to help you. If you would like to open another modmail thread, you can simply send me another message at any time. Thanks!",
+                        color: config.color,
+                    },
+                ],
+            });
+        } catch {}
+    }
     await create_modmail_message(user_id, closer, 4);
     await close_modmail_channel(user_id);
     const url = `https://shenhemains.com/dashboard/modmail/${user_id}`;
