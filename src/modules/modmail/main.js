@@ -68,6 +68,7 @@ function reply(show_identity) {
             ctx.guild,
             ctx.channel,
             ctx.author.user,
+            ctx.message,
             body,
             show_identity
         );

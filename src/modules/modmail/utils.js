@@ -57,7 +57,7 @@ exports.get_modmail_channel = _get_modmail_channel = async function (
                 embeds: [
                     {
                         title: "Modmail Channel Created",
-                        description: `A modmail channel was just opened with ${user}: ${channel}.${
+                        description: `A modmail channel was just opened with ${user} by ${opener}: ${channel}.${
                             success
                                 ? ""
                                 : " I was not able to put it in the modmail category."
@@ -101,13 +101,24 @@ exports.close_modmail_channel = async function (client, closer, user_id) {
         embeds: [
             {
                 title: "Modmail Channel Closed",
-                description: `The modmail thread with <@${user_id}> was just closed. You can view it [here](${url}).`,
+                description: `The modmail thread with <@${user_id}> was just closed by ${closer}. You can view it [here](${url}).`,
                 url: url,
                 color: "RED",
             },
         ],
     });
 };
+
+function translate_content(message, content) {
+    const files = message.attachments.toJSON();
+    if (files.length > 0) {
+        content += "\n\nAttachments:";
+        for (const file of files) {
+            content += "\n- " + file.url;
+        }
+    }
+    return content;
+}
 
 exports.relay_incoming = async function (client, guild, message) {
     const channel = await _get_modmail_channel(
@@ -120,7 +131,7 @@ exports.relay_incoming = async function (client, guild, message) {
         embeds: [
             {
                 title: "Incoming Message",
-                description: message.content,
+                description: translate_content(message, message.content),
                 author: {
                     name: `${message.author.username}#${message.author.discriminator}`,
                     iconURL: message.author.avatarURL({ dynamic: true }),
@@ -142,6 +153,7 @@ exports.relay_outgoing = async function (
     guild,
     channel,
     sender,
+    message,
     content,
     show_identity
 ) {
@@ -157,7 +169,7 @@ exports.relay_outgoing = async function (
     }
     const embed = {
         title: "Incoming Message from Staff",
-        description: content,
+        description: translate_content(message, content),
         color: config.color,
         author: show_identity
             ? {
