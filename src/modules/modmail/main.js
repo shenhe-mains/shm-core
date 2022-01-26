@@ -76,8 +76,8 @@ function reply(show_identity) {
     };
 }
 
-close = (announce) =>
-    async function (ctx, args) {
+function close(announce) {
+    return async (ctx, args) => {
         await assert_modmail(ctx);
         checkCount(args, 0);
         await close_modmail_channel(
@@ -88,6 +88,7 @@ close = (announce) =>
         );
         await ctx.channel.delete();
     };
+}
 
 async function check_modmail_confirm(client, interaction) {
     if (!(interaction instanceof ButtonInteraction)) return;
