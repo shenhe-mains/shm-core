@@ -270,9 +270,11 @@
         "watchlist": "899332321583464478",
         "welcome": "890252868135825408"
     },
-    "webhooks": {},
+    "webhooks": {
+        "message_logs": "936007414547873822"
+    },
     "log_ignore": [],
-    "prefix": "!!/",
+    "prefix": "#",
     "db_options": {
         "user": "shenhe",
         "host": "localhost",
