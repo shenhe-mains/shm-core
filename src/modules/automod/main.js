@@ -27,7 +27,7 @@ const term_match = [
     (match, content) =>
         ((m) => m && m[0])(
             new RegExp(
-                `(^|\b|(?<=[^A-Za-z]))${match}(?=\b|[^A-Za-z]|$)`,
+                `(^|\\b|(?<=[^A-Za-z]))${match}(?=\\b|[^A-Za-z]|$)`,
                 "i"
             ).exec(content)
         ),
