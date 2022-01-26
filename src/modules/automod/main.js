@@ -10,6 +10,7 @@ const {
     add_automod_report,
 } = require("../../db");
 const { PermissionError, ArgumentError, Info } = require("../../errors");
+const { pagify } = require("../../pages");
 const { inline_code, checkCount } = require("../../utils");
 
 const DEFER = 0;
@@ -49,6 +50,7 @@ exports.commands = {
     "automod-add": automod_add,
     "automod-rm": automod_rm,
     "automod-scan": bisect,
+    "automod-list": automod_list,
 };
 
 exports.listeners = {
@@ -104,6 +106,30 @@ async function bisect(ctx, args, body) {
         result == -1
             ? "No match."
             : `Matched with action \`${severities[result]}\``
+    );
+}
+
+async function automod_list(ctx, args) {
+    if (!has_permission(ctx.author, "settings")) {
+        throw new PermissionError(
+            "You do not have permission to view this setting. Normally, read-only actions are open to everyone, but this command posts offensive terms."
+        );
+    }
+    checkCount(args, 0);
+    const entries = [];
+    for (const entry of await get_automod_terms()) {
+        entries.push({
+            name: "Automod Term",
+            value: `${inline_code(entry.match)}\nScan type: \`${
+                term_types[entry.type]
+            }\`\nAction: \`${severities[entry.severity]}\``,
+        });
+    }
+    await pagify(
+        ctx,
+        { title: "Automod - Banned Terms", color: "GREY" },
+        entries,
+        10
     );
 }
 
