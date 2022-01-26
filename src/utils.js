@@ -105,3 +105,10 @@ exports.dm = async function (member, title, description, footer) {
         ],
     });
 };
+
+exports.censor_attachments = function (message, send_original) {
+    return message.attachments.toJSON().map((attachment) => ({
+        attachment: attachment.url,
+        name: (send_original ? "" : "SPOILER_") + attachment.name,
+    }));
+};

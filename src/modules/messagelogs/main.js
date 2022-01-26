@@ -1,7 +1,7 @@
 const { MessageEmbed } = require("discord.js");
 const { config } = require("../../core/config");
 const { get_webhook } = require("../../core/webhooks");
-const { shorten } = require("../../utils");
+const { shorten, censor_attachments } = require("../../utils");
 
 exports.listeners = {
     messageUpdate: [log_update],
@@ -83,9 +83,6 @@ async function log_delete(client, message) {
                 color: "RED",
             },
         ],
-        files: message.attachments.toJSON().map((attachment) => ({
-            attachment: attachment.url,
-            name: "SPOILER_" + attachment.name,
-        })),
+        files: censor_attachments(message),
     });
 }

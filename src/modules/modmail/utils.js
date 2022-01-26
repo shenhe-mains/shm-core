@@ -8,6 +8,7 @@ const {
     close_modmail_channel,
 } = require("../../db");
 const { UserError } = require("../../errors");
+const { censor_attachments } = require("../../utils");
 const { commands } = require("../moderation/main");
 
 exports.log = log = async function (client, ...args) {
@@ -152,7 +153,7 @@ exports.relay_incoming = async function (client, guild, message) {
         embeds: [
             {
                 title: "Incoming Message",
-                description: translate_content(message, message.content),
+                description: message.content,
                 author: {
                     name: `${message.author.username}#${message.author.discriminator}`,
                     iconURL: message.author.avatarURL({ dynamic: true }),
@@ -160,12 +161,13 @@ exports.relay_incoming = async function (client, guild, message) {
                 color: "AQUA",
             },
         ],
+        files: censor_attachments(message),
     });
     await create_modmail_message(
         message.author.id,
         message.author,
         0,
-        message.content
+        translate_content(message, message.content)
     );
 };
 
@@ -190,7 +192,7 @@ exports.relay_outgoing = async function (
     }
     const embed = {
         title: "Incoming Message from Staff",
-        description: translate_content(message, content),
+        description: content,
         color: config.color,
         author: show_identity
             ? {
@@ -207,6 +209,7 @@ exports.relay_outgoing = async function (
     try {
         await member.user.send({
             embeds: [embed],
+            files: censor_attachments(message, true),
         });
     } catch {
         throw new UserError(
@@ -217,6 +220,7 @@ exports.relay_outgoing = async function (
         embed.title = "Outgoing Message";
         await channel.send({
             embeds: [embed],
+            files: censor_attachments(message, true),
         });
     } finally {
         await create_modmail_message(
