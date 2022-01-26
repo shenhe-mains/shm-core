@@ -20,4 +20,4 @@ block main
                     when 0
                     when 1
                     when 2
-                        p!= message.content
+                        p!= message.content.replaceAll("\n", "<br />")
