@@ -130,7 +130,6 @@ async function check_modmail_confirm(client, interaction) {
 
 async function check_modmail(client, message) {
     if (message.author.id == client.user.id) return;
-    if (message.author.id != "251082987360223233") return;
     if (message.channel instanceof DMChannel) {
         try {
             var guild, member;

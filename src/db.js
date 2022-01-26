@@ -241,6 +241,13 @@ exports.client = client;
         )`
     );
 
+    client.query(
+        `CREATE TABLE IF NOT EXISTS user_roles (
+            role_id VARCHAR(32),
+            user_id VARCHAR(32)
+        )`
+    );
+
     exports.is_protected = is_protected = async function (channel_id) {
         return (
             (
@@ -293,13 +300,6 @@ exports.client = client;
 
 // polls
 {
-    client.query(
-        `CREATE TABLE IF NOT EXISTS user_roles (
-            role_id VARCHAR(32),
-            user_id VARCHAR(32)
-        )`
-    );
-
     client.query(
         `CREATE TABLE IF NOT EXISTS polls (
             message_id VARCHAR(32),
