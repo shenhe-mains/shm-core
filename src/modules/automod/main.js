@@ -123,13 +123,14 @@ async function automod_list(ctx, args) {
             value: `${inline_code(entry.match)}\nScan type: \`${
                 term_types[entry.type]
             }\`\nAction: \`${severities[entry.severity]}\``,
+            inline: true,
         });
     }
     await pagify(
         ctx,
         { title: "Automod - Banned Terms", color: "GREY" },
         entries,
-        10
+        12
     );
 }
 
