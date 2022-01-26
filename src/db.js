@@ -146,6 +146,59 @@ exports.client = client;
     };
 }
 
+// automod
+{
+    client.query(
+        `CREATE TABLE IF NOT EXISTS automod_terms (
+            match VARCHAR(1024) PRIMARY KEY,
+            type INT,
+            severity INT,
+            reports INT
+        )`
+    );
+
+    exports.get_automod_terms = async function () {
+        return (await client.query(`SELECT * FROM automod_terms`)).rows;
+    };
+
+    exports.has_automod_term = async function (match) {
+        return (
+            (
+                await client.query(
+                    `SELECT COUNT(1) FROM automod_terms WHERE match = $1`,
+                    [match]
+                )
+            ).rows[0].count > 0
+        );
+    };
+
+    exports.add_automod_report = async function (match) {
+        const count = (
+            await client.query(
+                `SELECT reports FROM automod_terms WHERE match = $1`,
+                [match]
+            )
+        ).rows[0].reports;
+        await client.query(`UPDATE reports SET reports = $1 WHERE match = $2`, [
+            count + 1,
+            match,
+        ]);
+    };
+
+    exports.add_automod_term = async function (match, type, severity) {
+        await client.query(
+            `INSERT INTO automod_terms (match, type, severity, reports) VALUES ($1, $2, $3, 0)`,
+            [match, type, severity]
+        );
+    };
+
+    exports.remove_automod_term = async function (match) {
+        await client.query(`DELETE FROM automod_terms WHERE match = $1`, [
+            match,
+        ]);
+    };
+}
+
 // custom roles
 {
     client.query(

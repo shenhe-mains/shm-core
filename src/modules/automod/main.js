@@ -1,8 +1,16 @@
 const { config } = require("../../core/config");
 const { mute, kick, ban } = require("../../core/moderation");
 const { has_permission } = require("../../core/privileges");
-const { add_warn } = require("../../db");
-const { inline_code } = require("../../utils");
+const {
+    add_warn,
+    has_automod_term,
+    add_automod_term,
+    remove_automod_term,
+    get_automod_terms,
+    add_automod_report,
+} = require("../../db");
+const { PermissionError, ArgumentError, Info } = require("../../errors");
+const { inline_code, checkCount } = require("../../utils");
 
 const DEFER = 0;
 const DELETE = 1;
@@ -13,6 +21,19 @@ const KICK = 5;
 const BAN = 6;
 
 const severities = ["defer", "delete", "verbal", "warn", "mute", "kick", "ban"];
+const term_types = ["substring", "word", "regex"];
+const term_match = [
+    (match, content) => (content.toLowerCase().match(match) ? match : false),
+    (match, content) =>
+        ((m) => m && m[0])(
+            new RegExp(
+                `(^|\b|(?<=[^A-Za-z]))${match}(?=\b|[^A-Za-z]|$)`,
+                "i"
+            ).exec(content)
+        ),
+    (match, content) =>
+        ((m) => m && m[0])(new RegExp(match, "i").exec(content)),
+];
 
 const user_messages = [
     "",
@@ -24,19 +45,11 @@ const user_messages = [
     "You have been banned for a message you sent, and a moderator will evaluate the situation shortly.",
 ];
 
-const terms = [
-    ["amtestdefer", DEFER],
-    ["amtestdelete", DELETE],
-    ["amtestverbal", VERBAL],
-    ["amtestwarn", WARN],
-    ["amtestmute", MUTE],
-    ["amtestkick", KICK],
-    ["amtestban", BAN],
-];
-
-function word(term) {
-    return new RegExp(`(^|\b|(?<=[^A-Za-z]))${term}(?=\b|[^A-Za-z]|$)`, "i");
-}
+exports.commands = {
+    "automod-add": automod_add,
+    "automod-rm": automod_rm,
+    "automod-scan": bisect,
+};
 
 exports.listeners = {
     messageCreate: [automod_scan],
@@ -45,25 +58,65 @@ exports.listeners = {
     ],
 };
 
-function scan(content) {
+async function automod_add(ctx, args, body) {
+    if (!has_permission(ctx.author, "settings")) {
+        throw new PermissionError(
+            "You do not have permission to modify bot settings such as automod terms."
+        );
+    }
+    checkCount(args, 3, Infinity);
+    const type = term_types.indexOf(args[0]);
+    if (type == -1) {
+        throw new ArgumentError(
+            "Expected one of `substring`, `word`, `regex` in argument 1."
+        );
+    }
+    const severity = severities.indexOf(args[1]);
+    if (severity == -1) {
+        throw new ArgumentError(
+            "Expected one of `defer`, `delete`, `verbal`, `warn`, `mute`, `kick`, `ban` in argument 2."
+        );
+    }
+    const match = body.substring(args[0].length + args[1].length + 2);
+    if (await has_automod_term(match)) {
+        throw new ArgumentError("That string is already being matched.");
+    }
+    await add_automod_term(match, type, severity);
+}
+
+async function automod_rm(ctx, args, body) {
+    if (!has_permission(ctx.author, "settings")) {
+        throw new PermissionError(
+            "You do not have permission to modify bot settings such as automod terms."
+        );
+    }
+    checkCount(args, 1, Infinity);
+    if (!(await has_automod_term(body))) {
+        throw new ArgumentError("That string is not being matched.");
+    }
+    await remove_automod_term(body);
+}
+
+async function bisect(ctx, args, body) {
+    const { result } = await scan();
+    throw new Info(
+        "Automod Scan Result",
+        result == -1
+            ? "No match."
+            : `Matched with action \`${severities[result]}\``
+    );
+}
+
+async function scan(content, fake) {
     var result = -1;
     var matches = [];
-    var match;
 
-    for (var [term, severity] of terms) {
-        match = undefined;
-        if (term instanceof RegExp) {
-            match = term.exec(content);
-            match &&= match[0];
-        } else {
-            if (content.toLowerCase().match(term)) {
-                match = term;
-            }
-        }
-        if (match !== undefined && match !== null) {
-            result = Math.max(result, severity);
-            matches.push(match);
-        }
+    for (const entry of await get_automod_terms()) {
+        const match = term_match[entry.type](entry.match, content);
+        if (!match) continue;
+        result = Math.max(result, entry.severity);
+        matches.push(match);
+        if (!fake) await add_automod_report(entry.match);
     }
 
     return {
@@ -87,7 +140,7 @@ async function automod_scan(client, message) {
         return;
     }
 
-    const { result, matches } = scan(message.content);
+    const { result, matches } = await scan(message.content);
 
     if (result == -1) return;
 
