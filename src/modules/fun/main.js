@@ -101,8 +101,8 @@ async function rps(ctx, args) {
         allowedMentions: { repliedUser: false },
     });
     rps[message.id] = {};
-    rps[message.id].players = [ctx.member.id, other.id];
-    rps[message.id][ctx.member.id] = null;
+    rps[message.id].players = [ctx.author.id, other.id];
+    rps[message.id][ctx.author.id] = null;
     rps[message.id][other.id] = null;
 }
 
