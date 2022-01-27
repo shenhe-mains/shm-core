@@ -22,7 +22,7 @@ async function dbquery(ctx, args, body) {
     }
     const fields = [];
     const field_names = result.fields.map((field) => field.name);
-    for (const row in result.rows) {
+    for (var row = 0; row < result.rows.length; ++rows) {
         fields.push({
             name: `Row ${row + 1}`,
             value:
