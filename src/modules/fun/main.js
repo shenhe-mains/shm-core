@@ -41,7 +41,7 @@ async function fight(ctx, args) {
         const [action, min, max] =
             fight_actions[Math.floor(Math.random() * fight_actions.length)];
         const target = Math.floor(Math.random() * (users.length - 1)) + 1;
-        rows.append(
+        rows.push(
             action
                 .replaceAll("{1}", users[0][0].toString())
                 .replaceAll("{2}", users[target][0].toString()) +
@@ -49,12 +49,12 @@ async function fight(ctx, args) {
         );
         users[target][1] -= Math.floor(Math.random() * (max - min)) + min;
         if (users[target][1] < 0) {
-            rows.append(`${users[target]} is out of the fight!`);
+            rows.push(`${users[target]} is out of the fight!`);
             users.splice(target, 1);
         }
         users.push(users.shift());
     }
-    rows.append(`${users[0]} is victorious!`);
+    rows.push(`${users[0]} is victorious!`);
     return {
         title: "Fight Result",
         description: rows.join("\n"),
