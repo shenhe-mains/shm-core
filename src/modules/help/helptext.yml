@@ -9,13 +9,18 @@ text:
 
             `automod` - Automoderation features (banned words, spam detection, etc.)
             `customroles` - Custom roles for server supporters
+            `db` - Database commands
+            `fun` - Fun / miscellaneous commands
             `help` - This module
             `messagelogs` - Logging for message edits / deletions
             `moderation` - Mod commands (muting, banning, etc.)
+            `modmail` - Modmail / Ticket system
             `nukeguard` - Anti-nuking features
             `polls` - Poll-related commands
             `settings` - Bot settings
             `statschannels` - Server stats channels like member count and boosters
+            `sticky` - Sticky messages
+            `triggers` - Auto-responder triggers
             `utility` - Utility and info commands like user info
             `verification` - Captcha verification system
             `website` - https://shenhemains.com
@@ -30,13 +35,22 @@ text:
             offences rather than just warned or muted for a few days.
 
 
+            You can view a list of automod terms [here](https://docs.google.com/spreadsheets/d/15nupMHv84-Si2OLYaBwD3KTjHlI169JjRN5JZjLkIyA/edit?usp=sharing).
             To request for automod terms to be added, removed, or changed, please visit <#805458033471782974>, or, if you are a staff member, you may just mention
             it in <#840864247373103114>.
 
 
-            To view a list of banned terms, you can run `{prefix}help automod-terms`. Sensitive or offensive words will be spoilered and most terms will be explained
-            without mentioning the term itself if possible.
-    automod-terms:
-        title: "Automoderator: Banned Words"
+            Commands in this module: `automod-add`, `automod-rm`, `automod-scan`, `automod-list`
+    automod-add:
+        title: Automoderator - Add term
         body: |
-            Right now, nothing is really here...
+            `{prefix}automod-add <type> <action> term to match`
+
+            Adds a new term to the automoderator. `type` should be one of `substring` (match anywhere), `word` (match regular expression only when surrounded by
+            non-letters), or `regex` (match regular expression). `action` should be one of `defer` (alert mod chat), `delete` (silently remove the message), `verbal`
+            (send a verbal/unlogged warning), `warn` (send a formal warning), `mute` (mute the user indefinitely and alert mod chat), `kick` (temporarily kick the
+            user from the server), or `ban` (ban the user indefinitely and alert mod chat).
+
+            Please only use `word` or `regex` if you know what you're doing with regular expressions. You can request for terms to be added in <#805458033471782974>
+            or <#840864247373103114>.
+        footer: Owner / Admin / Developer

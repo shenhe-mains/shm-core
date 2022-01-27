@@ -16,10 +16,10 @@ async function choose(ctx, args, body) {
     if (options.length == 0) {
         throw new ArgumentError("Please provide at least one choice.");
     }
-    throw new Success(
-        "Choice",
-        options[Math.floor(Math.random() * options.length)]
-    );
+    return {
+        title: "Choice",
+        description: options[Math.floor(Math.random() * options.length)],
+    };
 }
 
 async function checkFun(client, interaction) {

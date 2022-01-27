@@ -7,9 +7,9 @@ const { checkCount } = require("../../utils");
 
 exports.commands = { help: help };
 
-// const helpdata = yaml.load(
-//     fs.readFileSync(path.join(__dirname, "helptext.yml"))
-// );
+const helpdata = yaml.load(
+    fs.readFileSync(path.join(__dirname, "helptext.yml"))
+);
 
 async function help(ctx, args) {
     const helpdata = yaml.load(
@@ -32,6 +32,12 @@ async function help(ctx, args) {
 
     throw new Info(
         data.title.replaceAll("{prefix}", config.prefix),
-        data.body.replaceAll("{prefix}", config.prefix)
+        data.body.replaceAll("{prefix}", config.prefix),
+        (embed) => (
+            (embed.footer = {
+                text: (data.footer || "").replaceAll("{prefix}", config.prefix),
+            }),
+            embed
+        )
     );
 }
