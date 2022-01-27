@@ -156,7 +156,7 @@ async function automod_scan(client, message) {
     if (!message.guild || message.guild.id != config.guild) return;
     if (message.author.id == client.user.id) return;
     var author;
-    if (message.webhookId === undefined) {
+    if (message.webhookId === null) {
         try {
             author = await message.guild.members.fetch(message.author.id);
         } catch {
