@@ -852,10 +852,11 @@ exports.client = client;
 
     exports.apply = async function (team, user_id, keys, values) {
         var query_string;
-        if (await has_application(team, user_id)) {
+        const exists = await has_application(team, user_id);
+        if (exists) {
             query_string =
                 `UPDATE ${team}_applications SET ` +
-                keys.map((key, index) => `${key} = $${index + 3}`).join(", ") +
+                keys.map((key, index) => `${key} = $${index + 2}`).join(", ") +
                 ` WHERE user_id = $1`;
         } else {
             query_string = `INSERT INTO ${team}_applications (user_id, status, time, ${keys.join(
@@ -864,7 +865,10 @@ exports.client = client;
                 .map((key, index) => `$${index + 3}`)
                 .join(", ")})`;
         }
-        await client.query(query_string, [user_id, new Date(), values].flat());
+        await client.query(
+            query_string,
+            [user_id, exists ? [] : [new Date()], values].flat()
+        );
     };
 
     exports.get_applications = async function (user_id) {
