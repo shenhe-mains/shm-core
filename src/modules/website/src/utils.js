@@ -9,6 +9,7 @@ const {
     get_application_channel,
     set_application_channel,
 } = require("../../../db");
+const { team_info } = require("./data");
 
 const version = "?v=" + Math.floor(Math.random() * 1000000).toString();
 
@@ -89,7 +90,7 @@ exports.verifyMember = function (req, res, next) {
 
 exports.getApplicationChannel = async function (team, user, guild) {
     const name = `${team}-${user.username}-${user.discriminator}`;
-    const topic = `${user}'s application for ${team_info[req.team].name}`;
+    const topic = `${user}'s application for ${team_info[team].name}`;
     var channel;
     if (await has_application_channel(team, user.id)) {
         try {
