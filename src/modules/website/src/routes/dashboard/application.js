@@ -13,7 +13,7 @@ const {
     discordAuth,
     verifyMember,
     render,
-    getApplicationChannel,
+    send_to_application_channel,
 } = require("../../utils");
 const { fields_for } = require("../apply");
 const { staffData, assertPermission } = require("./utils");
@@ -181,29 +181,28 @@ app.get(
             "SUCCESS"
         );
         try {
-            await (
-                await getApplicationChannel(
-                    req.team,
-                    await client.users.fetch(req.applicant_id),
-                    req.member.guild
-                )
-            ).send({
-                embeds: [
-                    {
-                        title: `Application ${
-                            req.accept ? "accepted" : "rejected"
-                        }`,
-                        description: `<@${
-                            req.applicant_id
-                        }>'s application to the ${
-                            team_info[req.team].title
-                        } was ${req.accept ? "accepted" : "rejected"} by ${
-                            req.member
-                        }.`,
-                        color: req.accept ? "GREEN" : "RED",
-                    },
-                ],
-            });
+            await send_to_application_channel(
+                req.team,
+                await client.users.fetch(req.applicant_id),
+                req.member.guild,
+                {
+                    embeds: [
+                        {
+                            title: `Application ${
+                                req.accept ? "accepted" : "rejected"
+                            }`,
+                            description: `<@${
+                                req.applicant_id
+                            }>'s application to the ${
+                                team_info[req.team].title
+                            } was ${req.accept ? "accepted" : "rejected"} by ${
+                                req.member
+                            }.`,
+                            color: req.accept ? "GREEN" : "RED",
+                        },
+                    ],
+                }
+            );
         } finally {
             res.redirect(303, "/dashboard/");
         }

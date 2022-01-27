@@ -1,13 +1,5 @@
 const { config } = require("../../../../core/config");
-const {
-    has_application,
-    get_application,
-    apply,
-    has_application_channel,
-    get_application_channel,
-    set_application_channel,
-} = require("../../../../db");
-const { client } = require("../../../../client");
+const { has_application, get_application, apply } = require("../../../../db");
 const { app } = require("../app");
 const { team_info, timezones, application_fields, fields } = require("../data");
 const {
@@ -15,7 +7,7 @@ const {
     discordAuth,
     verifyMember,
     flash,
-    getApplicationChannel,
+    send_to_application_channel,
 } = require("../utils");
 
 async function status(member, team) {
@@ -179,32 +171,33 @@ app.post(
             );
             try {
                 const url = `https://shenhemains.com/dashboard/applications/${req.team}/${req.member.id}`;
-                await (
-                    await getApplicationChannel(
-                        req.team,
-                        req.member.user,
-                        req.member.guild
-                    )
-                ).send({
-                    embeds: [
-                        {
-                            title: `${req.member.user.username}#${
-                                req.member.user.discriminator
-                            } ${
-                                req.application
-                                    ? "updated their"
-                                    : "submitted an"
-                            } application for the ${team_info[req.team].title}`,
-                            description: `${req.member} just ${
-                                req.application
-                                    ? "edited their application"
-                                    : "applied"
-                            }; check it out [here](${url}).`,
-                            url: url,
-                            color: config.color,
-                        },
-                    ],
-                });
+                await send_to_application_channel(
+                    req.team,
+                    req.member.user,
+                    req.member.guild,
+                    {
+                        embeds: [
+                            {
+                                title: `${req.member.user.username}#${
+                                    req.member.user.discriminator
+                                } ${
+                                    req.application
+                                        ? "updated their"
+                                        : "submitted an"
+                                } application for the ${
+                                    team_info[req.team].title
+                                }`,
+                                description: `${req.member} just ${
+                                    req.application
+                                        ? "edited their application"
+                                        : "applied"
+                                }; check it out [here](${url}).`,
+                                url: url,
+                                color: config.color,
+                            },
+                        ],
+                    }
+                );
             } finally {
                 res.redirect(303, "/apply/");
             }

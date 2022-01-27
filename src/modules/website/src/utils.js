@@ -88,7 +88,7 @@ exports.verifyMember = function (req, res, next) {
         });
 };
 
-exports.getApplicationChannel = async function (team, user, guild) {
+async function get_application_channel(team, user, guild) {
     const name = `${team}-${user.username}-${user.discriminator}`;
     const topic = `${user}'s application for ${team_info[team].name}`;
     var channel;
@@ -114,4 +114,22 @@ exports.getApplicationChannel = async function (team, user, guild) {
         await set_application_channel(team, user.id, channel.id);
     }
     return channel;
+}
+
+exports.send_to_application_channel = async function (
+    team,
+    user,
+    guild,
+    message
+) {
+    var channel;
+    try {
+        channel = await get_application_channel(team, user, guild);
+        await channel.send(message);
+    } catch {}
+    try {
+        await (
+            await client.channels.fetch(config.channels.application_logs)
+        ).send(message);
+    } catch {}
 };
