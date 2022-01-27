@@ -216,6 +216,11 @@ function unmoderate(t, d) {
 }
 
 async function massban(ctx, args) {
+    if (!has_permission(ctx.author, "massban")) {
+        throw new PermissionError(
+            "You do not have permission to massban users."
+        );
+    }
     const user_ids = [];
     while (args.length > 0) {
         try {
@@ -230,6 +235,11 @@ async function massban(ctx, args) {
 }
 
 async function massban_from_url(ctx, args) {
+    if (!has_permission(ctx.author, "massban")) {
+        throw new PermissionError(
+            "You do not have permission to massban users."
+        );
+    }
     checkCount(args, 1, Infinity);
     var url = args.shift();
     if (url.startsWith("<") && url.endsWith(">")) {

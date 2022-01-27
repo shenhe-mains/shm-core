@@ -58,7 +58,7 @@ text:
 
             Please only use `word` or `regex` if you know what you're doing with regular expressions. You can request for terms to be added in <#805458033471782974>
             or <#840864247373103114>.
-        footer: Owner / Admin / Developer
+        footer: Requires Owner / Admin / Developer
     automod-rm:
         title: Automoderator - Remove term
         body: >
@@ -70,7 +70,7 @@ text:
 
 
             You can request for terms to be removed in <#805458033471782974> or <#840864247373103114>.
-        footer: Owner / Admin / Developer
+        footer: Requires Owner / Admin / Developer
     automod-scan:
         title: Automoderator - Scan message
         body: >
@@ -87,7 +87,7 @@ text:
 
             List all terms currently matched by the automoderator. Due to the nature of the automod, this will contain inappropriate, offensive, and potentially
             triggering terms, and as such, it is restricted. Please only use this in private channels or where you are sure it will not be hurtful to anyone.
-        footer: Owner / Admin / Developer
+        footer: Requires Owner / Admin / Developer
     customroles:
         title: Custom Supporter Roles
         body: >
@@ -130,4 +130,102 @@ text:
 
 
             Query the database. Please only do this if you know what you're doing. The server is running PostgreSQL with the `pg` node module.
-        footer: Developer
+        footer: Requires Developer
+    fun:
+        title: Fun / Miscellaneous Commands
+        body: >
+            This is a collection of random non-utility commands.
+
+
+            Commands in this module: `choose`
+    choose:
+        title: Choose Random Option
+        body: >
+            `{prefix}choose <option> <option> <option>` / `{prefix}choose <option with spaces>, <option with spaces>, <etc.>`
+
+
+            Pick a random option. For example, `{prefix}choose head tails` to flip a coin.
+    help:
+        title: Help
+        body: >
+            This is the command you are using right now. `{prefix}help` to see the list of modules, or `{prefix}help <key>` if you have something in particular
+            that you need help with.
+    messagelogs:
+        title: Message Logging
+        body: >
+            Messages that are edited or deleted are logged to <#922671895495733278> for moderation purposes.
+    moderation:
+        title: Moderation
+        body: >
+            This module contains all of the standard moderation utilities - muting, banning, etc.
+
+
+            Commands in this module: `slowmode`, `verbal`, `warn`, `mute`, `kick`, `ban`, `unmute`, `unban`, `massban`, `remove`, `clear-history`, `history`
+    slowmode:
+        title: Slowmode
+        body: >
+            `{prefix}slowmode [channel] <duration> [reason]`
+
+
+            Set the slowmode for a channel (default: current channel) with a particular reason (optional). Set the duration to `0` to remove the slowmode.
+        footer: Requires Moderator
+    verbal:
+        title: Verbally Warn
+        body: >
+            `{prefix}verbal <user> <reason>`
+
+
+            Verbally (informally) warn a user. This does not leave any records on their history. Generally, DMing the user directly is better. Also consider
+            opening a modmail thread with the user if you have a non-warning inquiry (`{prefix}modmail <user>`). This command will prompt for confirmation.
+        footer: Requires Moderator
+    warn:
+        title: Warn
+        body: >
+            `{prefix}warn <user> <reason>`
+
+
+            Warn a user, which is logged to their history. This command will prompt for confirmation. `{prefix}warn-silent` will not DM the user (useful for
+            adding a note to a user).
+        footer: Requires Moderator
+    mute:
+        title: Mute
+        body: >
+            `{prefix}mute <user> [duration] [reason]`
+
+
+            Mute a user for the specified duration (default 0 = indefinitely), which disables their ability to send messages, add reactions, and connect to
+            voice calls. This command will prompt for confirmation. `{prefix}mute-silent` will not DM the user.
+        footer: Requires Moderator
+    kick:
+        title: Kick
+        body: >
+            `{prefix}kick <user> [reason]`
+
+
+            Kicks a user for the specified reason. This command will prompt for confirmation. `{prefix}kick-silent` will not DM the user.
+        footer: Requires Moderator
+    ban:
+        title: Ban
+        body: >
+            `{prefix}ban <user> [duration] [reason]`
+
+
+            Bans a user for the specified duration (default 0 = indefinitely). This command will prompt for confirmation. `{prefix}ban-silent` will not DM the user.
+        footer: Requires Moderator
+    unmute:
+        title: Unmute
+        body: >
+            `{prefix}unmute <user> [reason]`
+
+
+            Unmutes a user, restoring their ability to send messages, add reactions, and connect to voice calls. This command will **not** prompt for confirmation.
+            `{prefix}unmute-silent` will not DM the user.
+        footer: Requires Moderator
+    unban:
+        title: Unban
+        body: >
+            `{prefix}unban <user> [reason]`
+
+            Unbans a user. This command will **not** prompt for confirmation. If the user is not banned, this command will fail. Because users who do not share a
+            server with a bot cannot be DM'd, this commmand will never attempt to DM the user. You should DM them yourself if you feel that it is necessary.
+        footer: Requires Moderator
