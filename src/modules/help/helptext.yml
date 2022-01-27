@@ -515,7 +515,8 @@ text:
             captcha verification will grant them <@&805458032929538061>, which grants them access to most of the rest of the server.
 
 
-            `{prefix}post-verify` will create a new verification prompt but this command shouldn't really need to be used. Requires Bot Owner / Admin / Developer.
+            `{prefix}post-verify <channel>` will create a new verification prompt but this command shouldn't really need to be used. Requires Bot Owner / Admin
+            / Developer.
     website:
         title: Shenhe Mains Website
         body: >

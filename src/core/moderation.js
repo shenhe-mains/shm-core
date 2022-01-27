@@ -155,7 +155,9 @@ exports.massban = async function (
                     days: days || 0,
                 });
             }
-        } catch {}
+        } catch (error) {
+            console.log(error);
+        }
     }
 };
 
