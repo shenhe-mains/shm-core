@@ -2,7 +2,7 @@ const { ButtonInteraction } = require("discord.js");
 const { ArgumentError, Success } = require("../../errors");
 const { checkCount } = require("../../utils");
 
-exports.commands = { choose: choose, fight: fight };
+exports.commands = { choose: choose, fight: fight, rps: rps };
 
 exports.listeners = { interactionCreate: [checkFun] };
 
@@ -73,6 +73,91 @@ async function fight(ctx, args) {
     };
 }
 
+async function rps(ctx, args) {
+    checkCount(args, 1);
+    const other = await ctx.parse_member(args[0]);
+    const message = await ctx.reply({
+        embeds: [
+            {
+                description: `${ctx.author} challenged ${other} to a game of rock-paper-scissors!`,
+                color: "GREEN",
+            },
+        ],
+        components: [
+            {
+                type: "ACTION_ROW",
+                components: [
+                    ["🪨", "fun.rps.rock"],
+                    ["📃", "fun.rps.paper"],
+                    ["✂️", "fun.rps.scissors"],
+                ].map(([emoji, id]) => ({
+                    type: "BUTTON",
+                    style: "SECONDARY",
+                    customId: id,
+                    emoji: emoji,
+                })),
+            },
+        ],
+        allowedMentions: { repliedUser: false },
+    });
+    rps[message.id] = {};
+    rps[message.id].players = [ctx.member.id, other.id];
+    rps[message.id][ctx.member.id] = null;
+    rps[message.id][other.id] = null;
+}
+
+const rps = {};
+
 async function checkFun(client, interaction) {
     if (!(interaction instanceof ButtonInteraction)) return;
+    if (rps.hasOwnProperty(interaction.message.id)) {
+        const item = rps[interaction.message.id];
+        if (
+            item.hasOwnProperty(interaction.user.id) &&
+            item[interaction.user.id] === null
+        ) {
+            item[interaction.user.id] = interaction.customId;
+            if (item.players.every((key) => item[key] !== null)) {
+                actions = item.players.map((key) => item[key].split(".")[2]);
+                if (actions[0] == actions[1]) {
+                    await interaction.reply({
+                        embeds: [
+                            {
+                                title: "TIE!",
+                                description: `<@${item.players[0]}> and <@${item.players[1]}> both used ${actions[0]}!`,
+                                color: "AQUA",
+                            },
+                        ],
+                    });
+                } else {
+                    var winner;
+                    if (actions[0] == "rock") {
+                        winner = actions[1] == "paper" ? 1 : 0;
+                    } else if (actions[0] == "paper") {
+                        winner = actions[1] == "scissors" ? 1 : 0;
+                    } else if (actions[0] == "scissors") {
+                        winner = actions[1] == "rock" ? 1 : 0;
+                    }
+                    await interaction.reply({
+                        embeds: [
+                            {
+                                title: "WIN!",
+                                description: `<@${item.players[winner]}>'s ${
+                                    actions[winner]
+                                } beat <@${item.players[1 - winner]}>'s ${
+                                    actions[1 - winner]
+                                }!`,
+                                color: "GREEN",
+                            },
+                        ],
+                    });
+                }
+            } else {
+                await interaction.reply({
+                    content: "Waiting for the other player...",
+                    ephemeral: true,
+                });
+            }
+        }
+    }
 }
