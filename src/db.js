@@ -179,10 +179,10 @@ exports.client = client;
                 [match]
             )
         ).rows[0].reports;
-        await client.query(`UPDATE reports SET reports = $1 WHERE match = $2`, [
-            count + 1,
-            match,
-        ]);
+        await client.query(
+            `UPDATE automod_terms SET reports = $1 WHERE match = $2`,
+            [count + 1, match]
+        );
     };
 
     exports.add_automod_term = async function (match, type, severity) {
