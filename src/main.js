@@ -27,6 +27,14 @@ client.on("ready", async () => {
     await db.client.connect();
     console.log("SHENHE CORE is ready.");
     handle_event("ready", client);
+    await client.user.setPresence({
+        activities: [
+            {
+                type: "LISTENING",
+                name: "to your DMs",
+            },
+        ],
+    });
 });
 
 for (var key of [
