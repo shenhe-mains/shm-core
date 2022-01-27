@@ -6,6 +6,17 @@ exports.commands = { choose: choose, fight: fight };
 
 exports.listeners = { interactionCreate: [checkFun] };
 
+function shuffle(a) {
+    var j, x, i;
+    for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+    }
+    return a;
+}
+
 async function choose(ctx, args, body) {
     var options;
     if (body.match(",")) {
@@ -32,6 +43,7 @@ const fight_actions = [
 
 async function fight(ctx, args) {
     checkCount(args, 2, Infinity);
+    shuffle(args);
     const users = [];
     for (var arg of args) {
         users.push([await ctx.parse_member(arg), 100]);
