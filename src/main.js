@@ -102,7 +102,7 @@ client.on("messageCreate", async (message) => {
                     title = "Permission Error";
                     description = error.message;
                     status = "permission error";
-                    reaction = "❌";
+                    reaction = "⛔";
                 } else if (error instanceof Info) {
                     color = "GREY";
                     title = error.title;

@@ -1,8 +1,9 @@
 aliases:
+    role-colour: role-color
     mute-silent: mute
     kick-silent: kick
     ban-silent: ban
-    role-colour: role-color
+    massban-from-url: massban
 text:
     __all:
         title: Shenhe Bot Help
@@ -23,11 +24,13 @@ text:
             `settings` - Bot settings
             `statschannels` - Server stats channels like member count and boosters
             `sticky` - Sticky messages
-            `triggers` - Auto-responder triggers
+            `triggers` - Autoresponder triggers
             `utility` - Utility and info commands like user info
-            `verification` - Captcha verification system
+            `verification` - CAPTCHA verification system
             `website` - https://shenhemains.com
             `welcome` - Welcome messages for new users
+
+            Additionally, there is a module handler (`modulehandler`) that is not itself a module because it is responsible for interfacing between the bot and modules.
 
             Alternatively, if you have a specific command you want help for, you can run `{prefix}help <command>` (don't include the prefix in the command name).
     automod:
@@ -58,7 +61,7 @@ text:
 
             Please only use `word` or `regex` if you know what you're doing with regular expressions. You can request for terms to be added in <#805458033471782974>
             or <#840864247373103114>.
-        footer: Requires Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin / Developer
     automod-rm:
         title: Automoderator - Remove term
         body: >
@@ -70,7 +73,7 @@ text:
 
 
             You can request for terms to be removed in <#805458033471782974> or <#840864247373103114>.
-        footer: Requires Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin / Developer
     automod-scan:
         title: Automoderator - Scan message
         body: >
@@ -87,7 +90,7 @@ text:
 
             List all terms currently matched by the automoderator. Due to the nature of the automod, this will contain inappropriate, offensive, and potentially
             triggering terms, and as such, it is restricted. Please only use this in private channels or where you are sure it will not be hurtful to anyone.
-        footer: Requires Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin / Developer
     customroles:
         title: Custom Supporter Roles
         body: >
@@ -160,7 +163,8 @@ text:
             This module contains all of the standard moderation utilities - muting, banning, etc.
 
 
-            Commands in this module: `slowmode`, `verbal`, `warn`, `mute`, `kick`, `ban`, `unmute`, `unban`, `massban`, `remove`, `clear-history`, `history`
+            Commands in this module: `slowmode`, `verbal`, `warn`, `mute`, `kick`, `ban`, `unmute`, `unban`, `massban`, `massban-from-url`, `remove`,
+            `clear-history`, `history`
     slowmode:
         title: Slowmode
         body: >
@@ -218,14 +222,315 @@ text:
             `{prefix}unmute <user> [reason]`
 
 
-            Unmutes a user, restoring their ability to send messages, add reactions, and connect to voice calls. This command will **not** prompt for confirmation.
-            `{prefix}unmute-silent` will not DM the user.
+            Unmutes a user, restoring their ability to send messages, add reactions, and connect to voice calls. `{prefix}unmute-silent` will not DM the user.
         footer: Requires Moderator
     unban:
         title: Unban
         body: >
             `{prefix}unban <user> [reason]`
 
-            Unbans a user. This command will **not** prompt for confirmation. If the user is not banned, this command will fail. Because users who do not share a
-            server with a bot cannot be DM'd, this commmand will never attempt to DM the user. You should DM them yourself if you feel that it is necessary.
+
+            Unbans a user. If the user is not banned, this command will fail. Because users who do not share a server with a bot cannot be DM'd, this commmand
+            will never attempt to DM the user. You should DM them yourself if you feel that it is necessary.
         footer: Requires Moderator
+    massban:
+        title: Massban
+        body: >
+            `{prefix}massban <user> <user> ... [reason]` / `{prefix}massban-from-url <url> [reason]`
+
+
+            Massbans many users. This command will prompt for confirmation including the number of users that will be banned and the reason. This command will not DM
+            any of the users who are banned. If you need to massban a lot of users and cannot fit it in one message, consider uploading it to something like
+            [GitHub Gist](https://gist.github.com/). Make sure the URL you link is raw plaintext, otherwise it will not be able to parse the user IDs.
+        footer: Requires Admin
+    remove:
+        title: Remove from Records
+        body: >
+            `{prefix}remove <type> <id>`
+
+
+            Remove an item from user history by a specific ID. `type` must be one of `warn`, `mute`, `kick`, or `ban`. Note that this command does not fail if the ID
+            was not found or is invalid.
+        footer: Requires Admin
+    clear-history:
+        title: Clear User History
+        body: >
+            `{prefix}clear-history <user> [type]`
+
+
+            Remove all items from a user's history. `type` must be one of `warns`, `mutes`, `kicks`, or `bans`. If `type` is not specified, this will remove all of a
+            user's history.
+        footer: Requires Admin
+    history:
+        title: View User History
+        body: >
+            `{prefix}history <user> [types...]`
+
+
+            Show a user's history. `type` arguments must be each one of `warns`, `mutes`, `kicks`, or `bans`. If no types are specified, this will list a user's entire
+            history.
+    modmail:
+        title: Modmail / Ticket System
+        body: >
+            The modmail system provides a way for users to communicate with the server's staff and vice versa. To contact the staff, simply DM the bot. It will prompt
+            you for confirmation that you actually want to open a modmail thread, and once you do, a channel will be created for the moderators where they can interact
+            with you. Messages they send to you will be sent to your DMs and your DMs will continue to be forwarded to the channel until the thread is closed. Please
+            only use modmail for serious inquiries that require staff attention.
+
+
+            Modmail threads are logged to <#911071731265986560> when they are opened or closed, and can be viewed on the website via the staff dashboard. You can open
+            a modmail thread with a user using `{prefix}modmali <user>`, which creates the modmail channel if it does not already exist. The user will not be notified of
+            this. To reply, use `{prefix}reply <message>` or `{prefix}anonreply <message>`. To close the thread, you can do `{prefix}close` or `{prefix}silentclose` to
+            not DM the user that the thread has been closed. Deleting the channel is not preferred, but will also silently close the thread.
+        footer: Requires Moderator to access modmail from the staff side
+    nukeguard:
+        title: Anti-Nuking System
+        body: >
+            This server has some systems in place to prevent nuking (when moderators / admins turn on a server and do massive and irreparable damage to it, sometimes
+            requiring it to essentially be completely remade). Currently, all important, non-temporary channels are protected, and if they are deleted, the user who
+            deleted it will be banned and admin chat will be notified. Also, whenever a role is deleted, admin chat is notified and the old role's members are saved
+            in case the role needs to be restored via copying to a new role.
+    polls:
+        title: Polls
+        body: >
+            Commands in this module: `poll`, `open-poll`, `close-poll`, `poll-results`, `disclose`
+    poll:
+        title: Setup Poll
+        body: |
+            `{prefix}poll <channel> <type> <body> ;; <option> ;; <option> ...`
+
+            Creates a new poll in the specified channel. `type` must be one of `normal`, `unique`, `commit`, `hidden`, `hidden_unique`, `hidden_commit`, or `show_on_commit`.
+
+            `normal` - standard poll; users can add or remove votes to multiple options at any time
+            `unique` - users can only choose exactly one option; choosing another one will swap their vote and remove the previous one
+            `commit` - users can only choose exactly one option and cannot change it later
+            `hidden` - standard poll like `normal`, but the poll message does not update to show the votes
+            `hidden_unique` - `unique` + `hidden`
+            `hidden_commit` - `commit` + `hidden`
+            `show_on_commit` - `commit` + `hidden`, but when the user locks in their vote, they are shown the current vote distribution
+        footer: Requires Admin
+    open-poll:
+        title: Open Poll
+        body: >
+            `{prefix}open-poll <message id>`
+
+
+            Open up a poll to voting. Polls are open to voting when created, but may be closed via `{prefix}close-poll`
+        footer: Requires Admin
+    close-poll:
+        title: Close Poll
+        body: >
+            `{prefix}close-poll <message id>`
+
+
+            Close a poll by disabling all of the buttons on it. Polls can be reopened via `{prefix}open-poll`. Closing a poll does not do anything else like show results.
+        footer: Requires Admin
+    poll-results:
+        title: Show Poll Results
+        body: >
+            `{prefix}poll-results <message id>`
+
+
+            Display a poll's current votes.
+        footer: Requires Admin
+    disclose:
+        title: Reveal Poll results
+        body: >
+            `{prefix}disclose <message id>`
+
+
+            Edit a poll's results into the poll message. This command is not needed for normal polls as the editing is done automatically, only for hidden polls. Note
+            that this action cannot be undone, and the results will not update automatically later if it is a hidden poll.
+        footer: Requires Admin
+    settings:
+        title: Bot Settings
+        body: >
+            This module contains commands used to modify the bot's settings. There is no help text or command list for this as it is only used by the dev team.
+        footer: Requires Bot Owner / Admin / Developer
+    statschannels:
+        title: Stats Channels
+        body: >
+            This server currently maintains two stats channels - <#927057269064085504> displays the overall member count and <#829803392447545404> displays the number
+            of server boosters.
+    sticky:
+        title: Sticky Messages
+        body: >
+            Sticky messages do exactly what the name says - they stick to the bottom of the channel by deleting + re-sending each time. Note that sticky messages are
+            quite annoying and disruptive, and should only be used when absolutely necessary.
+
+            To add a sticky message, do `{prefix}stick <message>`. To remove a stick message, do `{prefix}stickstop`.
+        footer: Requires Moderator
+    stick:
+        title: Add Sticky Message
+        body: >
+            `{prefix}stick <message>`
+
+
+            If the current channel does not have a sticky message, set a new message to stay stuck to the bottom of a channel.
+        footer: Requires Moderator
+    stickstop:
+        title: Remove Sticky Message
+        body: >
+            `{prefix}stickstop`
+
+
+            Removes the current channel's sticky message if it has one.
+    triggers:
+        title: Autoresponder Triggers
+        body: >
+            The autoresponder will send certain messages when certain phrases are sent.
+
+
+            Commands in this module: `add-trigger`, `rm-trigger`, `wildcard-trigger`, `exact-trigger`, `public-trigger`, `private-trigger`, `no-reply-trigger`,
+            `reply-trigger`, `ping-reply-trigger`, `allow-trigger`, `disallow-trigger`, `list-triggers`, `trigger-info`
+    add-trigger:
+        title: Add Autoresponder Trigger
+        body: >
+            `{prefix}add-trigger <match> <response>` / `{prefix}add-trigger <match with spaces> ;; <response>`
+
+
+            Adds a new entry to the autoresponder. When entries are created, they are exact matches, allowed in all channels, and send as normal messages.
+        footer: Requires Bot Owner / Admin / Developer
+    rm-trigger:
+        title: Remove Autoresponder Trigger
+        body: >
+            `{prefix}rm-trigger <match>`
+
+
+            Remove an entry from the autoresponder. You must call this command with the exact string the autoresponder entry matches.
+        footer: Requires Bot Owner / Admin / Developer
+    wildcard-trigger:
+        title: Set Autoresponder Trigger to Wildcard
+        body: >
+            `{prefix}wildcard-trigger <match>`
+
+
+            Set an autoresponder entry to match if the message contains the match string as a substring (case-insensitive).
+        footer: Requires Bot Owner / Admin / Developer
+    exact-trigger:
+        title: Set Autoresponder Trigger to Exact Match
+        body: >
+            `{prefix}exact-trigger <match>`
+
+
+            Set an autoresponder entry to match only if the message is exactly equal to the match string (case-insensitive).
+        footer: Requires Bot Owner / Admin / Developer
+    public-trigger:
+        title: Set Autoresponder Trigger to Public
+        body: >
+            `{prefix}public-trigger <match>`
+
+
+            Set an autoresponder entry to be allowed in all channels except those explicitly blocked by `{prefix}disallow-trigger`.
+        footer: Requires Bot Owner / Admin / Developer
+    private-trigger:
+        title: Set Autoresponder Trigger to Private
+        body: >
+            `{prefix}private-trigger <match>`
+
+
+            Set an autoresponder entry to be disallowed in all channels except those explicitly allowed by `{prefix}allow-trigger`.
+        footer: Requires Bot Owner / Admin / Developer
+    no-reply-trigger:
+        title: Set Autoresponder Trigger to Normal Message
+        body: >
+            `{prefix}no-reply--trigger <match>`
+
+
+            Set an autoresponder entry to send its message as a normal message to the channel.
+        footer: Requires Bot Owner / Admin / Developer
+    reply-trigger:
+        title: Set Autoresponder Trigger to Reply (No Ping)
+        body: >
+            `{prefix}reply-trigger <match>`
+
+
+            Set an autoresponder entry to send its message as a reply to the original message (without pinging the author).
+        footer: Requires Bot Owner / Admin / Developer
+    ping-reply-trigger:
+        title: Set Autoresponder Trigger to Reply (With Ping)
+        body: >
+            `{prefix}ping-reply-trigger <match>`
+
+
+            Set an autoresponder entry to send its message as a reply to the original message (will ping the author).
+        footer: Requires Bot Owner / Admin / Developer
+    allow-trigger:
+        title: Allow Autoresponder Trigger in Channel
+        body: >
+            `{prefix}allow-trigger <channel> <match>`
+
+
+            Explicitly allow an autoresponder entry in the specified channel, even if it is private.
+        footer: Requires Bot Owner / Admin / Developer
+    disallow-trigger:
+        title: Disallow Autoresponder Trigger in Channel
+        body: >
+            `{prefix}disallow-trigger <channel> <match>`
+
+
+            Explicitly disallow an autoresponder entry in the specified channel, even if it is public.
+        footer: Requires Bot Owner / Admin / Developer
+    list-triggers:
+        title: List Autoresponder Triggers
+        body: >
+            `{prefix}list-triggers`
+
+
+            List all autoresponder entries. This does not check whether the entries are allowed in the current channel.
+    trigger-info:
+        title: Show Autoresponder Trigger Info
+        body: >
+            `{prefix}trigger-info <match>`
+
+
+            Show information for a specific autoresponder entry.
+    utility:
+        title: Utility Commands
+        body: >
+            Useful commands for things like showing info or other uncategorized commands that don't belong to the `fun` module.
+
+            Commands in this module: `ranks`, `reload-config`
+    ranks:
+        title: Show Ranks
+        body: >
+            `{prefix}ranks [member]`
+
+
+            Show the ranks (not roles) for a member, or if not specified, youself. Ranks are internal permission categories.
+    reload-config:
+        title: Reload Configuration File
+        body: >
+            `{prefix}reload-config`
+
+
+            Reload `config.json`. Most things will be brought up-to-date by this command. This is only necessary if the file was edited manually, not if the
+            configuration was modified via commands (unless otherwise specified).
+        footer: Requires Bot Owner / Admin / Developer
+    verification:
+        title: CAPTCHA Verification System
+        body: >
+            This server uses Google reCAPTCHA to protect itself from raids and bot users. After reading the rules, unverified users have the option to press
+            the button interaction which sends them an ephemeral message (only visible to them) containing a unique link that will verify them. Passing
+            captcha verification will grant them <@&805458032929538061>, which grants them access to most of the rest of the server.
+
+
+            `{prefix}post-verify` will create a new verification prompt but this command shouldn't really need to be used. Requires Bot Owner / Admin / Developer.
+    website:
+        title: Shenhe Mains Website
+        body: >
+            https://shenhemains.com - check out our website here! This website serves as the official page for this discord server. Credit goes to the dev and art
+            teams for their work on this site and its assets, as well as many other staff members who provided feedback for it during development. This website
+            also contains the staff application forms and a staff dashboard for things like modmail threads and viewing staff applications.
+    welcome:
+        title: Welcome System
+        body: >
+            New members are sent a welcome message in <#890252868135825408> prompting them to read the rules and verify themselves.
+    modulehandler:
+        title: Module Handler
+        body: >
+            The module handler connects all of the modules to the bot and handles the logic for dispatching commands and sending client events like deleted channels
+            and button interactions. `{prefix}load <module>`, `{prefix}unload <module>`, and `{prefix}reload <module>` can be used to dynamically enable and disable
+            commands within the module and reload the module if the code has been updated. This allows certain commands to be updated without affecting functionality
+            of other commands or restarting the bot.
+        footer: Requires Bot Owner / Admin / Developer

@@ -19,7 +19,7 @@ exports.listeners = {
     messageCreate: [update_stick],
 };
 
-async function stick(ctx, args) {
+async function stick(ctx, args, body) {
     if (!has_permission(ctx.author, "sticky")) {
         throw new PermissionError(
             "You do not have permission to sticky messages."
@@ -28,14 +28,12 @@ async function stick(ctx, args) {
     if (await has_sticky(ctx.channel.id)) {
         throw new UserError("This channel already has a sticky message.");
     }
-    const index = ctx.message.content.indexOf("stick") + 5;
-    const content = ctx.message.content.substring(index).trim();
-    if (!content) {
+    if (!body) {
         throw new UserError("Please enter a non-empty sticky message.");
     }
-    await create_sticky(ctx.channel.id, content);
+    await create_sticky(ctx.channel.id, body);
     const message = await ctx.channel.send({
-        content: content,
+        content: body,
         allowedMentions: { users: [], roles: [] },
     });
     await ctx.message.delete();

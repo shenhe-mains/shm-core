@@ -111,9 +111,15 @@ async function info(entry) {
     return `Matches: ${inline_code(entry.match)}\nResponds: ${inline_code(
         entry.response
     )}\n${
+        [
+            "The response is sent as a normal message.",
+            "The response is sent as a reply to the original user without pinging.",
+            "The response is sent to as a reply to the original user and pings them.",
+        ][entry.reply]
+    }\n${
         entry.wildcard
-            ? "This is a wildcard match (matches any message that contains this string)"
-            : "This only matches messages exactly equal to this string"
+            ? "This is a wildcard match (matches any message that contains this string)."
+            : "This only matches messages exactly equal to this string."
     }\nThis is ${entry.public ? "allowed" : "disallowed"} in all channels${
         opposite.length > 0 ? " except " : ""
     }${english_list(opposite.map((entry) => `<#${entry.channel_id}>`))}.`;
