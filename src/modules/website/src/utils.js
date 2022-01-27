@@ -113,4 +113,5 @@ exports.getApplicationChannel = async function (team, user, guild) {
         }
         await set_application_channel(team, user.id, channel.id);
     }
+    return channel;
 };
