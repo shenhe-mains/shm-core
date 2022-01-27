@@ -100,10 +100,10 @@ async function rps(ctx, args) {
         ],
         allowedMentions: { repliedUser: false },
     });
-    rps[message.id] = {};
-    rps[message.id].players = [ctx.author.id, other.id];
-    rps[message.id][ctx.author.id] = null;
-    rps[message.id][other.id] = null;
+    rps_data[message.id] = {};
+    rps_data[message.id].players = [ctx.author.id, other.id];
+    rps_data[message.id][ctx.author.id] = null;
+    rps_data[message.id][other.id] = null;
 }
 
 const rps_data = {};
