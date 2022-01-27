@@ -49,12 +49,12 @@ async function fight(ctx, args) {
                 ` ${users[target][0]} now has ${users[target][1]} HP.`
         );
         if (users[target][1] < 0) {
-            rows.push(`${users[target]} is out of the fight!`);
+            rows.push(`${users[target][0]} is out of the fight!`);
             users.splice(target, 1);
         }
         users.push(users.shift());
     }
-    rows.push(`${users[0]} is victorious!`);
+    rows.push(`${users[0][0]} is victorious!`);
     return {
         title: "Fight Result",
         description: rows.join("\n"),
