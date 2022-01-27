@@ -209,6 +209,7 @@ app.post(
                 res.redirect(303, "/apply/");
             }
         } catch (error) {
+            console.log(error);
             flash(req, error, "ERROR");
             res.send(
                 render(req, "apply/form.pug", appl_options(req, req.body))
