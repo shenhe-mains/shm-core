@@ -88,7 +88,7 @@ exports.verifyMember = function (req, res, next) {
         });
 };
 
-async function get_application_channel(team, user, guild) {
+async function get_app_channel(team, user, guild) {
     const name = `${team}-${user.username}-${user.discriminator}`;
     const topic = `${user}'s application for ${team_info[team].name}`;
     var channel;
@@ -124,7 +124,7 @@ exports.send_to_application_channel = async function (
 ) {
     var channel;
     try {
-        channel = await get_application_channel(team, user, guild);
+        channel = await get_app_channel(team, user, guild);
         await channel.send(message);
     } catch {}
     try {
