@@ -10,7 +10,13 @@ const {
 const { client } = require("../../../../client");
 const { app } = require("../app");
 const { team_info, timezones, application_fields, fields } = require("../data");
-const { render, discordAuth, verifyMember, flash } = require("../utils");
+const {
+    render,
+    discordAuth,
+    verifyMember,
+    flash,
+    getApplicationChannel,
+} = require("../utils");
 
 async function status(member, team) {
     if (
@@ -173,40 +179,13 @@ app.post(
             );
             try {
                 const url = `https://shenhemains.com/dashboard/applications/${req.team}/${req.member.id}`;
-                const name = `${req.team}-${req.member.user.username}-${req.member.user.discriminator}`;
-                const topic = `${req.member}'s application for ${
-                    team_info[req.team].name
-                }`;
-                var channel;
-                if (await has_application_channel(req.team, req.member.id)) {
-                    try {
-                        channel = await client.channels.fetch(
-                            await get_application_channel(
-                                req.team,
-                                req.member.id
-                            )
-                        );
-                    } catch {}
-                }
-                if (channel === undefined) {
-                    try {
-                        channel = await (
-                            await client.channels.fetch(
-                                config.channels.application_category
-                            )
-                        ).createChannel(name, { topic: topic });
-                    } catch {
-                        channel = await req.member.guild.channels.create(name, {
-                            topic: topic,
-                        });
-                    }
-                    await set_application_channel(
+                await (
+                    await getApplicationChannel(
                         req.team,
-                        req.member.id,
-                        channel.id
-                    );
-                }
-                await channel.send({
+                        req.member.user,
+                        req.member.guild
+                    )
+                ).send({
                     embeds: [
                         {
                             title: `${req.member.user.username}#${

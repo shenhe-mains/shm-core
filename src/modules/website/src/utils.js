@@ -81,3 +81,30 @@ exports.verifyMember = function (req, res, next) {
             res.redirect("/?nomember=1");
         });
 };
+
+exports.getApplicationChannel = function (team, user, guild) {
+    const name = `${team}-${user.username}-${user.discriminator}`;
+    const topic = `${user}'s application for ${team_info[req.team].name}`;
+    var channel;
+    if (await has_application_channel(team, user.id)) {
+        try {
+            channel = await client.channels.fetch(
+                await get_application_channel(team, user.id)
+            );
+        } catch {}
+    }
+    if (channel === undefined) {
+        try {
+            channel = await(
+                await client.channels.fetch(
+                    config.channels.application_category
+                )
+            ).createChannel(name, { topic: topic });
+        } catch {
+            channel = await guild.channels.create(name, {
+                topic: topic,
+            });
+        }
+        await set_application_channel(team, user.id, channel.id);
+    }
+};

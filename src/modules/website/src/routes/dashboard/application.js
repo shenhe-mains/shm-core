@@ -8,7 +8,13 @@ const {
 } = require("../../../../../db");
 const { app } = require("../../app");
 const { team_info, fields } = require("../../data");
-const { flash, discordAuth, verifyMember, render } = require("../../utils");
+const {
+    flash,
+    discordAuth,
+    verifyMember,
+    render,
+    getApplicationChannel,
+} = require("../../utils");
 const { fields_for } = require("../apply");
 const { staffData, assertPermission } = require("./utils");
 
@@ -176,8 +182,10 @@ app.get(
         );
         try {
             await (
-                await client.channels.fetch(
-                    config.staff_teams[req.team].channel
+                await getApplicationChannel(
+                    req.team,
+                    await client.users.fetch(req.applicant_id),
+                    req.member.guild
                 )
             ).send({
                 embeds: [
