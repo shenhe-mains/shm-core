@@ -4,6 +4,11 @@ const pug = require("pug");
 const data = require("../../../../data");
 const { config } = require("../../../core/config");
 const { client } = require("../../../client");
+const {
+    has_application_channel,
+    get_application_channel,
+    set_application_channel,
+} = require("../../../db");
 
 const version = "?v=" + Math.floor(Math.random() * 1000000).toString();
 
