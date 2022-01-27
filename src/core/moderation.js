@@ -133,10 +133,9 @@ exports.massban = async function (
     for (var i in user_ids) {
         await callback(i);
         const user_id = user_ids[i];
-        console.log("massban", user_id);
         var member;
         try {
-            member = ctx.guild.members.fetch(user_id);
+            member = await ctx.guild.members.fetch(user_id);
         } catch {}
         try {
             if (member !== undefined) {
