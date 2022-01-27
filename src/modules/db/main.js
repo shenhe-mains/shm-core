@@ -22,14 +22,16 @@ async function dbquery(ctx, args, body) {
     }
     const fields = [];
     const field_names = result.fields.map((field) => field.name);
-    for (const entry of result.rows) {
-        fields.push(
-            "```" +
+    for (const row in result.rows) {
+        fields.push({
+            name: `Row ${row + 1}`,
+            value:
+                "```" +
                 field_names
-                    .map((name) => name + ": " + entry[name])
+                    .map((name) => name + ": " + result.rows[row][name])
                     .join("\n") +
-                "```"
-        );
+                "```",
+        });
     }
     await pagify(
         ctx,
