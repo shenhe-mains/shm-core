@@ -136,7 +136,7 @@ exports.massban = async function (
         console.log("massban", user_id);
         var member;
         try {
-            member = ctx.guilds.members.fetch(user_id);
+            member = ctx.guild.members.fetch(user_id);
         } catch {}
         try {
             if (member !== undefined) {
@@ -151,14 +151,12 @@ exports.massban = async function (
                     reason,
                     ctx.url
                 );
-                await ctx.guilds.bans.create(user_id, {
+                await ctx.guild.bans.create(user_id, {
                     reason: reason,
                     days: days || 0,
                 });
             }
-        } catch (error) {
-            console.log(error);
-        }
+        } catch {}
     }
 };
 
