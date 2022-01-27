@@ -32,7 +32,10 @@ const fight_actions = [
 
 async function fight(ctx, args) {
     checkCount(args, 2, Infinity);
-    const users = args.map((arg) => [await ctx.parse_member(arg), 100]);
+    const users = [];
+    for (var arg of args) {
+        users.push([await ctx.parse_member(arg), 100]);
+    }
     const rows = [];
     while (users.length > 1) {
         const [action, min, max] =
