@@ -123,3 +123,11 @@ text:
             pick a color with [this online color picker](https://imagecolorpicker.com/color-code/d9e9f9) and copy-paste the code (`#` followed by 6 characters).
             If your role does not exist yet, it gets created with the name `new role`.
         footer: A.K.A. role-colour
+    db:
+        title: Database Query
+        body: >
+            `{prefix}db <query>`
+
+
+            Query the database. Please only do this if you know what you're doing. The server is running PostgreSQL with the `pg` node module.
+        footer: Developer

@@ -243,6 +243,9 @@
             "bypass",
             "mod",
             "leader"
+        ],
+        "database": [
+            "dev"
         ]
     },
     "support_anchor": "903686165792706580",
