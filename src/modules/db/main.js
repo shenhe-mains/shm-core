@@ -21,7 +21,7 @@ async function dbquery(ctx, args, body) {
         );
     }
     const fields = [];
-    const field_names = rows.fields.map((field) => field.name);
+    const field_names = result.fields.map((field) => field.name);
     for (const entry of result.rows) {
         fields.push(
             "```" +
