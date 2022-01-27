@@ -106,12 +106,12 @@ async function rps(ctx, args) {
     rps[message.id][other.id] = null;
 }
 
-const rps = {};
+const rps_data = {};
 
 async function checkFun(client, interaction) {
     if (!(interaction instanceof ButtonInteraction)) return;
-    if (rps.hasOwnProperty(interaction.message.id)) {
-        const item = rps[interaction.message.id];
+    if (rps_data.hasOwnProperty(interaction.message.id)) {
+        const item = rps_data[interaction.message.id];
         if (
             item.hasOwnProperty(interaction.user.id) &&
             item[interaction.user.id] === null
