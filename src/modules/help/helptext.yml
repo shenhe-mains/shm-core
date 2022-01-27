@@ -1,5 +1,8 @@
 aliases:
     mute-silent: mute
+    kick-silent: kick
+    ban-silent: ban
+    role-colour: role-color
 text:
     __all:
         title: Shenhe Bot Help
@@ -43,14 +46,80 @@ text:
             Commands in this module: `automod-add`, `automod-rm`, `automod-scan`, `automod-list`
     automod-add:
         title: Automoderator - Add term
-        body: |
-            `{prefix}automod-add <type> <action> term to match`
+        body: >
+            `{prefix}automod-add <type> <action> <term to match>`
+
 
             Adds a new term to the automoderator. `type` should be one of `substring` (match anywhere), `word` (match regular expression only when surrounded by
             non-letters), or `regex` (match regular expression). `action` should be one of `defer` (alert mod chat), `delete` (silently remove the message), `verbal`
             (send a verbal/unlogged warning), `warn` (send a formal warning), `mute` (mute the user indefinitely and alert mod chat), `kick` (temporarily kick the
             user from the server), or `ban` (ban the user indefinitely and alert mod chat).
 
+
             Please only use `word` or `regex` if you know what you're doing with regular expressions. You can request for terms to be added in <#805458033471782974>
             or <#840864247373103114>.
         footer: Owner / Admin / Developer
+    automod-rm:
+        title: Automoderator - Remove term
+        body: >
+            `{prefix}automod-rm <term to match>`
+
+
+            Remove a term from the automoderator. You must enter the exact string being matched by the automoderator. You can run `{prefix}automod-list` to find the
+            string if you forget what it is.
+
+
+            You can request for terms to be removed in <#805458033471782974> or <#840864247373103114>.
+        footer: Owner / Admin / Developer
+    automod-scan:
+        title: Automoderator - Scan message
+        body: >
+            `{prefix}automod-scan <message content>`
+
+
+            Scan a message. This command can be used by anyone but it is recommended to only use it as a moderator because if the scan succeeds, the automoderator
+            will trigger and take action against you.
+    automod-list:
+        title: Automod - List terms
+        body: >
+            `{prefix}automod-list`
+
+
+            List all terms currently matched by the automoderator. Due to the nature of the automod, this will contain inappropriate, offensive, and potentially
+            triggering terms, and as such, it is restricted. Please only use this in private channels or where you are sure it will not be hurtful to anyone.
+        footer: Owner / Admin / Developer
+    customroles:
+        title: Custom Supporter Roles
+        body: >
+            Server boosters and [Ko-Fi](https://ko-fi.com/shenhe) supporters, on top of receiving the exclusive roles <@&817617933495697469> and
+            <@&926279568980058183> respectively, also gain access to custom roles. To get your role, head over to <#805458034251530262> and run
+            `{prefix}role-claim <role name>`. Then, you can rename it with `{prefix}role-rename <role name>` or change its color with `{prefix}role-color <color>`.
+
+
+            Server boosters' roles will be removed when they are no longer boosting the server, but the ko-fi supporter role, and therefore the custom roles, are
+            permanent.
+    role-claim:
+        title: Custom Role - Claim
+        body: >
+            `{prefix}role-claim <role name>`
+
+
+            Claim a role with a particular name. You will be granted this role and it will be attached to your account so long as you are a server supporter. If
+            your custom role already exists, this does the same thing as `{prefix}role-rename`.
+    role-rename:
+        title: Custom Role - Rename
+        body: >
+            `{prefix}role-rename <role name>`
+
+
+            Rename your custom role. If your role does not exist yet, this does the same thing as `{prefix}role-claim`.
+    role-color:
+        title: Custom Role - Recolor
+        body: >
+            `{prefix}role-color <role name>`
+
+
+            Recolor your custom role. You can enter a hexcode or some common color names such as `red`, `blue`, etc. If you're having trouble with this, you can
+            pick a color with [this online color picker](https://imagecolorpicker.com/color-code/d9e9f9) and copy-paste the code (`#` followed by 6 characters).
+            If your role does not exist yet, it gets created with the name `new role`.
+        footer: A.K.A. role-colour
