@@ -82,7 +82,7 @@ exports.verifyMember = function (req, res, next) {
         });
 };
 
-exports.getApplicationChannel = function (team, user, guild) {
+exports.getApplicationChannel = async function (team, user, guild) {
     const name = `${team}-${user.username}-${user.discriminator}`;
     const topic = `${user}'s application for ${team_info[req.team].name}`;
     var channel;
@@ -95,7 +95,7 @@ exports.getApplicationChannel = function (team, user, guild) {
     }
     if (channel === undefined) {
         try {
-            channel = await(
+            channel = await (
                 await client.channels.fetch(
                     config.channels.application_category
                 )
