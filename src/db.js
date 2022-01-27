@@ -900,6 +900,7 @@ exports.client = client;
         team,
         user_id
     ) {
+        console.log("HAS");
         return (
             (
                 await client.query(
@@ -911,6 +912,7 @@ exports.client = client;
     };
 
     exports.get_application_channel = async function (team, user_id) {
+        console.log("GET");
         return (
             await client.query(
                 `SELECT channel_id FROM application_channels WHERE team = $1 AND user_id = $2`,
@@ -925,11 +927,13 @@ exports.client = client;
         channel_id
     ) {
         if (await has_application_channel(team, user_id)) {
+            console.log("SET UPDATE");
             await client.query(
                 `UPDATE application_channels SET channel_id = $1 WHERE team = $2 AND user_id = $3`,
                 [channel_id, team, user_id]
             );
         } else {
+            console.log("SET CREATE");
             await client.query(
                 `INSERT INTO application_channels (team, user_id, channel_id) VALUES ($1, $2, $3)`,
                 [team, user_id, channel_id]
