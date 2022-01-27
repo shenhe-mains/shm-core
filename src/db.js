@@ -680,6 +680,14 @@ exports.client = client;
 // staff applications
 {
     client.query(
+        `CREATE TABLE IF NOT EXISTS application_channels (
+            team VARCHAR(16),
+            user_id VARCHAR(32),
+            channel_id VARCHAR(32)
+        )`
+    );
+
+    client.query(
         `CREATE TABLE IF NOT EXISTS mod_applications (
             id SERIAL PRIMARY KEY,
             user_id VARCHAR(32),
@@ -886,5 +894,46 @@ exports.client = client;
             }
         }
         return applications;
+    };
+
+    exports.has_application_channel = has_application_channel = async function (
+        team,
+        user_id
+    ) {
+        return (
+            (
+                await client.query(
+                    `SELECT 1 FROM application_channels WHERE team = $1 AND user_id = $2`,
+                    [team, user_id]
+                )
+            ).rows.length > 0
+        );
+    };
+
+    exports.get_application_channel = async function (team, user_id) {
+        return (
+            await client.query(
+                `SELECT channel_id FROM application_channels WHERE team = $1 AND user_id = $2`,
+                [team, user_id]
+            )
+        ).rows[0].channel_id;
+    };
+
+    exports.set_application_channel = async function (
+        team,
+        user_id,
+        channel_id
+    ) {
+        if (await has_application_channel(team, user_id)) {
+            await client.query(
+                `UPDATE application_channels SET channel_id = $1 WHERE team = $2 AND user_id = $3`,
+                [channel_id, team, user_id]
+            );
+        } else {
+            await client.query(
+                `INSERT INTO application_channels (team, user_id, channel_id) VALUES ($1, $2, $3)`,
+                [team, user_id, channel_id]
+            );
+        }
     };
 }

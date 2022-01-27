@@ -39,18 +39,15 @@ exports.get_modmail_channel = _get_modmail_channel = async function (
         return await client.channels.fetch(await get_modmail_channel(user.id));
     } catch {
         var channel, success;
+        const name = `${user.username}-${user.discriminator}`;
+        const topic = `Modmail with ${user}`;
         try {
             channel = await (
                 await client.channels.fetch(config.channels.modmail_category)
-            ).createChannel(`${user.username}-${user.discriminator}`, {
-                topic: `Modmail with ${user}`,
-            });
+            ).createChannel(name, { topic: topic });
             success = true;
         } catch {
-            channel = await guild.channels.create(
-                `${user.username}-${user.discriminator}`,
-                { topic: `Modmail with ${user}` }
-            );
+            channel = await guild.channels.create(name, { topic: topic });
             success = false;
         }
         try {

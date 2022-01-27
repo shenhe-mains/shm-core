@@ -1,5 +1,12 @@
 const { config } = require("../../../../core/config");
-const { has_application, get_application, apply } = require("../../../../db");
+const {
+    has_application,
+    get_application,
+    apply,
+    has_application_channel,
+    get_application_channel,
+    set_application_channel,
+} = require("../../../../db");
 const { client } = require("../../../../client");
 const { app } = require("../app");
 const { team_info, timezones, application_fields, fields } = require("../data");
@@ -166,11 +173,40 @@ app.post(
             );
             try {
                 const url = `https://shenhemains.com/dashboard/applications/${req.team}/${req.member.id}`;
-                await (
-                    await client.channels.fetch(
-                        config.staff_teams[req.team].channel
-                    )
-                ).send({
+                const name = `${req.team}-${req.member.user.username}-${req.member.user.discriminator}`;
+                const topic = `${req.member}'s application for ${
+                    team_info[req.team].name
+                }`;
+                var channel;
+                if (await has_application_channel(req.team, req.member.id)) {
+                    try {
+                        channel = await client.channels.fetch(
+                            await get_application_channel(
+                                req.team,
+                                req.member.id
+                            )
+                        );
+                    } catch {}
+                }
+                if (channel === undefined) {
+                    try {
+                        channel = await (
+                            await client.channels.fetch(
+                                config.channels.application_category
+                            )
+                        ).createChannel(name, { topic: topic });
+                    } catch {
+                        channel = await req.member.guild.channels.create(name, {
+                            topic: topic,
+                        });
+                    }
+                    await set_application_channel(
+                        req.team,
+                        req.member.id,
+                        channel.id
+                    );
+                }
+                await channel.send({
                     embeds: [
                         {
                             title: `${req.member.user.username}#${
