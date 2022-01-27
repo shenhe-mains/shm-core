@@ -52,9 +52,6 @@ for (var key of [
 }
 
 client.on("messageCreate", async (message) => {
-    console.log(
-        `[#${message.channel.name}] @${message.author.username}#${message.author.discriminator}: ${message.content}`
-    );
     handle_event("messageCreate", client, message);
     if (
         message.guild !== undefined &&
