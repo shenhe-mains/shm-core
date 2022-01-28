@@ -278,7 +278,9 @@
     "webhooks": {
         "message_logs": "936007414547873822"
     },
-    "log_ignore": [],
+    "log_ignore": [
+        "841866382840561705"
+    ],
     "prefix": "#",
     "db_options": {
         "user": "shenhe",
