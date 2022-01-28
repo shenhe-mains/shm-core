@@ -199,7 +199,7 @@ exports.relay_outgoing = async function (
             : null,
         footer: {
             text: show_identity
-                ? member.roles.highest.name
+                ? sender.roles.highest.name
                 : "Anonymous Message",
         },
     };
