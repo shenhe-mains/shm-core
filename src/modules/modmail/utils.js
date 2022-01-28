@@ -194,7 +194,7 @@ exports.relay_outgoing = async function (
         author: show_identity
             ? {
                   name: `${sender.user.username}#${sender.user.discriminator}`,
-                  iconURL: sender.avatarURL({ dynamic: true }),
+                  iconURL: sender.user.avatarURL({ dynamic: true }),
               }
             : null,
         footer: {
