@@ -193,7 +193,7 @@ exports.relay_outgoing = async function (
         color: config.color,
         author: show_identity
             ? {
-                  name: `${sender.username}#${sender.discriminator}`,
+                  name: `${sender.user.username}#${sender.user.discriminator}`,
                   iconURL: sender.avatarURL({ dynamic: true }),
               }
             : null,
@@ -222,7 +222,7 @@ exports.relay_outgoing = async function (
     } finally {
         await create_modmail_message(
             member.id,
-            sender,
+            sender.user,
             show_identity ? 1 : 2,
             translate_content(message, content)
         );
