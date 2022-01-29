@@ -301,7 +301,7 @@ text:
 
 
             Commands in this module: `play`, `playlist`, `playlist-shuffle`, `search`, `pause`, `unpause`, `skip`, `backtrack`, `restart-player`, `nowplaying`, `stop`,
-            `disconnect`, `queue`, `songhistory`, `repeat`, `loop`, `rm-song`, `shuffle`, `shuffle-all`
+            `disconnect`, `queue`, `songhistory`, `repeat`, `loop`, `radio`, `rm-song`, `shuffle`, `shuffle-all`, `volume`
     play:
         title: Play Music
         body: >
@@ -460,6 +460,13 @@ text:
 
             Shuffle all of the songs, including ones in history and the current one. If the current song gets moved, the player will restart with the new song, but
             it is also possible that the song ends up in the same spot and isn't restarted.
+    volume:
+        title: Set Music Volume
+        body: >
+            `{prefix}volume <volume>`
+
+
+            Set the volume (min. 0, max. 100). This will persist so long as the music player is connected.
     nukeguard:
         title: Anti-Nuking System
         body: >

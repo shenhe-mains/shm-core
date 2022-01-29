@@ -67,6 +67,7 @@ exports.commands = {
     "rm-song": remove,
     shuffle: do_shuffle,
     "shuffle-all": shuffle_all,
+    volume: volume,
 };
 
 exports.log_exclude = [
@@ -98,6 +99,7 @@ exports.log_exclude = [
     "rm-song",
     "shuffle",
     "shuffle-all",
+    "volume",
 ];
 
 exports.listeners = {
@@ -140,9 +142,10 @@ async function get_player(song) {
         filter: "audioonly",
         highWaterMark: 1 << 25,
     });
-    const resource = createAudioResource(stream, {
+    const resource = (server.resource = createAudioResource(stream, {
         inputType: StreamType.Arbitrary,
-    });
+    }));
+    if (server.volume !== undefined) resource.volume.setVolume(server.volume);
     player.play(resource);
     return entersState(player, AudioPlayerStatus.Playing, 5000);
 }
@@ -684,6 +687,20 @@ async function shuffle_all(ctx, args) {
                 ? "There was only one song, so nothing has changed."
                 : "All songs, including the history and queue, have been shuffled.",
     };
+}
+
+async function volume(ctx, args) {
+    checkCount(args, 1);
+    await connect(ctx, true);
+    const server = get_server(ctx);
+    const vol = parseInt(args[0]);
+    if (isNaN(vol) || vol < 0 || vol > 100) {
+        throw new ArgumentError("Volume must be an integer between 0 and 100.");
+    }
+    if (!server.resource) {
+        throw new UserError("I am not playing anything right now.");
+    }
+    server.resource.volume.setVolume((server.volume = vol / 100));
 }
 
 function embed_for(item) {
