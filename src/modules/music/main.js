@@ -746,10 +746,7 @@ async function check_queue(ctx, force) {
     const server = get_server(ctx);
 
     if (server.index >= server.queue.length) {
-        if (server.loop) {
-            server.index = 0;
-            if (server.loop > 0) --server.loop;
-        } else if (server.radio) {
+        if (server.radio) {
             const related = (
                 await ytdl.getInfo(server.queue[server.queue.length - 1].url)
             ).related_videos;
@@ -788,6 +785,9 @@ async function check_queue(ctx, force) {
                     });
                 }
             }
+        } else if (server.loop) {
+            server.index = 0;
+            if (server.loop > 0) --server.loop;
         } else {
             await end(ctx, server);
             await ctx.send({
