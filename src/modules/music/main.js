@@ -93,7 +93,7 @@ exports.log_exclude = [
     "songhistory",
     "repeat",
     "loop",
-    "remove",
+    "rm-song",
     "shuffle",
     "shuffle-all",
 ];
@@ -258,7 +258,7 @@ async function getSongs(query) {
 }
 
 function play(prompt) {
-    return async (ctx, args, body, nosend) => {
+    return async (ctx, args, body, key, nosend) => {
         checkCount(args, 1, Infinity);
         await connect(ctx);
         const results = await getSongs(body);
@@ -337,7 +337,13 @@ function play_playlist(do_shuffle) {
         var success = 0;
         for (const item of do_shuffle ? shuffle(list.items) : list.items) {
             try {
-                await forceplay(ctx, [item.shortUrl], item.shortUrl, true);
+                await forceplay(
+                    ctx,
+                    [item.shortUrl],
+                    item.shortUrl,
+                    null,
+                    true
+                );
                 ++success;
             } catch {}
         }
