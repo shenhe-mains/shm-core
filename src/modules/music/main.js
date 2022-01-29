@@ -548,9 +548,7 @@ function loop(key) {
                 ? (key == "loop"
                       ? "When I reach the end of the queue, I will return to the start instead of stopping."
                       : "When this song ends, it will play again instead of moving to the next song.") +
-                  (server[key] > 0
-                      ? ` (${server[key]} repetition${pluralize(server[key])}×)`
-                      : "")
+                  (server[key] > 0 ? ` (${server[key]}×)` : "")
                 : "",
         };
     };
