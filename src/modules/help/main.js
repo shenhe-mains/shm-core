@@ -7,6 +7,8 @@ const { checkCount } = require("../../utils");
 
 exports.commands = { help: help };
 
+exports.log_exclude = ["help"];
+
 const helpdata = yaml.load(
     fs.readFileSync(path.join(__dirname, "helptext.yml"))
 );

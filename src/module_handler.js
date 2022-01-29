@@ -10,7 +10,7 @@ const command_registry = {
     reload: reload,
 };
 const listener_registry = {};
-const log_exclude_registry = new Set();
+const log_exclude_registry = new Set(["load", "unload", "reload"]);
 const shutdowns = {};
 const modules = {};
 
