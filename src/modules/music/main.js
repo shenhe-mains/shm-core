@@ -63,7 +63,7 @@ exports.commands = {
     songhistory: history,
     repeat: loop("repeat"),
     loop: loop("loop"),
-    remove: remove,
+    "rm-song": remove,
     shuffle: do_shuffle,
     "shuffle-all": shuffle_all,
 };
