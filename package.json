@@ -12,6 +12,7 @@
         "@discordjs/opus": "^0.5.3",
         "@discordjs/rest": "^0.2.0-canary.0",
         "@discordjs/voice": "^0.8.0",
+        "canvas": "^2.9.0",
         "child_process": "^1.0.2",
         "clear-module": "^4.1.2",
         "cookie-session": "^2.0.0",

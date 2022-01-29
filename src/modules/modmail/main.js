@@ -203,6 +203,9 @@ async function check_modmail(client, message) {
                     ],
                 });
                 opening_content[confirmation.id] = message;
+                setTimeout(() => {
+                    delete opening_content[confirmation.id];
+                }, 86400000);
             }
         } catch {
             console.error(error);

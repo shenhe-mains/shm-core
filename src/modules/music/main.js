@@ -313,6 +313,9 @@ function play(prompt) {
                 results: results.slice(0, 5),
                 ctx: ctx,
             };
+            setTimeout(() => {
+                delete search_results[message.id];
+            }, 86400000);
         }
     };
 }
