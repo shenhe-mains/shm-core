@@ -702,12 +702,12 @@ async function volume(ctx, args) {
 }
 
 async function lyrics(ctx, args, body) {
-    await connect(ctx, true);
-    const server = get_server(ctx);
     var query;
     if (args.length > 0) {
         query = body;
     } else {
+        await connect(ctx, true);
+        const server = get_server(ctx);
         if (server.index < 0 || server.index >= server.queue.length) {
             throw new UserError("I am not playing anything right now.");
         }

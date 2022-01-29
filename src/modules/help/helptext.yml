@@ -301,7 +301,7 @@ text:
 
 
             Commands in this module: `play`, `playlist`, `playlist-shuffle`, `search`, `pause`, `unpause`, `skip`, `backtrack`, `restart-player`, `nowplaying`, `stop`,
-            `disconnect`, `queue`, `songhistory`, `repeat`, `loop`, `radio`, `rm-song`, `shuffle`, `shuffle-all`, `volume`
+            `disconnect`, `queue`, `songhistory`, `repeat`, `loop`, `radio`, `rm-song`, `shuffle`, `shuffle-all`, `volume`, `lyrics`
     play:
         title: Play Music
         body: >
@@ -467,6 +467,15 @@ text:
 
 
             Set the volume (min. 0, max. 100). This will persist so long as the music player is connected.
+    lyrics:
+        title: Get Song Lyrics
+        body: >
+            `{prefix}lyrics [query]`
+
+
+            Search for the song on Genius and fetch the lyrics. If you are currently in a voice call with the bot and it is playing music, you can exclude the query
+            and it will automatically search for the song it is playing (although this may not work due to many YouTube videos having a lot of extra words and characters
+            in it, or because the title is in a different language).
     nukeguard:
         title: Anti-Nuking System
         body: >
