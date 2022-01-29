@@ -24,6 +24,7 @@ const {
 } = require("../../errors");
 const { pagify } = require("../../pages");
 const { config } = require("../../core/config");
+const { client } = require("../../client");
 
 exports.commands = {
     play: play,
@@ -39,6 +40,10 @@ exports.commands = {
     "restart-player": restart_player,
     np: playing,
     nowplaying: playing,
+    stop: stop,
+    dc: disconnect,
+    disconnect: disconnect,
+    leave: disconnect,
     queue: queue,
     songhistory: history,
 };
@@ -100,7 +105,7 @@ async function connect(ctx, no_create) {
     const server = get_server(ctx);
 
     if (server.connection) {
-        if (server.channel.id != ctx.author.voice.channel.id) {
+        if (client.user.voice.channel.id != ctx.author.voice.channel.id) {
             throw new PermissionError(
                 "You must be in the same voice channel as me to use that command."
             );
@@ -256,32 +261,6 @@ async function unpause(ctx, args) {
     } catch {}
 }
 
-async function playing(ctx, args) {
-    checkCount(args, 0);
-    await connect(ctx, true);
-    const server = get_server(ctx);
-    if (server.queue.length == 0) {
-        return {
-            title: "Queue Empty",
-            description: `The queue is currently empty. \`${config.prefix}play\` your favorite songs!`,
-        };
-    } else if (server.index > server.queue.length) {
-        return {
-            title: "End of queue",
-            description: `I have reached the end of the queue. \`${config.prefix}restart-player\` to return to the start or \`${config.prefix}play\` a new song!`,
-        };
-    } else {
-        const item = server.queue[server.index];
-        const embed = embed_for(item);
-        embed.title = server.paused ? "Paused" : "Now Playing";
-        embed.description = hyperlink(item);
-        await ctx.reply({
-            embeds: [embed],
-            allowedMentions: { repliedUser: false },
-        });
-    }
-}
-
 function skip(mult, verb, single, multi) {
     return async (ctx, args) => {
         checkCount(args, 0, 1);
@@ -320,6 +299,51 @@ function skip(mult, verb, single, multi) {
             description: count == 1 ? single : `${multi} ${count} songs.`,
         };
     };
+}
+
+async function playing(ctx, args) {
+    checkCount(args, 0);
+    await connect(ctx, true);
+    const server = get_server(ctx);
+    if (server.queue.length == 0) {
+        return {
+            title: "Queue Empty",
+            description: `The queue is currently empty. \`${config.prefix}play\` your favorite songs!`,
+        };
+    } else if (server.index > server.queue.length) {
+        return {
+            title: "End of queue",
+            description: `I have reached the end of the queue. \`${config.prefix}restart-player\` to return to the start or \`${config.prefix}play\` a new song!`,
+        };
+    } else {
+        const item = server.queue[server.index];
+        const embed = embed_for(item);
+        embed.title = server.paused ? "Paused" : "Now Playing";
+        embed.description = hyperlink(item);
+        await ctx.reply({
+            embeds: [embed],
+            allowedMentions: { repliedUser: false },
+        });
+    }
+}
+
+async function stop(ctx, args) {
+    checkCount(args, 0);
+    await connect(ctx, true);
+    const server = get_server(ctx);
+    server.index = server.queue.length;
+    check_queue(ctx);
+}
+
+async function disconnect(ctx, args) {
+    checkCount(args, 0);
+    await connect(ctx, true);
+    const server = get_server(ctx);
+    try {
+        server.connection.destroy();
+    } finally {
+        delete servers[ctx.guild.id];
+    }
 }
 
 async function restart_player(ctx, args) {
