@@ -805,8 +805,7 @@ async function check_queue(ctx, force) {
                 });
             } else {
                 try {
-                    const id =
-                        related[Math.floor(Math.random() * related.length)].id;
+                    const id = related[0].id;
                     const item = ytdlToSimple(
                         (await ytdl.getInfo(id)).videoDetails
                     );
