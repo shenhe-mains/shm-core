@@ -1,31 +1,26 @@
+const genius = require("genius-lyrics");
 const ytdl = require("ytdl-core");
 const yts = require("yt-search");
+const ytpl = require("ytpl");
 const { Util, ButtonInteraction } = require("discord.js");
 const {
-    AudioPlayer,
     AudioPlayerStatus,
     createAudioPlayer,
     createAudioResource,
-    DiscordGatewayAdapterCreator,
     entersState,
-    getVoiceConnection,
     joinVoiceChannel,
     StreamType,
-    VoiceConnection,
     VoiceConnectionDisconnectReason,
     VoiceConnectionStatus,
 } = require("@discordjs/voice");
 const { checkCount, pluralize, shuffle } = require("../../utils");
-const {
-    ArgumentError,
-    PermissionError,
-    UserError,
-    Success,
-} = require("../../errors");
+const { ArgumentError, PermissionError, UserError } = require("../../errors");
 const { pagify } = require("../../pages");
 const { config } = require("../../core/config");
 const { client } = require("../../client");
-const ytpl = require("ytpl");
+const data = require("../../../data.json");
+
+const genius_client = new genius.Client(data.genius_token);
 
 const bt = skip(
     -1,
@@ -68,6 +63,7 @@ exports.commands = {
     shuffle: do_shuffle,
     "shuffle-all": shuffle_all,
     volume: volume,
+    lyrics: lyrics,
 };
 
 exports.log_exclude = [
@@ -100,6 +96,7 @@ exports.log_exclude = [
     "shuffle",
     "shuffle-all",
     "volume",
+    "lyrics",
 ];
 
 exports.listeners = {
@@ -702,6 +699,33 @@ async function volume(ctx, args) {
         throw new UserError("I am not playing anything right now.");
     }
     server.resource.volume.setVolume((server.volume = vol / 100));
+}
+
+async function lyrics(ctx, args, body) {
+    await connect(ctx, true);
+    const server = get_server(ctx);
+    var query;
+    if (args.length > 0) {
+        query = body;
+    } else {
+        if (server.index < 0 || server.index >= server.queue.length) {
+            throw new UserError("I am not playing anything right now.");
+        }
+        query = server.queue[server.index].title;
+    }
+    const results = await genius_client.songs.search(query);
+    if (results.length == 0) {
+        throw new UserError(
+            "I could not find any lyrics. " +
+                (args.length == 0
+                    ? "If the title contains a lot of extra characters or words, you might be able to find one with a manual search."
+                    : "Please make sure your search isn't too specific.")
+        );
+    }
+    return {
+        title: "Lyrics",
+        description: (await results[0].lyrics()).substring(0, 4096),
+    };
 }
 
 function embed_for(item) {
