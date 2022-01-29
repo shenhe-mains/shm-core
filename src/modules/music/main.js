@@ -157,11 +157,11 @@ async function connect(ctx, no_create) {
 
     const server = get_server(ctx);
 
-    if (server.connection) {
-        if (
-            (await ctx.guild.members.fetch(client.user.id)).voice.channel.id !=
-            ctx.author.voice.channel.id
-        ) {
+    const my_channel = (await ctx.guild.members.fetch(client.user.id)).voice
+        .channel;
+
+    if (my_channel && server.connection) {
+        if (my_channel.id != ctx.author.voice.channel.id) {
             throw new PermissionError(
                 "You must be in the same voice channel as me to use that command."
             );
