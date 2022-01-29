@@ -32,7 +32,7 @@ async function stick(ctx, args, body) {
         throw new UserError("Please enter a non-empty sticky message.");
     }
     await create_sticky(ctx.channel.id, body);
-    const message = await ctx.channel.send({
+    const message = await ctx.send({
         content: body,
         allowedMentions: { users: [], roles: [] },
     });

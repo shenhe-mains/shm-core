@@ -15,7 +15,7 @@ const {
     VoiceConnectionDisconnectReason,
     VoiceConnectionStatus,
 } = require("@discordjs/voice");
-const { checkCount, pluralize } = require("../../utils");
+const { checkCount, pluralize, shuffle } = require("../../utils");
 const {
     ArgumentError,
     PermissionError,
@@ -25,19 +25,32 @@ const {
 const { pagify } = require("../../pages");
 const { config } = require("../../core/config");
 const { client } = require("../../client");
+const ytpl = require("ytpl");
+
+const bt = skip(
+    -1,
+    "backtrack",
+    "Backtracked to the previous song",
+    "Backtracked"
+);
+
+const forceplay = play(false);
+const ppfalse = play_playlist(false);
+const pptrue = play_playlist(true);
 
 exports.commands = {
-    play: play(false),
+    p: forceplay,
+    play: forceplay,
+    pp: ppfalse,
+    playlist: ppfalse,
+    ppshuffle: pptrue,
+    playlist: pptrue,
     search: play(true),
     pause: pause,
     unpause: unpause,
     skip: skip(1, "skip", "Skipped the current song.", "Skipped"),
-    backtrack: skip(
-        -1,
-        "backtrack",
-        "Backtracked to the previous song",
-        "Backtracked"
-    ),
+    backtrack: bt,
+    bt: bt,
     "restart-player": restart_player,
     np: playing,
     nowplaying: playing,
@@ -45,17 +58,29 @@ exports.commands = {
     dc: disconnect,
     disconnect: disconnect,
     leave: disconnect,
+    q: queue,
     queue: queue,
     songhistory: history,
+    repeat: loop("repeat"),
+    loop: loop("loop"),
+    remove: remove,
+    shuffle: do_shuffle,
+    "shuffle-all": shuffle_all,
 };
 
 exports.log_exclude = [
+    "p",
     "play",
+    "pp",
+    "playlist",
+    "ppshuffle",
+    "playlist-shuffle",
     "search",
     "pause",
     "unpause",
     "skip",
     "backtrack",
+    "bt",
     "restart-player",
     "np",
     "nowplaying",
@@ -63,8 +88,14 @@ exports.log_exclude = [
     "dc",
     "disconnect",
     "leave",
+    "q",
     "queue",
     "songhistory",
+    "repeat",
+    "loop",
+    "remove",
+    "shuffle",
+    "shuffle-all",
 ];
 
 exports.listeners = {
@@ -212,20 +243,27 @@ async function getSongs(query) {
             if (results.length == 0) throw 0;
             return results;
         } catch {
+            try {
+                await ytpl(query);
+            } catch {
+                throw new ArgumentError(
+                    "I could not find anything with that query."
+                );
+            }
             throw new ArgumentError(
-                "I could not find anything with that query."
+                `I could not find anything with that query. If you meant to queue a playlist, please use \`${config.prefix}playlist\`.`
             );
         }
     }
 }
 
 function play(prompt) {
-    return async (ctx, args, body) => {
+    return async (ctx, args, body, nosend) => {
         checkCount(args, 1, Infinity);
         await connect(ctx);
         const results = await getSongs(body);
         if (results.length == 1 || !prompt) {
-            await _queue(ctx, results[0]);
+            await _queue(ctx, results[0], nosend);
         } else {
             const message = await ctx.reply({
                 embeds: [
@@ -235,7 +273,7 @@ function play(prompt) {
                             .slice(0, 5)
                             .map(
                                 (item, index) =>
-                                    `\`${index + 1}.\` ${item.title}`
+                                    `\`${index + 1}.\` ${hyperlink(item)}`
                             )
                             .join("\n"),
                     },
@@ -270,6 +308,48 @@ function play(prompt) {
                 ctx: ctx,
             };
         }
+    };
+}
+
+function play_playlist(do_shuffle) {
+    return async (ctx, args, body) => {
+        checkCount(args, 1, Infinity);
+        await connect(ctx);
+        var list;
+        try {
+            list = await ytpl(body);
+        } catch {
+            throw new ArgumentError(
+                "Error fetching playlist; please make sure it exists and is not private."
+            );
+        }
+        const message = await ctx.replyEmbed({
+            title: "Queueing Playlist...",
+            description:
+                `Attempting to queue ${list.items.length} song${pluralize(
+                    list.items.length
+                )}.` +
+                (list.estimatedItemCount > 100
+                    ? " Your playlist had over 100 items, so only the first 100 will be attempted due to dependency restrictions."
+                    : ""),
+            color: "AQUA",
+        });
+        var success = 0;
+        for (const item of do_shuffle ? shuffle(list.items) : list.items) {
+            try {
+                await forceplay(ctx, [item.shortUrl], item.shortUrl, true);
+                ++success;
+            } catch {}
+        }
+        await message.edit({
+            embeds: [
+                {
+                    title: "Playlist Queued",
+                    description: `Queued ${success} song${pluralize(success)}.`,
+                    color: "GREEN",
+                },
+            ],
+        });
     };
 }
 
@@ -327,11 +407,8 @@ function skip(mult, verb, single, multi) {
             }
             count = Math.min(count, server.queue.length - server.index);
         }
-        server.index = Math.min(
-            server.index + count * mult,
-            server.queue.length
-        );
-        check_queue(ctx);
+        server.index += count * mult;
+        check_queue(ctx, true);
         return {
             title: `${multi}`,
             description: count == 1 ? single : `${multi} ${count} songs.`,
@@ -437,6 +514,156 @@ async function _show(ctx, title, items, mult) {
     );
 }
 
+function loop(key) {
+    return async (ctx, args) => {
+        checkCount(args, 0, 1);
+        await connect(ctx);
+        const server = get_server(ctx);
+        server[key] ||= 0;
+        server[key == "loop" ? "repeat" : "loop"] = 0;
+        if (args.length > 0) {
+            const count = parseInt(args[0]);
+            if (isNaN(count) || count < 0) {
+                throw new ArgumentError(
+                    `${
+                        key == "loop" ? "Loop" : "Repeat"
+                    } counter must be non-negative.`
+                );
+            }
+            server[key] = count;
+        } else {
+            server[key] = server[key] == 0 ? -1 : 0;
+        }
+        return {
+            title: `${key == "loop" ? "Loop" : "Repeat"}: ${
+                server[key] ? "On" : "Off"
+            }`,
+            description: server[key]
+                ? (key == "loop"
+                      ? "When I reach the end of the queue, I will return to the start instead of stopping."
+                      : "When this song ends, it will play again instead of moving to the next song.") +
+                  (server[key] > 0
+                      ? ` (${server[key]} repetition${pluralize(server[key])}×)`
+                      : "")
+                : "",
+        };
+    };
+}
+
+async function remove(ctx, args) {
+    checkCount(args, 0, 2);
+    await connect(ctx, true);
+    const server = get_server(ctx);
+    const vals = args.map((arg) => parseInt(arg));
+    const min = -server.index;
+    const max = server.queue.length - server.index;
+    if (
+        vals.some(
+            (x) =>
+                isNaN(x) ||
+                x < -server.index ||
+                x >= server.queue.length - server.index
+        )
+    ) {
+        throw new ArgumentError(
+            `Arguments must be integers between ${min} and ${max}.`
+        );
+    }
+    if (args.length == 0 || vals[0] == 0) {
+        const [removed] = server.queue.splice(server.index, 1);
+        check_queue(ctx, true);
+        return {
+            title: "Song Removed",
+            description: `The current song, ${hyperlink(
+                removed
+            )}, was just removed.`,
+        };
+    } else if (args.length == 1 || vals[0] == vals[1]) {
+        const [removed] = server.queue.splice(server.index + vals[0], 1);
+        if (vals[0] < 0) {
+            --server.index;
+            --server.playing;
+        }
+        return {
+            title: "Song Removed",
+            description: `${hyperlink(removed)} was just removed.`,
+        };
+    } else {
+        if (vals[0] > vals[1]) [vals[0], vals[1]] = [vals[1], vals[0]];
+        const left = server.index + vals[0];
+        const right = server.index + vals[1];
+        const amt = right - left + 1;
+        server.queue.splice(left, amt);
+        if (server.index > right) {
+            server.index -= amt;
+            server.playing -= amt;
+        } else if (server.index >= left) {
+            server.index = left;
+            check_queue(ctx, true);
+        }
+        return {
+            title: `Songs Removed`,
+            description: `${amt} songs were just removed.`,
+        };
+    }
+}
+
+async function do_shuffle(ctx, args) {
+    checkCount(args, 0, 1);
+    await connect(ctx, true);
+    const server = get_server(ctx);
+    if (args.length > 0) {
+        args[0] = parseInt(args[0]);
+        if (isNaN(args[0]) || args[0] < 0) {
+            throw new ArgumentError(
+                "The number of songs to shuffle must be a positive integer."
+            );
+        }
+    }
+    if (server.index >= server.queue.length - 1) {
+        throw new UserError("There are no songs left in the queue to shuffle.");
+    }
+    const count = Math.min(
+        server.queue.length - server.index - 1,
+        args.length > 0 ? args[0] : server.queue.length - server.index - 1
+    );
+    if (count >= 2) {
+        server.queue.splice(
+            server.index + 1,
+            count,
+            ...shuffle(
+                server.queue.slice(server.index + 1, server.index + count + 1)
+            )
+        );
+    }
+    return {
+        title: "Shuffled",
+        description:
+            count == 1
+                ? "There was only one song included in the shuffle, so nothing has changed."
+                : `${count} songs were just shuffled.`,
+    };
+}
+
+async function shuffle_all(ctx, args) {
+    checkCount(args, 0);
+    await connect(ctx, true);
+    const server = get_server(ctx);
+    if (server.queue.length == 0) {
+        throw new UserError("There are no songs to shuffle.");
+    }
+    const id = server.queue[server.index].videoId;
+    shuffle(server.queue);
+    if (server.queue[server.index].videoId != id) check_queue(ctx, true);
+    return {
+        title: "Shuffled",
+        description:
+            server.queue.length == 1
+                ? "There was only one song, so nothing has changed."
+                : "All songs, including the history and queue, have been shuffled.",
+    };
+}
+
 function embed_for(item) {
     return {
         fields: [
@@ -463,35 +690,52 @@ function embed_for(item) {
     };
 }
 
-async function _queue(ctx, item) {
+async function _queue(ctx, item, nosend) {
     const server = get_server(ctx);
     item.requester = ctx.author;
     server.queue.push(item);
 
-    const embed = embed_for(item);
-    embed.title = "Song Queued";
-    embed.description = `${hyperlink(item)} has been added to the queue!`;
-    await ctx.reply({
-        embeds: [embed],
-        allowedMentions: { repliedUser: false },
-    });
+    if (!nosend) {
+        const embed = embed_for(item);
+        embed.title = "Song Queued";
+        embed.description = `${hyperlink(item)} has been added to the queue!`;
+        await ctx.reply({
+            embeds: [embed],
+            allowedMentions: { repliedUser: false },
+        });
+    }
 
     check_queue(ctx);
 }
 
 async function check_queue(ctx, force) {
     const server = get_server(ctx);
+
     if (server.index >= server.queue.length) {
-        if (server.channel.members.size == 0) {
-            try {
-                (await connect(ctx, true)).destroy();
-            } catch {}
+        if (server.loop) {
+            server.index = 0;
+            if (server.loop > 0) --server.loop;
         } else {
-            try {
-                server.player.stop();
-            } catch {}
+            if (server.channel.members.size == 0) {
+                try {
+                    (await connect(ctx, true)).destroy();
+                } catch {}
+            } else {
+                try {
+                    server.player.stop();
+                } catch {}
+            }
+            await ctx.send({
+                embeds: [
+                    {
+                        title: "Queue Ended",
+                        description: `There are no more songs in the queue. \`${config.prefix}play\` your favorite songs to keep it going.`,
+                        color: "AQUA",
+                    },
+                ],
+            });
+            return;
         }
-        return;
     }
 
     if (!force && server.playing == server.index) return;
@@ -504,17 +748,22 @@ async function check_queue(ctx, force) {
     server.paused = false;
 
     server.player.on(AudioPlayerStatus.Idle, () => {
-        if (server.index <= server.queue.length) {
-            ++server.index;
+        if (server.repeat) {
+            if (server.repeat > 0) --server.repeat;
+            check_queue(ctx, true);
+        } else {
+            if (server.index <= server.queue.length) {
+                ++server.index;
+            }
+            check_queue(ctx);
         }
-        check_queue(ctx);
     });
 
     const embed = embed_for(song);
     embed.title = "Now Playing!";
     embed.description = hyperlink(song);
 
-    await ctx.channel.send({
+    await ctx.send({
         embeds: [embed],
     });
 }

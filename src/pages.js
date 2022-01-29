@@ -41,6 +41,9 @@ exports.pagify = async function (ctx, embed, fields, page_size, mini) {
             fields: fields,
             mini: mini ? true : false,
         };
+        setTimeout(() => {
+            delete items[message.id];
+        }, 86400000);
     }
 };
 
@@ -48,7 +51,6 @@ exports.pageInteraction = async function (client, interaction) {
     if (!interaction instanceof ButtonInteraction) return;
     if (items.hasOwnProperty(interaction.message.id)) {
         const item = items[interaction.message.id];
-        const old = item.page;
         switch (interaction.customId) {
             case "pagify.page_leftmost":
                 item.page = 0;

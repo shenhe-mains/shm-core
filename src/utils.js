@@ -3,7 +3,9 @@ const { config } = require("./core/config");
 const { CommandSyntaxError } = require("./errors");
 
 exports.pluralize = pluralize = function (x, a, b) {
-    return x == 1 ? b || "" : a || "s";
+    if (a === undefined) a = "s";
+    if (b === undefined) b = "";
+    return x == 1 ? b : a;
 };
 
 function substring_if(string, length) {
@@ -111,4 +113,12 @@ exports.censor_attachments = function (message, send_original) {
         attachment: attachment.url,
         name: (send_original ? "" : "SPOILER_") + attachment.name,
     }));
+};
+
+exports.shuffle = function (array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
 };
