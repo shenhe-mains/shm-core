@@ -136,7 +136,7 @@ function get_server(ctx) {
     return server;
 }
 
-async function get_player(song) {
+async function get_player(server, song) {
     const player = createAudioPlayer();
     const stream = ytdl(song.url, {
         filter: "audioonly",
@@ -824,7 +824,7 @@ async function check_queue(ctx, force) {
 
     const song = server.queue[server.index];
     const connection = await connect(ctx);
-    server.player = await get_player(song);
+    server.player = await get_player(server, song);
     connection.subscribe(server.player);
     server.playing = server.index;
     server.paused = false;
