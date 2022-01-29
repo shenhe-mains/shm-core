@@ -278,6 +278,7 @@ text:
 
             Show a user's history. `type` arguments must be each one of `warns`, `mutes`, `kicks`, or `bans`. If no types are specified, this will list a user's entire
             history.
+        footer: Requires Staff
     modmail:
         title: Modmail / Ticket System
         body: >
