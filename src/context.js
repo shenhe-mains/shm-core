@@ -40,6 +40,13 @@ exports.Context = class {
         return await this.message.reply(...arguments);
     }
 
+    async replyEmbed(embed, ping) {
+        return await this.message.reply({
+            embeds: [embed],
+            allowedMentions: { repliedUser: ping || false },
+        });
+    }
+
     async send() {
         return await this.channel.send(...arguments);
     }

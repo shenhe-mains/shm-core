@@ -136,6 +136,8 @@ async function _unload(module) {
     delete modules[module];
 }
 
-fs.readdir(path.join(__dirname, "modules"), function (error, items) {
-    items.forEach(_load);
-});
+if (process.argv.indexOf("no-start") == -1) {
+    fs.readdir(path.join(__dirname, "modules"), function (error, items) {
+        items.forEach(_load);
+    });
+}

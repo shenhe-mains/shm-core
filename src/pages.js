@@ -2,10 +2,14 @@ const { ButtonInteraction } = require("discord.js");
 
 const items = {};
 
-exports.pagify = async function (ctx, embed, fields, page_size) {
+exports.pagify = async function (ctx, embed, fields, page_size, mini) {
     const page = fields.length > page_size;
     const pages = Math.ceil(fields.length / page_size);
-    embed.fields = fields.slice(0, page_size);
+    if (mini) {
+        embed.description = fields.slice(0, page_size).join("\n");
+    } else {
+        embed.fields = fields.slice(0, page_size);
+    }
     embed.footer = { text: `Page 1 / ${pages}` };
     const message = await ctx.reply({
         embeds: [embed],
@@ -35,6 +39,7 @@ exports.pagify = async function (ctx, embed, fields, page_size) {
             pages: pages,
             size: page_size,
             fields: fields,
+            mini: mini ? true : false,
         };
     }
 };
@@ -61,10 +66,15 @@ exports.pageInteraction = async function (client, interaction) {
                 break;
         }
         const embed = interaction.message.embeds[0];
-        embed.fields = item.fields.slice(
+        const fields = item.fields.slice(
             item.page * item.size,
             (item.page + 1) * item.size
         );
+        if (item.mini) {
+            embed.description = fields.join("\n");
+        } else {
+            embed.fields = fields;
+        }
         embed.footer = { text: `Page ${item.page + 1} / ${item.pages}` };
         await interaction.update({ embeds: [embed] });
     }

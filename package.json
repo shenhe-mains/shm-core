@@ -6,24 +6,30 @@
     "private": true,
     "type": "commonjs",
     "scripts": {
-        "start": "node src/main.js",
-        "test": "node src/main.js test-config"
+        "start": "node src/main.js"
     },
     "dependencies": {
         "@discordjs/rest": "^0.2.0-canary.0",
+        "@discordjs/voice": "^0.8.0",
         "child_process": "^1.0.2",
         "clear-module": "^4.1.2",
         "cookie-session": "^2.0.0",
         "discord-api-types": "^0.26.1",
         "discord.js": "^13.6.0",
         "express": "^4.17.2",
+        "ffmpeg": "^0.0.4",
+        "ffmpeg-static": "^4.4.1",
+        "fluent-ffmpeg": "^2.1.2",
         "http-terminator": "^3.0.4",
         "js-yaml": "^4.1.0",
+        "libsodium-wrappers": "^0.7.9",
         "node-fetch": "^2.6.7",
         "optionator": "^0.9.1",
         "pg": "^8.7.1",
         "pug": "^3.0.2",
         "semver": "^7.3.5",
-        "shlex": "^2.1.0"
+        "shlex": "^2.1.0",
+        "yt-search": "^2.10.3",
+        "ytdl-core": "^4.10.0"
     }
 }
