@@ -40,6 +40,7 @@ exports.commands = {
     remove: remove,
     "clear-history": clear_history,
     history: history,
+    nick: nick,
 };
 
 async function slowmode(ctx, args) {
@@ -415,4 +416,30 @@ async function clear_history(ctx, args) {
     for (var type of args.length > 0 ? args : categories) {
         await client.query(`DELETE FROM ${type} WHERE user_id = $1`, [user_id]);
     }
+}
+
+async function nick(ctx, args, body) {
+    checkCount(args, 1, Infinity);
+    var member = ctx.author;
+
+    try {
+        member = await ctx.parse_member(args[0]);
+        body = body.substring(args[0].length);
+    } catch {}
+
+    if (member.id != ctx.author.id) {
+        if (member.id == ctx.client.user.id) {
+            if (!has_permission(ctx.author, "settings")) {
+                throw new PermissionError(
+                    "You do not have permission to edit bot settings, including my nickname."
+                );
+            }
+        } else {
+            await assert_hierarchy(ctx.author, member);
+        }
+    }
+
+    const nick = body.trim();
+
+    await member.setNickname(nick || null);
 }
