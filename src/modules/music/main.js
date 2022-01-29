@@ -792,6 +792,14 @@ async function check_queue(ctx, force) {
             const related = (
                 await ytdl.getInfo(server.queue[server.queue.length - 1].url)
             ).related_videos;
+            while (related.length > 0) {
+                if (
+                    !server.queue.some((item) => item.videoId == related[0].id)
+                ) {
+                    break;
+                }
+                related.shift();
+            }
             if (related.length == 0) {
                 await end(ctx, server);
                 await ctx.send({
