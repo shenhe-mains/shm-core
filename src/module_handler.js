@@ -4,23 +4,24 @@ const { checkCount } = require("./utils");
 const { has_permission } = require("./core/privileges");
 const path = require("path");
 
-var command_registry = {
+const command_registry = {
     load: load,
     unload: unload,
     reload: reload,
 };
-
-var listener_registry = {};
-
-var shutdowns = {};
-
-var modules = {};
+const listener_registry = {};
+const log_exclude_registry = new Set();
+const shutdowns = {};
+const modules = {};
 
 exports.get_command = function (key) {
     if (command_registry.hasOwnProperty(key)) {
-        return command_registry[key];
+        return {
+            execute: command_registry[key],
+            log: !log_exclude_registry.has(key),
+        };
     }
-    return undefined;
+    return { execute: undefined };
 };
 
 exports.handle_event = function (key, ...event) {
@@ -82,17 +83,24 @@ async function _load(module) {
 
     const {
         commands,
+        log_exclude,
         listeners,
         shutdown,
     } = require(`./modules/${module}/main.js`);
 
     if (commands) {
-        for (var key in commands) {
+        for (const key in commands) {
             if (command_registry.hasOwnProperty(key)) {
                 throw `Duplicate key \`${key}\`.`;
             }
 
             command_registry[key] = commands[key];
+        }
+    }
+
+    if (log_exclude) {
+        for (const key of log_exclude) {
+            log_exclude_registry.add(key);
         }
     }
 
@@ -118,6 +126,9 @@ async function _unload(module) {
     for (var key in modules[module]) {
         if (command_registry.hasOwnProperty(key)) {
             delete command_registry[key];
+        }
+        if (log_exclude_registry.has(key)) {
+            log_exclude_registry.delete(key);
         }
     }
 

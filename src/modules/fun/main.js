@@ -4,6 +4,8 @@ const { checkCount } = require("../../utils");
 
 exports.commands = { choose: choose, fight: fight, rps: rps };
 
+exports.log_exclude = ["choose", "fight", "rps"];
+
 exports.listeners = { interactionCreate: [checkFun] };
 
 function shuffle(a) {

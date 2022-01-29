@@ -72,13 +72,13 @@ client.on("messageCreate", async (message) => {
         const args = body
             ? body.split(/\s+/).map((arg) => arg.replace("{NL}", "\n"))
             : [];
-        const fn = get_command(key.toLowerCase());
+        const { execute, log } = get_command(key.toLowerCase());
         var ctx, color, title, description, status, reaction;
         try {
-            if (fn !== undefined) {
+            if (execute !== undefined) {
                 ctx = new Context(client, message);
                 await ctx.init();
-                const response = await fn(ctx, args, body, key);
+                const response = await execute(ctx, args, body, key);
                 if (response === undefined) throw new Success();
                 throw new Success(response.title, response.description);
             }
@@ -183,7 +183,7 @@ ${error.stack.toString().substring(0, 4000)}
                 }
             }
         }
-        if (ctx !== undefined) {
+        if (ctx !== undefined && log) {
             await ctx.log({
                 embeds: [
                     {

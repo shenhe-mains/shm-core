@@ -27,7 +27,8 @@ const { config } = require("../../core/config");
 const { client } = require("../../client");
 
 exports.commands = {
-    play: play,
+    play: play(false),
+    search: play(true),
     pause: pause,
     unpause: unpause,
     skip: skip(1, "skip", "Skipped the current song.", "Skipped"),
@@ -47,6 +48,24 @@ exports.commands = {
     queue: queue,
     songhistory: history,
 };
+
+exports.log_exclude = [
+    "play",
+    "search",
+    "pause",
+    "unpause",
+    "skip",
+    "backtrack",
+    "restart-player",
+    "np",
+    "nowplaying",
+    "stop",
+    "dc",
+    "disconnect",
+    "leave",
+    "queue",
+    "songhistory",
+];
 
 exports.listeners = {
     interactionCreate: [check_music_interactions],
@@ -105,7 +124,10 @@ async function connect(ctx, no_create) {
     const server = get_server(ctx);
 
     if (server.connection) {
-        if (client.user.voice.channel.id != ctx.author.voice.channel.id) {
+        if (
+            (await ctx.guild.members.fetch(client.user.id)).voice.channel.id !=
+            ctx.author.voice.channel.id
+        ) {
             throw new PermissionError(
                 "You must be in the same voice channel as me to use that command."
             );
@@ -197,42 +219,58 @@ async function getSongs(query) {
     }
 }
 
-async function play(ctx, args, body) {
-    checkCount(args, 1, Infinity);
-    await connect(ctx);
-    const results = await getSongs(body);
-    if (results.length == 1) {
-        await _queue(ctx, results[0]);
-    } else {
-        const message = await ctx.reply({
-            embeds: [
-                {
-                    title: "Search Results",
-                    description: results
-                        .slice(0, 5)
-                        .map((item, index) => `\`${index + 1}.\` ${item.title}`)
-                        .join("\n"),
-                },
-            ],
-            components: [
-                {
-                    type: "ACTION_ROW",
-                    components: results.slice(0, 5).map((item, index) => ({
-                        type: "BUTTON",
-                        style: "PRIMARY",
-                        customId: `music.select.${index}`,
-                        emoji: ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"][index],
-                    })),
-                },
-            ],
-            allowedMentions: { repliedUser: false },
-        });
-        search_results[message.id] = {
-            user_id: ctx.author.id,
-            results: results.slice(0, 5),
-            ctx: ctx,
-        };
-    }
+function play(prompt) {
+    return async (ctx, args, body) => {
+        checkCount(args, 1, Infinity);
+        await connect(ctx);
+        const results = await getSongs(body);
+        if (results.length == 1 || !prompt) {
+            await _queue(ctx, results[0]);
+        } else {
+            const message = await ctx.reply({
+                embeds: [
+                    {
+                        title: "Search Results",
+                        description: results
+                            .slice(0, 5)
+                            .map(
+                                (item, index) =>
+                                    `\`${index + 1}.\` ${item.title}`
+                            )
+                            .join("\n"),
+                    },
+                ],
+                components: [
+                    {
+                        type: "ACTION_ROW",
+                        components: results.slice(0, 5).map((item, index) => ({
+                            type: "BUTTON",
+                            style: "PRIMARY",
+                            customId: `music.select.${index}`,
+                            emoji: ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"][index],
+                        })),
+                    },
+                    {
+                        type: "ACTION_ROW",
+                        components: [
+                            {
+                                type: "BUTTON",
+                                style: "DANGER",
+                                customId: "music.select.cancel",
+                                emoji: "❌",
+                            },
+                        ],
+                    },
+                ],
+                allowedMentions: { repliedUser: false },
+            });
+            search_results[message.id] = {
+                user_id: ctx.author.id,
+                results: results.slice(0, 5),
+                ctx: ctx,
+            };
+        }
+    };
 }
 
 async function pause(ctx, args) {
@@ -310,7 +348,7 @@ async function playing(ctx, args) {
             title: "Queue Empty",
             description: `The queue is currently empty. \`${config.prefix}play\` your favorite songs!`,
         };
-    } else if (server.index > server.queue.length) {
+    } else if (server.index >= server.queue.length) {
         return {
             title: "End of queue",
             description: `I have reached the end of the queue. \`${config.prefix}restart-player\` to return to the start or \`${config.prefix}play\` a new song!`,
@@ -463,6 +501,7 @@ async function check_queue(ctx, force) {
     server.player = await get_player(song);
     connection.subscribe(server.player);
     server.playing = server.index;
+    server.paused = false;
 
     server.player.on(AudioPlayerStatus.Idle, () => {
         if (server.index <= server.queue.length) {
@@ -482,7 +521,9 @@ async function check_queue(ctx, force) {
 
 async function check_music_interactions(client, interaction) {
     if (!(interaction instanceof ButtonInteraction)) return;
-    if (interaction.customId.startsWith("music.select.")) {
+    if (interaction.customId == "music.select.cancel") {
+        await interaction.update({ components: [] });
+    } else if (interaction.customId.startsWith("music.select.")) {
         if (!search_results.hasOwnProperty(interaction.message.id)) return;
         const { user_id, results, ctx } =
             search_results[interaction.message.id];
