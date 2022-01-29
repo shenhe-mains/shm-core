@@ -493,7 +493,7 @@ async function history(ctx, args) {
     checkCount(args, 0);
     await connect(ctx);
     const server = get_server(ctx);
-    if (server.index == 0) {
+    if (server.index == 0 || server.queue.length == 0) {
         return await ctx.replyEmbed({
             title: "History Empty",
             description: `This is the beginning of the queue.`,
