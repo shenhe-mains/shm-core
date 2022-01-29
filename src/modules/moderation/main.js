@@ -419,7 +419,8 @@ async function clear_history(ctx, args) {
 }
 
 async function nick(ctx, args, body) {
-    checkCount(args, 1, Infinity);
+    if (args.length == 0) await ctx.author.setNickname(null);
+
     var member = ctx.author;
 
     try {
