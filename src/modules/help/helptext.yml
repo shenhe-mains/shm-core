@@ -4,6 +4,14 @@ aliases:
     kick-silent: kick
     ban-silent: ban
     massban-from-url: massban
+    p: play
+    pp: playlist
+    ppshuffle: playlist-shuffle
+    bt: backtrack
+    np: nowplaying
+    dc: disconnect
+    leave: disconnect
+    q: queue
 text:
     __all:
         title: Shenhe Bot Help
@@ -19,6 +27,7 @@ text:
             `messagelogs` - Logging for message edits / deletions
             `moderation` - Mod commands (muting, banning, etc.)
             `modmail` - Modmail / Ticket system
+            `music` - Music Bot
             `nukeguard` - Anti-nuking features
             `polls` - Poll-related commands
             `settings` - Bot settings
@@ -125,7 +134,7 @@ text:
             Recolor your custom role. You can enter a hexcode or some common color names such as `red`, `blue`, etc. If you're having trouble with this, you can
             pick a color with [this online color picker](https://imagecolorpicker.com/color-code/d9e9f9) and copy-paste the code (`#` followed by 6 characters).
             If your role does not exist yet, it gets created with the name `new role`.
-        footer: A.K.A. role-colour
+        footer: "Alias: role-colour"
     db:
         title: Database Query
         body: >
@@ -283,6 +292,165 @@ text:
             this. To reply, use `{prefix}reply <message>` or `{prefix}anonreply <message>`. To close the thread, you can do `{prefix}close` or `{prefix}silentclose` to
             not DM the user that the thread has been closed. Deleting the channel is not preferred, but will also silently close the thread.
         footer: Requires Moderator to access modmail from the staff side
+    music:
+        title: Music Bot
+        body: >
+            This bot comes with a generic music bot capable of handling most normal operation (but without "extra" commands like bassboost, nightcore, etc). To use the
+            bot, just join a voice channel and summon the bot, or if the bot is already playing somewhere, join that voice channel. You can use `{prefix}play <song>` to
+            add songs to the queue, `{prefix}queue` to view the queue, etc.
+
+
+            Commands in this module: `play`, `playlist`, `playlist-shuffle`, `search`, `pause`, `unpause`, `skip`, `backtrack`, `restart-player`, `nowplaying`, `stop`,
+            `disconnect`, `queue`, `songhistory`, `repeat`, `loop`, `rm-song`, `shuffle`, `shuffle-all`
+    play:
+        title: Play Music
+        body: >
+            `{prefix}play <URL or search>`
+
+
+            Add a song to the queue. If the query given is not a URL, it will search for the term and, if an entry is found, queue the first one. To preview the search
+            results and choose which one to play, use `{prefix}search`.
+        footer: "Aliases: p"
+    playlist:
+        title: Play Playlist
+        body: >
+            `{prefix}playlist <URL>`
+
+
+            Add a playlist to the queue. This operation may take a while but the first song should start playing pretty quickly. Due to limitations with the library,
+            if the playlist has too many songs, only the first 100 will be added.
+        footer: "Aliases: pp"
+    playlist-shuffle:
+        title: Insert Playlist, Shuffled
+        body: >
+            `{prefix}playlist-shuffle <URL>`
+
+
+            Add a playlist to the queue, shuffling it before it is added. This will not affect the order of other songs, but allows you to shuffle a playlist as you
+            insert it into the queue.
+        footer: "Aliases: ppshuffle"
+    search:
+        title: Play Music, Search
+        body: >
+            `{prefix}search <search>`
+
+
+            Search for the song on YouTube and if there are multiple options, prompt with up to 5, allowing you to choose which one to play, or cancel instead. If you
+            enter a YouTube URL, this command will just add it directly, as will it if the search term only returns one result.
+    pause:
+        title: Pause Music
+        body: >
+            `{prefix}pause`
+
+
+            Pause the audio player. Actions like skipping will automatically unpause, or you can manually unpause with `{prefix}unpause`
+    unpause:
+        title: Unpause Music
+        body: >
+            `{prefix}unpause`
+
+
+            Resumes the audio player. You can pause again with `{prefix}pause`.
+    skip:
+        title: Skip Songs
+        body: >
+            `{prefix}skip [N]`
+
+
+            Skip `N` songs, including the current one. By default, `N` is one.
+    backtrack:
+        title: Backtrack Songs
+        body: >
+            `{prefix}backtrack [N]`
+
+
+            Skip `N` songs backwards, moving back `N` places in the history. By default, `N` is one.
+        footer: "Aliases: bt"
+    restart-player:
+        title: Restart Player
+        body: >
+            `{prefix}restart-player`
+
+
+            Move the audio player back to the first song in the entire list (including the history) and start playing from there.
+    nowplaying:
+        title: Show Current Song Info
+        body: >
+            `{prefix}nowplaying`
+
+
+            Show information about the song that's current playing.
+        footer: "Aliases: np"
+    stop:
+        title: Stop Music Player
+        body: >
+            `{prefix}stop`
+
+
+            Move the audio player to the end of the queue, stopping the music bot. The queue and history are not removed but simply moved past making this
+            easily reversible.
+    disconnect:
+        title: Disconnect Music Player
+        body: >
+            `{prefix}disconnect`
+
+
+            Leave the current voice call, removing the audio player. This also resets the bot's status in the guild, including the queue and song history.
+        footer: "Aliases: dc, leave"
+    queue:
+        title: Show Queue
+        body: >
+            `{prefix}queue`
+
+
+            Show upcoming songs that will be played.
+        footer: "Aliases: q"
+    songhistory:
+        title: Show History
+        body: >
+            `{prefix}songhistory`
+
+
+            Show the list of past songs that have already been played. This command is not called `{prefix}history` because that conflicts with a moderator command.
+    repeat:
+        title: Repeat Song
+        body: >
+            `{prefix}repeat [N]`
+
+
+            Repeat the current song `N` times. When the player reaches the end of a song while repeating, it will not advance in the queue and will just play the
+            same song again. `N` defaults to infinity.
+    loop:
+        title: Loop Queue
+        body: >
+            `{prefix}loop [N]`
+
+
+            Repeat the entire queue `N` times. When the player reaches the end of the queue while advancing, it will move back to the start if this object is on.
+    rm-song:
+        title: Remove Song
+        body: >
+            `{prefix}remove [A] [B]`
+
+
+            Remove (a) song(s) from the queue. `{prefix}remove` removes the current song and plays the next one. `{prefix}remove <A>` removes the song at position
+            `A`. `{prefix}remove <A> <B>` removes all songs with indices between $A$ and $B$. This command is not called `{prefix}remove` because that conflicts
+            with a moderator command.
+    shuffle:
+        title: Shuffle Queue
+        body: >
+            `{prefix}shuffle [N]`
+
+
+            If `N` is not specified, it shuffles the whole queue by default. Otherwise, the next `N` elements are swapped.
+    shuffle-all:
+        title: Shuffle All Music
+        body: >
+            `{prefix}shuffle-all
+
+
+            Shuffle all of the songs, including ones in history and the current one. If the current song gets moved, the player will restart with the new song, but
+            it is also possible that the song ends up in the same spot and isn't restarted.
     nukeguard:
         title: Anti-Nuking System
         body: >
