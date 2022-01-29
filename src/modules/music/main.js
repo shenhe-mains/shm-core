@@ -144,6 +144,7 @@ async function get_player(server, song) {
     });
     const resource = (server.resource = createAudioResource(stream, {
         inputType: StreamType.Arbitrary,
+        inlineVolume: true,
     }));
     if (server.volume !== undefined) resource.volume.setVolume(server.volume);
     player.play(resource);
