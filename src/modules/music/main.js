@@ -63,6 +63,7 @@ exports.commands = {
     songhistory: history,
     repeat: loop("repeat"),
     loop: loop("loop"),
+    radio: radio,
     "rm-song": remove,
     shuffle: do_shuffle,
     "shuffle-all": shuffle_all,
@@ -93,6 +94,7 @@ exports.log_exclude = [
     "songhistory",
     "repeat",
     "loop",
+    "radio",
     "rm-song",
     "shuffle",
     "shuffle-all",
@@ -223,17 +225,20 @@ async function connect(ctx, no_create) {
     }
 }
 
+function ytdlToSimple(result) {
+    result.url = result.video_url;
+    result.timestamp = stringify_duration(parseInt(result.lengthSeconds));
+    try {
+        result.image = result.thumbnails[result.thumbnails.length - 1].url;
+    } catch {}
+    result.author.url = result.author.channel_url;
+    return result;
+}
+
 async function getSongs(query) {
     if (ytdl.validateURL(query)) {
         try {
-            const result = (await ytdl.getInfo(query)).videoDetails;
-            result.url = result.video_url;
-            result.timestamp = stringify_duration(
-                parseInt(result.lengthSeconds)
-            );
-            result.image = result.thumbnails[result.thumbnails.length - 1].url;
-            result.author.url = result.author.channel_url;
-            return [result];
+            return [ytdlToSimple((await ytdl.getInfo(query)).videoDetails)];
         } catch {
             throw new ArgumentError("I could not get the video from that URL.");
         }
@@ -523,7 +528,7 @@ async function _show(ctx, title, items, mult) {
 function loop(key) {
     return async (ctx, args) => {
         checkCount(args, 0, 1);
-        await connect(ctx);
+        await connect(ctx, true);
         const server = get_server(ctx);
         server[key] ||= 0;
         server[key == "loop" ? "repeat" : "loop"] = 0;
@@ -551,6 +556,19 @@ function loop(key) {
                   (server[key] > 0 ? ` (${server[key]}×)` : "")
                 : "",
         };
+    };
+}
+
+async function radio(ctx, args) {
+    checkCount(args, 0);
+    await connect(ctx, true);
+    const server = get_server(ctx);
+    server.radio = !server.radio;
+    return {
+        title: `Radio: ${server.radio ? "On" : "Off"}`,
+        description: server.ratio
+            ? "Radio mode is now off."
+            : "Radio mode is now on. When I reach the end of the queue, I will randomly select a related song and keep going.",
     };
 }
 
@@ -694,9 +712,9 @@ function embed_for(item) {
     };
 }
 
-async function _queue(ctx, item, nosend) {
+async function _queue(ctx, item, nosend, requester) {
     const server = get_server(ctx);
-    item.requester = ctx.author;
+    item.requester = requester || ctx.author;
     server.queue.push(item);
 
     if (!nosend) {
@@ -712,6 +730,18 @@ async function _queue(ctx, item, nosend) {
     check_queue(ctx);
 }
 
+async function end(ctx, server) {
+    if (server.channel.members.size == 0) {
+        try {
+            (await connect(ctx, true)).destroy();
+        } catch {}
+    } else {
+        try {
+            server.player.stop();
+        } catch {}
+    }
+}
+
 async function check_queue(ctx, force) {
     const server = get_server(ctx);
 
@@ -719,16 +749,47 @@ async function check_queue(ctx, force) {
         if (server.loop) {
             server.index = 0;
             if (server.loop > 0) --server.loop;
-        } else {
-            if (server.channel.members.size == 0) {
-                try {
-                    (await connect(ctx, true)).destroy();
-                } catch {}
+        } else if (server.radio) {
+            const related = (
+                await ytdl.getInfo(server.queue[server.queue.length - 1].url)
+            ).related_videos;
+            if (related.length == 0) {
+                await end(ctx, server);
+                await ctx.send({
+                    embeds: [
+                        {
+                            title: "Radio Mode - No Videos Found",
+                            description: `There are no more songs in the queue and I could not find any related videos. \`${config.prefix}play\` your favorite songs to keep it going.`,
+                            color: "AQUA",
+                        },
+                    ],
+                });
             } else {
                 try {
-                    server.player.stop();
-                } catch {}
+                    const id =
+                        related[Math.floor(Math.random() * related.length)].id;
+                    const item = ytdlToSimple(
+                        (await ytdl.getInfo(id)).videoDetails
+                    );
+                    item.requester = client.user;
+                    server.queue.push(item);
+                    server.index = server.queue.length - 1;
+                    force = true;
+                } catch {
+                    await ctx.send({
+                        embeds: [
+                            {
+                                title: "Radio Mode Failed",
+                                description:
+                                    "An unexpected error occurred while trying to load a random related song.",
+                                color: "RED",
+                            },
+                        ],
+                    });
+                }
             }
+        } else {
+            await end(ctx, server);
             await ctx.send({
                 embeds: [
                     {

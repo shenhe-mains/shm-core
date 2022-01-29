@@ -419,7 +419,7 @@ text:
 
 
             Repeat the current song `N` times. When the player reaches the end of a song while repeating, it will not advance in the queue and will just play the
-            same song again. `N` defaults to infinity.
+            same song again. `N` defaults to infinity. Call again to turn off repeat.
     loop:
         title: Loop Queue
         body: >
@@ -427,6 +427,15 @@ text:
 
 
             Repeat the entire queue `N` times. When the player reaches the end of the queue while advancing, it will move back to the start if this object is on.
+            `N` defaults to infinity. Call again to turn off loop.
+    radio:
+        title: Radio Mode
+        body: >
+            `{prefix}radio`
+
+
+            Toggle radio mode. When radio mode is on, if the player reaches the end of the queue, it will pick a random song and keep going. This takes precedence
+            over loop but not over repeat.
     rm-song:
         title: Remove Song
         body: >
@@ -434,7 +443,7 @@ text:
 
 
             Remove (a) song(s) from the queue. `{prefix}remove` removes the current song and plays the next one. `{prefix}remove <A>` removes the song at position
-            `A`. `{prefix}remove <A> <B>` removes all songs with indices between $A$ and $B$. This command is not called `{prefix}remove` because that conflicts
+            `A`. `{prefix}remove <A> <B>` removes all songs with indices between `A` and `B`. This command is not called `{prefix}remove` because that conflicts
             with a moderator command.
     shuffle:
         title: Shuffle Queue
@@ -442,7 +451,7 @@ text:
             `{prefix}shuffle [N]`
 
 
-            If `N` is not specified, it shuffles the whole queue by default. Otherwise, the next `N` elements are swapped.
+            If `N` is not specified, it shuffles the whole queue by default. Otherwise, the next `N` elements are shuffled.
     shuffle-all:
         title: Shuffle All Music
         body: >
