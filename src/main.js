@@ -31,7 +31,7 @@ client.on("ready", async () => {
         activities: [
             {
                 type: "LISTENING",
-                name: "to your DMs",
+                name: "your DMs",
             },
         ],
     });
