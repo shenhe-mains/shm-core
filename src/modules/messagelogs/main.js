@@ -103,6 +103,7 @@ async function log_delete_bulk(client, messages) {
     }
     if (rows.length == 0) return;
     const hook = await get_log_webhook(client);
+    const url = messages.first().url;
     const header = `${messages.first().channel} ${timestamp(
         messages.first()
     )} - ${timestamp(messages.last())}\n`;
@@ -127,6 +128,7 @@ async function log_delete_bulk(client, messages) {
                 {
                     title: "Messages Purged",
                     description: message,
+                    url: url,
                     color: "RED",
                 },
             ],
