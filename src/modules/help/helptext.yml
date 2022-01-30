@@ -70,7 +70,7 @@ text:
 
             Please only use `word` or `regex` if you know what you're doing with regular expressions. You can request for terms to be added in <#805458033471782974>
             or <#840864247373103114>.
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     automod-rm:
         title: Automoderator - Remove term
         body: >
@@ -82,7 +82,7 @@ text:
 
 
             You can request for terms to be removed in <#805458033471782974> or <#840864247373103114>.
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     automod-scan:
         title: Automoderator - Scan message
         body: >
@@ -99,7 +99,7 @@ text:
 
             List all terms currently matched by the automoderator. Due to the nature of the automod, this will contain inappropriate, offensive, and potentially
             triggering terms, and as such, it is restricted. Please only use this in private channels or where you are sure it will not be hurtful to anyone.
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     customroles:
         title: Custom Supporter Roles
         body: >
@@ -557,7 +557,7 @@ text:
         title: Bot Settings
         body: >
             This module contains commands used to modify the bot's settings. There is no help text or command list for this as it is only used by the dev team.
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     statschannels:
         title: Stats Channels
         body: >
@@ -601,7 +601,7 @@ text:
 
 
             Adds a new entry to the autoresponder. When entries are created, they are exact matches, allowed in all channels, and send as normal messages.
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     rm-trigger:
         title: Remove Autoresponder Trigger
         body: >
@@ -609,7 +609,7 @@ text:
 
 
             Remove an entry from the autoresponder. You must call this command with the exact string the autoresponder entry matches.
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     wildcard-trigger:
         title: Set Autoresponder Trigger to Wildcard
         body: >
@@ -617,7 +617,7 @@ text:
 
 
             Set an autoresponder entry to match if the message contains the match string as a substring (case-insensitive).
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     exact-trigger:
         title: Set Autoresponder Trigger to Exact Match
         body: >
@@ -625,7 +625,7 @@ text:
 
 
             Set an autoresponder entry to match only if the message is exactly equal to the match string (case-insensitive).
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     public-trigger:
         title: Set Autoresponder Trigger to Public
         body: >
@@ -633,7 +633,7 @@ text:
 
 
             Set an autoresponder entry to be allowed in all channels except those explicitly blocked by `{prefix}disallow-trigger`.
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     private-trigger:
         title: Set Autoresponder Trigger to Private
         body: >
@@ -641,7 +641,7 @@ text:
 
 
             Set an autoresponder entry to be disallowed in all channels except those explicitly allowed by `{prefix}allow-trigger`.
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     no-reply-trigger:
         title: Set Autoresponder Trigger to Normal Message
         body: >
@@ -649,7 +649,7 @@ text:
 
 
             Set an autoresponder entry to send its message as a normal message to the channel.
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     reply-trigger:
         title: Set Autoresponder Trigger to Reply (No Ping)
         body: >
@@ -657,7 +657,7 @@ text:
 
 
             Set an autoresponder entry to send its message as a reply to the original message (without pinging the author).
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     ping-reply-trigger:
         title: Set Autoresponder Trigger to Reply (With Ping)
         body: >
@@ -665,7 +665,7 @@ text:
 
 
             Set an autoresponder entry to send its message as a reply to the original message (will ping the author).
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     allow-trigger:
         title: Allow Autoresponder Trigger in Channel
         body: >
@@ -673,7 +673,7 @@ text:
 
 
             Explicitly allow an autoresponder entry in the specified channel, even if it is private.
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     disallow-trigger:
         title: Disallow Autoresponder Trigger in Channel
         body: >
@@ -681,7 +681,7 @@ text:
 
 
             Explicitly disallow an autoresponder entry in the specified channel, even if it is public.
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     list-triggers:
         title: List Autoresponder Triggers
         body: >
@@ -717,7 +717,7 @@ text:
 
             Reload `config.json`. Most things will be brought up-to-date by this command. This is only necessary if the file was edited manually, not if the
             configuration was modified via commands (unless otherwise specified).
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
     verification:
         title: CAPTCHA Verification System
         body: >
@@ -726,8 +726,7 @@ text:
             captcha verification will grant them <@&805458032929538061>, which grants them access to most of the rest of the server.
 
 
-            `{prefix}post-verify <channel>` will create a new verification prompt but this command shouldn't really need to be used. Requires Bot Owner / Admin
-            / Developer.
+            `{prefix}post-verify <channel>` will create a new verification prompt but this command shouldn't really need to be used. Requires Bot Owner / Admin.
     website:
         title: Shenhe Mains Website
         body: >
@@ -745,4 +744,4 @@ text:
             and button interactions. `{prefix}load <module>`, `{prefix}unload <module>`, and `{prefix}reload <module>` can be used to dynamically enable and disable
             commands within the module and reload the module if the code has been updated. This allows certain commands to be updated without affecting functionality
             of other commands or restarting the bot.
-        footer: Requires Bot Owner / Admin / Developer
+        footer: Requires Bot Owner / Admin
