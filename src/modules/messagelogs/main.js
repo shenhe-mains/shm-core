@@ -6,6 +6,7 @@ const { shorten, censor_attachments } = require("../../utils");
 exports.listeners = {
     messageUpdate: [log_update],
     messageDelete: [log_delete],
+    messageDeleteBulk: [log_delete_bulk],
 };
 
 function is_loggable(message) {
@@ -32,6 +33,10 @@ async function get_log_webhook(client) {
     );
 }
 
+function timestamp(item) {
+    return `<t:${Math.floor(item.createdTimestamp / 1000)}>`;
+}
+
 async function log_update(client, before, after) {
     if (!is_loggable(before)) return;
     const hook = await get_log_webhook(client);
@@ -42,7 +47,7 @@ async function log_update(client, before, after) {
                 title: "Message Edited",
                 description: `Sent by ${before.author} in ${
                     before.channel
-                } on <t:${Math.floor(before.createdTimestamp / 1000)}>`,
+                } on ${timestamp(before)}`,
                 url: before.url,
                 fields: [
                     {
@@ -62,16 +67,15 @@ async function log_update(client, before, after) {
 
 async function log_delete(client, message) {
     if (!is_loggable(message)) return;
-    const hook = await get_log_webhook(client);
-    await hook.send({
+    await (
+        await get_log_webhook(client)
+    ).send({
         embeds: [
             {
                 title: "Message Deleted",
                 description: `Sent by ${message.author} in ${
                     message.channel
-                } on <t:${Math.floor(message.createdTimestamp / 1000)}>\n\n${
-                    message.content
-                }`,
+                } on ${timestamp(message)}\n\n${message.content}`,
                 url: message.url,
                 fields: message.reference
                     ? [
@@ -86,4 +90,46 @@ async function log_delete(client, message) {
         ],
         files: censor_attachments(message),
     });
+}
+
+async function log_delete_bulk(client, messages) {
+    const rows = [];
+    for (const message of messages.values()) {
+        if (!is_loggable(message)) continue;
+        rows.push(
+            ...`${message.author}: ${message.content}`.split("\n"),
+            ...message.attachments.toJSON().map((attachment) => attachment.url)
+        );
+    }
+    if (rows.length == 0) return;
+    const hook = await get_log_webhook(client);
+    const header = `${messages.first().channel} ${timestamp(
+        messages.first()
+    )} - ${timestamp(messages.last())}\n`;
+    while (rows.length > 0) {
+        var message = header;
+        var added = false;
+        while (rows.length > 0) {
+            if (message.length + 1 + rows[0].length <= 4096) {
+                message += "\n" + rows.shift();
+                added = true;
+            } else {
+                break;
+            }
+        }
+        if (!added) {
+            const length = 4096 - 1 - message.length;
+            message = rows[0].substring(0, length);
+            rows[0] = rows[0].substring(length);
+        }
+        await hook.send({
+            embeds: [
+                {
+                    title: "Messages Purged",
+                    description: message,
+                    color: "RED",
+                },
+            ],
+        });
+    }
 }
