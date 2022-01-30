@@ -1,5 +1,5 @@
 const { Info, PermissionError } = require("../../errors");
-const { checkCount } = require("../../utils");
+const { checkCount, censor_attachments } = require("../../utils");
 const { ranks, has_permission } = require("../../core/privileges");
 const { reload } = require("../../core/config");
 
@@ -46,6 +46,7 @@ async function clone(ctx, args) {
     const response = {
         embeds: message.embeds,
         components: message.components,
+        files: censor_attachments(message, true),
     };
     if (message.content) response.content = message.content;
     await channel.send(response);
