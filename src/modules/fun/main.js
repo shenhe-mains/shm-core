@@ -108,7 +108,7 @@ async function rps(ctx, args) {
     rps_data[message.id][other.id] = null;
     setTimeout(() => {
         delete rps_data[message.id];
-    }, 86400000);
+    }, 600000);
 }
 
 const rps_data = {};

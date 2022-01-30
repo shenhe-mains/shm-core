@@ -1,3 +1,4 @@
+const { Message } = require("discord.js");
 const { confirmationPrompt } = require("./confirmation");
 const { config } = require("./core/config");
 const {
@@ -138,16 +139,29 @@ exports.Context = class {
             await interaction.update({ components: [] });
             return interaction;
         } catch (interaction) {
-            await interaction.update({
-                embeds: [
-                    {
-                        title: "Canceled",
-                        description: "Operation canceled by user",
-                        color: "RED",
-                    },
-                ],
-                components: [],
-            });
+            if (interaction instanceof Message) {
+                await interaction.edit({
+                    embeds: [
+                        {
+                            title: "Timed Out",
+                            description: "Operation was not confirmed in time.",
+                            color: "RED",
+                        },
+                    ],
+                    components: [],
+                });
+            } else {
+                await interaction.update({
+                    embeds: [
+                        {
+                            title: "Canceled",
+                            description: "Operation canceled by user",
+                            color: "RED",
+                        },
+                    ],
+                    components: [],
+                });
+            }
             throw new Canceled();
         }
     }

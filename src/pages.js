@@ -43,7 +43,7 @@ exports.pagify = async function (ctx, embed, fields, page_size, mini) {
         };
         setTimeout(() => {
             delete items[message.id];
-        }, 86400000);
+        }, 600000);
     }
 };
 

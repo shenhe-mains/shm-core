@@ -41,6 +41,7 @@ exports.commands = {
     "clear-history": clear_history,
     history: history,
     nick: nick,
+    purge: purge,
 };
 
 async function slowmode(ctx, args) {
@@ -420,14 +421,11 @@ async function clear_history(ctx, args) {
 
 async function nick(ctx, args, body) {
     if (args.length == 0) await ctx.author.setNickname(null);
-
     var member = ctx.author;
-
     try {
         member = await ctx.parse_member(args[0]);
         body = body.substring(args[0].length);
     } catch {}
-
     if (member.id != ctx.author.id) {
         if (member.id == ctx.client.user.id) {
             if (!has_permission(ctx.author, "settings")) {
@@ -444,10 +442,48 @@ async function nick(ctx, args, body) {
             await assert_hierarchy(ctx.author, member);
         }
     }
-
     const nick = body.trim();
-
     if (nick.length > 32) throw new ArgumentError("Maximum 32 characters.");
-
     await member.setNickname(nick || null);
+}
+
+async function purge(ctx, args) {
+    checkCount(args, 1);
+    if (!has_permission(ctx.author, "purge")) {
+        throw new PermissionError(
+            "You do not have permission to purge messages."
+        );
+    }
+    const count = parseInt(args[0]);
+    if (isNaN(count) || count <= 0 || count > 100) {
+        throw new ArgumentError("Please enter a positive integer (max. 100).");
+    }
+    await (
+        await ctx.confirmOrCancel({
+            title: "Confirm Purge",
+            description: `Purge the last ${count} message${pluralize(
+                count
+            )}? (Only works for messages younger than 2 weeks.)`,
+        })
+    ).message.delete();
+    await ctx.message.delete();
+    const messages = await ctx.channel.bulkDelete(count);
+    const reply = await ctx.send({
+        embeds: [
+            {
+                title: "Purged Messages",
+                description: `${messages.size} message${pluralize(
+                    messages.size
+                )} ${pluralize(
+                    messages.size,
+                    "were",
+                    "was"
+                )} successfully purged.`,
+            },
+        ],
+        color: "GREEN",
+    });
+    setTimeout(() => {
+        reply.delete();
+    }, 2500);
 }

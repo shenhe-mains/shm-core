@@ -158,6 +158,12 @@
             "bot",
             "bypass"
         ],
+        "purge": [
+            "owner",
+            "admin",
+            "bot",
+            "bypass"
+        ],
         "slowmode": [
             "owner",
             "admin",

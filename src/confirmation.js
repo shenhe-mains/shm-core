@@ -37,8 +37,26 @@ exports.confirmationPrompt = async function (
     });
     authors[message.id] = ctx.author.id;
     return new Promise((resolve, reject) => {
-        resolves[message.id] = resolve;
-        rejects[message.id] = reject;
+        const timeout = setTimeout(() => {
+            delete authors[message.id];
+            delete resolves[message.id];
+            delete rejects[message.id];
+            reject(message);
+        }, 600000);
+        resolves[message.id] = (interaction) => {
+            try {
+                clearTimeout(timeout);
+            } finally {
+                resolve(interaction);
+            }
+        };
+        rejects[message.id] = (interaction) => {
+            try {
+                clearTimeout(timeout);
+            } finally {
+                reject(interaction);
+            }
+        };
     });
 };
 
@@ -58,6 +76,7 @@ exports.confirmationInteraction = async function (client, interaction) {
         } else {
             rejects[interaction.message.id](interaction);
         }
+        delete authors[interaction.message.id];
         delete resolves[interaction.message.id];
         delete rejects[interaction.message.id];
     }

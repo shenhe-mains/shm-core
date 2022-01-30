@@ -315,7 +315,7 @@ function play(prompt) {
             };
             setTimeout(() => {
                 delete search_results[message.id];
-            }, 86400000);
+            }, 600000);
         }
     };
 }

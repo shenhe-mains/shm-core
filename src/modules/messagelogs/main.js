@@ -92,10 +92,15 @@ async function log_delete(client, message) {
     });
 }
 
-async function log_delete_bulk(client, messages) {
+async function log_delete_bulk(client, message_list) {
     const rows = [];
-    for (const message of messages.values()) {
+    const messages = [];
+    for (const message of message_list.values()) {
         if (!is_loggable(message)) continue;
+        messages.push(message);
+    }
+    messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+    for (const message of messages) {
         rows.push(
             ...`${message.author}: ${message.content}`.split("\n"),
             ...message.attachments.toJSON().map((attachment) => attachment.url)
@@ -103,10 +108,10 @@ async function log_delete_bulk(client, messages) {
     }
     if (rows.length == 0) return;
     const hook = await get_log_webhook(client);
-    const url = messages.first().url;
-    const header = `${messages.first().channel} ${timestamp(
-        messages.first()
-    )} - ${timestamp(messages.last())}\n`;
+    const url = messages[0].url;
+    const header = `${messages[0].channel} ${timestamp(
+        messages[0]
+    )} - ${timestamp(messages[messages.length - 1])}\n`;
     while (rows.length > 0) {
         var message = header;
         var added = false;
