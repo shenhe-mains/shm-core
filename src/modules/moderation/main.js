@@ -436,6 +436,11 @@ async function nick(ctx, args, body) {
                 );
             }
         } else {
+            if (!has_permission(ctx.author, "nick")) {
+                throw new PermissionError(
+                    "You do not have permission to use this command on other users."
+                );
+            }
             await assert_hierarchy(ctx.author, member);
         }
     }

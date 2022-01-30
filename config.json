@@ -175,6 +175,15 @@
             "trial",
             "staff"
         ],
+        "nick": [
+            "owner",
+            "admin",
+            "bot",
+            "bypass",
+            "mod",
+            "tcmod",
+            "trial"
+        ],
         "clear": [
             "owner",
             "admin",

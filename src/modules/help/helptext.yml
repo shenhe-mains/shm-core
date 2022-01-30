@@ -173,7 +173,7 @@ text:
 
 
             Commands in this module: `slowmode`, `verbal`, `warn`, `mute`, `kick`, `ban`, `unmute`, `unban`, `massban`, `massban-from-url`, `remove`,
-            `clear-history`, `history`
+            `clear-history`, `history`, `nick`
     slowmode:
         title: Slowmode
         body: >
@@ -279,6 +279,15 @@ text:
             Show a user's history. `type` arguments must be each one of `warns`, `mutes`, `kicks`, or `bans`. If no types are specified, this will list a user's entire
             history.
         footer: Requires Staff
+    nick:
+        title: Set Nickname
+        body: >
+            `{prefix}nick [user] [nickname]`
+
+
+            Set a user's nickname. If the user is not specified, defaults to yourself. If the nickname is not provided, it will reset the user's nickname. You are always
+            allowed to use this command on yourself. If using this on another user, you must be a moderator or above and outrank them. If using this on the bot, you must
+            have permission to modify bot settings.
     modmail:
         title: Modmail / Ticket System
         body: >
