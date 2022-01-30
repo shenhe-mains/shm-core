@@ -198,8 +198,7 @@
         ],
         "settings": [
             "owner",
-            "admin",
-            "dev"
+            "admin"
         ],
         "sticky": [
             "owner",
