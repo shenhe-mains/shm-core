@@ -3,8 +3,8 @@
     "guild": "805458032908959804",
     "mute": "805458032908959805",
     "verify": "805458032929538061",
-    "prefix": "s#",
-    "star_threshold": 1,
+    "prefix": "#",
+    "star_threshold": 5,
     "ranks": {
         "shenhe": {
             "level": 1000000,
