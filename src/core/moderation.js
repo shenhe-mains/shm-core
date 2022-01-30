@@ -204,6 +204,10 @@ exports.schedule_undo = schedule_undo = async function (type, guild, user_id) {
                             [user_id]
                         );
                         if (type == "mute") {
+                            client.query(
+                                `DELETE FROM autoroles WHERE user_id = $1 AND role_id = $2`,
+                                [user_id, config.mute]
+                            );
                             guild.members
                                 .fetch(user_id)
                                 .then((member) =>
@@ -213,7 +217,7 @@ exports.schedule_undo = schedule_undo = async function (type, guild, user_id) {
                             guild.bans.remove(user_id);
                         }
                         guild.channels
-                            .fetch(config.command_logs)
+                            .fetch(config.channels.logs)
                             .then((channel) =>
                                 channel.send({
                                     embeds: [

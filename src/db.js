@@ -987,3 +987,33 @@ exports.client = client;
         ]);
     };
 }
+
+// autoroles
+{
+    client.query(
+        `CREATE TABLE IF NOT EXISTS autoroles (
+            user_id VARCHAR(32),
+            role_id VARCHAR(32)
+        )`
+    );
+
+    exports.set_autoroles = async function (user_id, role_ids) {
+        await client.query(
+            `INSERT INTO autoroles (user_id, role_id) VALUES ${role_ids
+                .map(
+                    (role_id, index) => `($${index * 2 + 1}, $${index * 2 + 2})`
+                )
+                .join(", ")}`,
+            role_ids.map((role_id) => [user_id, role_id]).flat()
+        );
+    };
+
+    exports.get_autoroles = async function (user_id) {
+        return (
+            await client.query(
+                `SELECT role_id FROM autoroles WHERE user_id = $1`,
+                [user_id]
+            )
+        ).rows.map((row) => row.role_id);
+    };
+}

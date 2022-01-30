@@ -1,5 +1,6 @@
 const { DiscordAPIError } = require("discord.js");
 const fetch = require("node-fetch");
+const { config } = require("../../core/config");
 const { schedule_undo } = require("../../core/moderation");
 const { parse_duration } = require("../../core/parsing");
 const { has_permission, assert_hierarchy } = require("../../core/privileges");
@@ -181,19 +182,37 @@ function moderate(t, d) {
 
 function unmoderate(t, d) {
     return ((type, dm) =>
-        async function (ctx, args) {
+        async function (ctx, args, body) {
             if (!has_permission(ctx.author, type)) {
                 throw new PermissionError(
                     `You do not have permission to un${type} users.`
                 );
             }
             checkCount(args, 1, Infinity);
-            const data = await (type == "mute"
-                ? ctx.parse_member
-                : ctx.parse_user
-            ).bind(ctx)(args.shift());
+            var data;
+            try {
+                data = await (type == "mute"
+                    ? ctx.parse_member
+                    : ctx.parse_user
+                ).bind(ctx)(args[0]);
+            } catch (error) {
+                if (type == "mute") {
+                    const id = await ctx.parse_user_id(args[0]);
+                    await client.query(
+                        `DELETE FROM autoroles WHERE user_id = $1 AND role_id = $2`,
+                        [id, config.mute]
+                    );
+                    return {
+                        title: `User ${id} has been unmuted`,
+                        description:
+                            "I could not find that user in this server, but if they were previously muted, I have removed the mute role from their autoroles so they will not be re-muted when they rejoin the server.",
+                    };
+                } else {
+                    throw error;
+                }
+            }
             const user = await (type == "mute" ? data.user : data);
-            const reason = args.join(" ");
+            const reason = body.substring(args[0].length).trim();
             var fail = false;
             try {
                 await (type == "mute" ? ctx.unmute : ctx.unban).bind(ctx)(
