@@ -6,6 +6,7 @@ const { reload } = require("../../core/config");
 exports.commands = {
     ranks: _ranks,
     "reload-config": reload_config,
+    clone: clone,
 };
 
 async function _ranks(ctx, args) {
@@ -31,4 +32,21 @@ async function reload_config(ctx, args) {
         );
     }
     reload();
+}
+
+async function clone(ctx, args) {
+    checkCount(args, 2);
+    if (!has_permission(ctx.author, "settings")) {
+        throw new PermissionError(
+            "You do not have permission to command the bot like that."
+        );
+    }
+    const channel = await ctx.parse_channel(args[0]);
+    const message = await ctx.parse_message(args[1]);
+    const response = {
+        embeds: message.embeds,
+        components: message.components,
+    };
+    if (message.content) response.content = message.content;
+    await channel.send(response);
 }

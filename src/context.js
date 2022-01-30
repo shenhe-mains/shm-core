@@ -19,6 +19,7 @@ const {
     parse_channel_id,
     parse_role,
     parse_role_id,
+    parse_message,
 } = require("./core/parsing");
 const { Canceled } = require("./errors");
 const { user_input } = require("./utils");
@@ -119,6 +120,10 @@ exports.Context = class {
 
     parse_channel_id(string) {
         return parse_channel_id(this, string);
+    }
+
+    async parse_message(string) {
+        return await parse_message(this, string);
     }
 
     async confirm(embed, confirm_message, cancel_message) {

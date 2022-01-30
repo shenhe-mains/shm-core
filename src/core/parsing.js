@@ -1,4 +1,4 @@
-const { ArgumentError, CommandSyntaxError } = require("../errors");
+const { ArgumentError, CommandSyntaxError, UserError } = require("../errors");
 const { inline_code } = require("../utils");
 
 exports.parse_user_id = parse_user_id = function (ctx, string) {
@@ -84,6 +84,40 @@ exports.parse_channel = async function (ctx, string) {
         throw new ArgumentError(
             "Error fetching channel; I could not find it in this server."
         );
+    }
+};
+
+exports.parse_message = async function (ctx, string) {
+    if (!string.match(/^https:\/\/discord.com\/channels\/\d+\/\d+\/\d+$/)) {
+        throw new ArgumentError(
+            "That does not appear to be a valid message link."
+        );
+    } else {
+        const re = /\d+/g;
+        const guild_id = re.exec(string)[0];
+        const channel_id = re.exec(string)[0];
+        const message_id = re.exec(string)[0];
+        console.log(guild_id, channel_id, message_id);
+        var guild, channel;
+        try {
+            guild = await ctx.client.guilds.fetch(guild_id);
+        } catch (error) {
+            throw new UserError("I cannot access that guild.");
+        }
+        try {
+            channel = await guild.channels.fetch(channel_id);
+        } catch {
+            throw new UserError(
+                `I cannot access that channel within ${guild}.`
+            );
+        }
+        try {
+            return await channel.messages.fetch(message_id);
+        } catch {
+            throw new UserError(
+                `I cannot access that message within ${channel}, or it does not exist anymore.`
+            );
+        }
     }
 };
 
