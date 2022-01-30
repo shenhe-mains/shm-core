@@ -162,7 +162,9 @@
             "owner",
             "admin",
             "bot",
-            "bypass"
+            "bypass",
+            "mod",
+            "tcmod"
         ],
         "slowmode": [
             "owner",

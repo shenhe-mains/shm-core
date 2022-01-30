@@ -295,7 +295,7 @@ text:
 
 
             Purge `N` messages. This command will prompt for confirmation.
-        footer: Requires Admin
+        footer: Requires Moderator
     modmail:
         title: Modmail / Ticket System
         body: >
