@@ -262,6 +262,12 @@
             "mod",
             "leader"
         ],
+        "reactroles": [
+            "owner",
+            "admin",
+            "bot",
+            "bypass"
+        ],
         "database": [
             "owner"
         ]
@@ -279,6 +285,7 @@
         "927319922676219924": {}
     },
     "autorole_exclude": "838116854866116608",
+    "reactrole_block": "838116854866116608",
     "channels": {
         "admin": "912781727087341618",
         "application_category": "926955286198116352",

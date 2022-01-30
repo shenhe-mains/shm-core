@@ -21,6 +21,7 @@ const {
     parse_role_id,
 } = require("./core/parsing");
 const { Canceled } = require("./errors");
+const { user_input } = require("./utils");
 
 exports.Context = class {
     constructor(client, message) {
@@ -164,6 +165,10 @@ exports.Context = class {
             }
             throw new Canceled();
         }
+    }
+
+    async user_input(options) {
+        return await user_input(this.channel, this.author, options);
     }
 
     async log() {

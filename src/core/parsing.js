@@ -52,7 +52,9 @@ exports.parse_role_id = parse_role_id = function (ctx, string) {
 exports.parse_role = async function (ctx, string) {
     const id = parse_role_id(ctx, string);
     try {
-        return await ctx.guild.roles.fetch(id);
+        const role = await ctx.guild.roles.fetch(id);
+        if (role === null) throw 0;
+        return role;
     } catch {
         throw new ArgumentError(
             "Error fetching role; I could not find it in this server."
