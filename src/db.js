@@ -941,3 +941,49 @@ exports.client = client;
         }
     };
 }
+
+// starboard
+{
+    client.query(
+        `CREATE TABLE IF NOT EXISTS starboard (
+            message_id VARCHAR(32) PRIMARY KEY,
+            channel_id VARCHAR(32),
+            relayed_id VARCHAR(32)
+        )`
+    );
+
+    exports.get_starboard_message = get_starboard_message = async function (
+        message_id
+    ) {
+        return (
+            await client.query(
+                `SELECT channel_id, relayed_id FROM starboard WHERE message_id = $1`,
+                [message_id]
+            )
+        ).rows[0];
+    };
+
+    exports.set_starboard_message = async function (
+        message_id,
+        channel_id,
+        relayed_id
+    ) {
+        if ((await get_starboard_message(message_id)) === undefined) {
+            await client.query(
+                `INSERT INTO starboard (message_id, channel_id, relayed_id) VALUES ($1, $2, $3)`,
+                [message_id, channel_id, relayed_id]
+            );
+        } else {
+            await client.query(
+                `UPDATE starboard SET channel_id = $1, relayed_id = $2 WHERE message_id = $3`,
+                [channel_id, relayed_id, message_id]
+            );
+        }
+    };
+
+    exports.delete_starboard_message = async function (message_id) {
+        await client.query(`DELETE FROM starboard WHERE message_id = $1`, [
+            message_id,
+        ]);
+    };
+}

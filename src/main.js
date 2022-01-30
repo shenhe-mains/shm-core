@@ -45,6 +45,10 @@ for (var key of [
     "interactionCreate",
     "messageDelete",
     "messageDeleteBulk",
+    "messageReactionAdd",
+    "messageReactionRemove",
+    "messageReactionRemoveAll",
+    "messageReactionRemoveEmoji",
     "messageUpdate",
     "roleDelete",
 ]) {

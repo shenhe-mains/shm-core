@@ -9,6 +9,7 @@ exports.listeners = {
 };
 
 function is_loggable(message) {
+    if (message.content === null) return false;
     if (message.guild === undefined) return false;
     if (message.webhookId !== null) return false;
     if (message.author.bot) return false;
