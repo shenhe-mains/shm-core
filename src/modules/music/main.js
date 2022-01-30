@@ -462,6 +462,7 @@ async function stop(ctx, args) {
     await connect(ctx, true);
     const server = get_server(ctx);
     server.index = server.queue.length;
+    server.repeat = server.loop = server.radio = false;
     check_queue(ctx);
 }
 
