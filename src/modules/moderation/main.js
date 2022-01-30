@@ -442,5 +442,7 @@ async function nick(ctx, args, body) {
 
     const nick = body.trim();
 
+    if (nick.length > 32) throw new ArgumentError("Maximum 32 characters.");
+
     await member.setNickname(nick || null);
 }
