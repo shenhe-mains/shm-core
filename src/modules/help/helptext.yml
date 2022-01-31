@@ -323,10 +323,10 @@ text:
     set-role-color:
         title: Recolor Role
         body: >
-            `{prefix}set-role-color <role> <name>`
+            `{prefix}set-role-color <role> [color]`
 
 
-            Recolor the specified role. A.K.A. `{prefix}set-role-colour`.
+            Recolor the specified role (default removes the color). A.K.A. `{prefix}set-role-colour`.
         footer: Requires Bot Owner / Admin
     modmail:
         title: Modmail / Ticket System
