@@ -71,11 +71,13 @@ async function push(ctx, args, body) {
     try {
         await shell("git", ["commit", "-m", body]);
     } catch {
+        console.log("A");
         embed.description = "Failed to commit.";
         embed.color = "RED";
         await message.edit({ embeds: [embed] });
         throw new UserError();
     }
+    console.log("B");
     embed.description = "Pushing.";
     await message.edit({ embeds: [embed] });
     try {
