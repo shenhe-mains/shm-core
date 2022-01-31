@@ -1,12 +1,19 @@
-const { exec } = require("child_process");
+delete require.cache[require.resolve("./utils")];
 const { modify, config } = require("../.././core/config");
 const { has_permission } = require("../../core/privileges");
 const { add_protect, remove_protect } = require("../../db");
-const { PermissionError, Success } = require("../../errors");
+const {
+    PermissionError,
+    Success,
+    ArgumentError,
+    UserError,
+} = require("../../errors");
 const { checkCount } = require("../../utils");
+const { shell } = require("./utils");
 
 exports.commands = {
     pull: pull,
+    push: push,
     prefix: prefix,
     "log-ignore": log_ignore,
     "log-unignore": log_unignore,
@@ -29,13 +36,27 @@ function parse_channel_ids(ctx, args) {
 async function pull(ctx, args) {
     assert_perms(ctx);
     checkCount(args, 0);
-    exec("git pull", (error, stdout, stderr) => {
-        if (error) {
-            ctx.reply("Pulling failed.");
-        } else {
-            ctx.reply("Pulling succeeded.");
-        }
-    });
+    try {
+        await shell("git", ["pull"]);
+    } catch {
+        throw new UserError(
+            "Could not pull, possibly due to a merge conflict."
+        );
+    }
+}
+
+async function push(ctx, args, body) {
+    assert_perms(ctx);
+    if (!body) {
+        throw new ArgumentError("Please provide a commit reason.");
+    }
+    try {
+        await shell("git", ["add", "--all"]);
+        await shell("git", ["commit", "-m", body]);
+        await shell("git", ["push"]);
+    } catch {
+        throw new UserError("Could not commit & push.");
+    }
 }
 
 async function prefix(ctx, args) {
