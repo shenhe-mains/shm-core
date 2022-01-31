@@ -20,6 +20,7 @@ exports.commands = {
     anonreply: reply(false),
     close: close(true),
     silentclose: close(false),
+    delete: delete_channel,
 };
 
 exports.listeners = {
@@ -86,8 +87,13 @@ function close(announce) {
             announce,
             await get_modmail_for_channel(ctx.channel.id)
         );
-        await ctx.channel.delete();
     };
+}
+
+async function delete_channel(ctx, args) {
+    await assert_modmail(ctx);
+    checkCount(args, 0);
+    await ctx.channel.delete(`modmail thread closed by ${ctx.author.id}`);
 }
 
 async function check_modmail_confirm(client, interaction) {
