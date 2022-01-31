@@ -525,7 +525,7 @@ async function role_add(ctx, args) {
     for (const role of roles) {
         if (role.comparePositionTo(ctx.author.roles.highest) >= 0) {
             throw new PermissionError(
-                "You cannot grant roles that are above your highest role."
+                "You cannot grant roles that are not below your highest role."
             );
         }
     }
@@ -551,7 +551,7 @@ async function role_rm(ctx, args) {
     for (const role of roles) {
         if (role.comparePositionTo(ctx.author.roles.highest) >= 0) {
             throw new PermissionError(
-                "You cannot remove roles that are above your highest role."
+                "You cannot remove roles that are not below your highest role."
             );
         }
     }
