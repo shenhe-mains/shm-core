@@ -1055,7 +1055,7 @@ exports.client = client;
 
     client.query(
         `CREATE TABLE IF NOT EXISTS suggestion_votes (
-            id INT FOREIGN KEY REFERENCES suggestions(id),
+            id INT,
             user_id VARCHAR(32),
             up BOOLEAN
         )`
