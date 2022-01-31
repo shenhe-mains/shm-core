@@ -652,16 +652,17 @@ exports.client = client;
         await client.query(`DELETE FROM modmail_channels WHERE user_id = $1`, [
             user_id,
         ]);
-        await client.query(`INSERT INTO old_modmail (channel_id) VALUES ($1)`, [
-            channel_id,
-        ]);
+        await client.query(
+            `INSERT INTO closed_modmail (channel_id) VALUES ($1)`,
+            [channel_id]
+        );
     };
 
     exports.is_closed_modmail = async function (channel_id) {
         return (
             (
                 await client.query(
-                    `SELECT COUNT(1) FROM old_modmail WHERE channel_id = $1`,
+                    `SELECT COUNT(1) FROM closed_modmail WHERE channel_id = $1`,
                     [channel_id]
                 )
             ).rows[0].count > 0
@@ -669,7 +670,7 @@ exports.client = client;
     };
 
     exports.delete_modmail = async function (channel_id) {
-        await client.query(`DELETE FROM old_modmail WHERE channel_id = $1`, [
+        await client.query(`DELETE FROM closed_modmail WHERE channel_id = $1`, [
             channel_id,
         ]);
     };
