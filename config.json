@@ -6,6 +6,7 @@
     "prefix": "#",
     "private_star_threshold": 3,
     "public_star_threshold": 5,
+    "webhook": "916020798903418890",
     "ranks": {
         "shenhe": {
             "level": 1000000,
@@ -293,6 +294,16 @@
         ],
         "database": [
             "owner"
+        ],
+        "webhook": [
+            "owner",
+            "admin",
+            "bot",
+            "bypass"
+        ],
+        "send": [
+            "owner",
+            "admin"
         ]
     },
     "support_anchor": "903686165792706580",
