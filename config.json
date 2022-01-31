@@ -283,6 +283,14 @@
             "bot",
             "bypass"
         ],
+        "suggestions": [
+            "owner",
+            "admin",
+            "bot",
+            "bypass",
+            "mod",
+            "tcmod"
+        ],
         "database": [
             "owner"
         ]
@@ -313,6 +321,7 @@
         "mod": "841857695265980466",
         "modmail_category": "913215273996259380",
         "modmail_logs": "911071731265986560",
+        "suggestions": "937562743098179594",
         "watchlist": "899332321583464478",
         "private_starboard": "937177440311189544",
         "public_starboard": "805603604408827934",
@@ -353,7 +362,7 @@
                 "805458032938188838",
                 "905624291326959660"
             ],
-            "open": false
+            "open": true
         },
         "tcmod": {
             "roles": [
@@ -384,7 +393,7 @@
             "roles": [
                 "900037988518608978"
             ],
-            "open": true
+            "open": false
         },
         "event": {
             "roles": [
