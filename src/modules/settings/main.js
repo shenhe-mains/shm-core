@@ -81,6 +81,7 @@ async function push(ctx, args, body) {
         embed.color = "RED";
         await message.edit({ embeds: [embed] });
     }
+    await message.delete();
 }
 
 async function prefix(ctx, args) {
