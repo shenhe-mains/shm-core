@@ -4,6 +4,9 @@ aliases:
     kick-silent: kick
     ban-silent: ban
     massban-from-url: massban
+    role: role-add
+    role-rm: role-remove
+    set-role-colour: set-role-color
     p: play
     pp: playlist
     ppshuffle: playlist-shuffle
@@ -302,7 +305,7 @@ text:
             `{prefix}role-add <user> <roles...>`
 
 
-            Add the specified roles to the target user. All roles must be below your highest role, and you must outrank the user.
+            Add the specified roles to the target user. All roles must be below your highest role, and you must outrank the user. A.K.A. `{prefix}role`.
         footer: Requires Moderator
     role-remove:
         title: Remove Role from Member

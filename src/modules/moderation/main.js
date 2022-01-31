@@ -520,7 +520,15 @@ async function role_add(ctx, args) {
         throw new PermissionError("You do not have permission to grant roles.");
     }
     const member = await ctx.parse_member(args.shift());
+    assert_hierarchy(ctx.author, member);
     const roles = await Promise.all(args.map(ctx.parse_role.bind(ctx)));
+    for (const role of roles) {
+        if (role.comparePositionTo(ctx.author.highest) >= 0) {
+            throw new PermissionError(
+                "You cannot grant roles that are above your highest role."
+            );
+        }
+    }
     await member.roles.add(roles, `added via command by ${ctx.author.id}`);
     return {
         title: "Roles Granted",
@@ -538,7 +546,15 @@ async function role_rm(ctx, args) {
         );
     }
     const member = await ctx.parse_member(args.shift());
+    assert_hierarchy(ctx.author, member);
     const roles = await Promise.all(args.map(ctx.parse_role.bind(ctx)));
+    for (const role of roles) {
+        if (role.comparePositionTo(ctx.author.highest) >= 0) {
+            throw new PermissionError(
+                "You cannot remove roles that are above your highest role."
+            );
+        }
+    }
     await member.roles.remove(roles, `removed via command by ${ctx.author.id}`);
     return {
         title: "Roles Removed",
