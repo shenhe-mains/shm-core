@@ -64,6 +64,7 @@ async function push(ctx, args, body) {
         embed.description = "Failed to add files.";
         embed.color = "RED";
         await message.edit({ embeds: [embed] });
+        throw new UserError();
     }
     embed.description = "Committing.";
     await message.edit({ embeds: [embed] });
@@ -73,6 +74,7 @@ async function push(ctx, args, body) {
         embed.description = "Failed to commit.";
         embed.color = "RED";
         await message.edit({ embeds: [embed] });
+        throw new UserError();
     }
     embed.description = "Pushing.";
     await message.edit({ embeds: [embed] });
@@ -82,6 +84,7 @@ async function push(ctx, args, body) {
         embed.description = "Failed to push.";
         embed.color = "RED";
         await message.edit({ embeds: [embed] });
+        throw new UserError();
     }
     await message.delete();
 }
