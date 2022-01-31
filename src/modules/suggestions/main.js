@@ -42,6 +42,9 @@ async function suggest(ctx, args, body) {
                     name: `${ctx.author.user.username}#${ctx.author.user.discriminator}`,
                     iconURL: ctx.author.user.avatarURL({ dynamic: true }),
                 },
+                footer: {
+                    text: "Use #suggest <your suggestion> in bot-spam to suggest your ideas!",
+                },
             },
         ],
         components: [
