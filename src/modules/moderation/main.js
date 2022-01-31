@@ -523,7 +523,7 @@ async function role_add(ctx, args) {
     assert_hierarchy(ctx.author, member);
     const roles = await Promise.all(args.map(ctx.parse_role.bind(ctx)));
     for (const role of roles) {
-        if (role.comparePositionTo(ctx.author.highest) >= 0) {
+        if (role.comparePositionTo(ctx.author.roles.highest) >= 0) {
             throw new PermissionError(
                 "You cannot grant roles that are above your highest role."
             );
@@ -549,7 +549,7 @@ async function role_rm(ctx, args) {
     assert_hierarchy(ctx.author, member);
     const roles = await Promise.all(args.map(ctx.parse_role.bind(ctx)));
     for (const role of roles) {
-        if (role.comparePositionTo(ctx.author.highest) >= 0) {
+        if (role.comparePositionTo(ctx.author.roles.highest) >= 0) {
             throw new PermissionError(
                 "You cannot remove roles that are above your highest role."
             );
