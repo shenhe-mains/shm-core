@@ -37,6 +37,7 @@ async function suggest(ctx, args, body) {
             {
                 title: `Suggestion #${suggestion_id}`,
                 description: body,
+                color: config.color,
                 author: {
                     name: `${ctx.author.user.username}#${ctx.author.user.discriminator}`,
                     iconURL: ctx.author.user.avatarURL({ dynamic: true }),
