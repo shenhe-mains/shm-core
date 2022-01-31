@@ -571,7 +571,7 @@ async function role_rename(ctx, args) {
 }
 
 async function role_recolor(ctx, args) {
-    checkCount(args, 2);
+    checkCount(args, 1, 2);
     if (!has_permission(ctx.author, "role_modify")) {
         throw new PermissionError(
             "You do not have permission to modify roles."
@@ -579,7 +579,7 @@ async function role_recolor(ctx, args) {
     }
     const role = await ctx.parse_role(args[0]);
     const old = role.color;
-    const color = args[1];
+    const color = args[1] || 0;
     await role.edit({
         color: color.toUpperCase(),
         reason: `edited via command by ${ctx.author.id}`,
