@@ -579,7 +579,7 @@ async function role_recolor(ctx, args) {
     }
     const role = await ctx.parse_role(args[0]);
     const old = role.color;
-    const color = args[1] || 0;
+    const color = args[1] || "0";
     await role.edit({
         color: color.toUpperCase(),
         reason: `edited via command by ${ctx.author.id}`,
