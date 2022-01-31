@@ -70,7 +70,7 @@ exports.get_modmail_channel = _get_modmail_channel = async function (
                     embeds: [
                         {
                             title: "New Modmail Channel",
-                            description: `This is a modmail channel for ${user}. Use \`${config.prefix}reply <message>\` or \`${config.prefix}anonreply <message>\`, and once you're done, \`${config.prefix}close\` to close the thread (closing does not alert the user).`,
+                            description: `This is a modmail channel for ${user}. Use \`${config.prefix}reply <message>\` or \`${config.prefix}anonreply <message>\`, and once you're done, \`${config.prefix}close\` to close the thread (this will alert the user that the thread has been closed; use \`${config.prefix}silentclose\` if you wish to avoid that).`,
                             author: {
                                 name: `${user.username}#${user.discriminator}`,
                                 iconURL: user.avatarURL({ dynamic: true }),
