@@ -89,7 +89,8 @@ function close(announce) {
             ctx.client,
             ctx.author.user,
             announce,
-            await get_modmail_for_channel(ctx.channel.id)
+            await get_modmail_for_channel(ctx.channel.id),
+            ctx.channel.id
         );
     };
 }
@@ -239,7 +240,8 @@ async function check_modmail_deleted(client, channel) {
             await close_modmail_channel(
                 client,
                 entry.executor,
-                await get_modmail_for_channel(channel.id)
+                await get_modmail_for_channel(channel.id),
+                channel.id
             );
             return;
         }

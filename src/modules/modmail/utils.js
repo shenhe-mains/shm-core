@@ -95,7 +95,8 @@ exports.close_modmail_channel = async function (
     client,
     closer,
     announce,
-    user_id
+    user_id,
+    channel_id
 ) {
     if (announce) {
         try {
@@ -114,7 +115,7 @@ exports.close_modmail_channel = async function (
         } catch {}
     }
     await create_modmail_message(user_id, closer, 4);
-    await close_modmail_channel(user_id);
+    await close_modmail_channel(user_id, channel_id);
     const url = `https://shenhemains.com/dashboard/modmail/${user_id}`;
     await log(client, {
         embeds: [
