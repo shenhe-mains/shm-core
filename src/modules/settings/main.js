@@ -50,12 +50,36 @@ async function push(ctx, args, body) {
     if (!body) {
         throw new ArgumentError("Please provide a commit reason.");
     }
+    const embed = {
+        title: "Pushing...",
+        description: "Adding files.",
+        color: config.color,
+    };
+    const message = await ctx.replyEmbed(embed);
     try {
         await shell("git", ["add", "--all"]);
+    } catch {
+        embed.description = "Failed to add files.";
+        embed.color = "RED";
+        await message.edit({ embeds: [embed] });
+    }
+    embed.description = "Committing.";
+    await message.edit({ embeds: [embed] });
+    try {
         await shell("git", ["commit", "-m", body]);
+    } catch {
+        embed.description = "Failed to commit.";
+        embed.color = "RED";
+        await message.edit({ embeds: [embed] });
+    }
+    embed.description = "Pushing.";
+    await message.edit({ embeds: [embed] });
+    try {
         await shell("git", ["push"]);
     } catch {
-        throw new UserError("Could not commit & push.");
+        embed.description = "Failed to push.";
+        embed.color = "RED";
+        await message.edit({ embeds: [embed] });
     }
 }
 
