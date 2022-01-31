@@ -577,6 +577,12 @@ exports.client = client;
     );
 
     client.query(
+        `CREATE TABLE IF NOT EXISTS closed_modmail (
+            channel_id VARCHAR(32) PRIMARY KEY
+        )`
+    );
+
+    client.query(
         `CREATE TABLE IF NOT EXISTS modmail_messages (
             user_id VARCHAR(32),
             time TIMESTAMP,
@@ -642,9 +648,29 @@ exports.client = client;
         }
     };
 
-    exports.close_modmail_channel = async function (user_id) {
+    exports.close_modmail_channel = async function (user_id, channel_id) {
         await client.query(`DELETE FROM modmail_channels WHERE user_id = $1`, [
             user_id,
+        ]);
+        await client.query(`INSERT INTO old_modmail (channel_id) VALUES ($1)`, [
+            channel_id,
+        ]);
+    };
+
+    exports.is_closed_modmail = async function (channel_id) {
+        return (
+            (
+                await client.query(
+                    `SELECT COUNT(1) FROM old_modmail WHERE channel_id = $1`,
+                    [channel_id]
+                )
+            ).rows[0].count > 0
+        );
+    };
+
+    exports.delete_modmail = async function (channel_id) {
+        await client.query(`DELETE FROM old_modmail WHERE channel_id = $1`, [
+            channel_id,
         ]);
     };
 
@@ -1015,5 +1041,75 @@ exports.client = client;
                 [user_id]
             )
         ).rows.map((row) => row.role_id);
+    };
+}
+
+// suggestions
+{
+    client.query(
+        `CREATE TABLE IF NOT EXISTS suggestions (
+            id SERIAL PRIMARY KEY,
+            message_id VARCHAR(32)
+        )`
+    );
+
+    client.query(
+        `CREATE TABLE IF NOT EXISTS suggestion_votes (
+            id INT FOREIGN KEY REFERENCES suggestions(id),
+            user_id VARCHAR(32),
+            up BOOLEAN
+        )`
+    );
+
+    exports.create_suggestion = async function (temp_id) {
+        await client.query(`INSERT INTO suggestions (message_id) VALUES $1`, [
+            temp_id,
+        ]);
+        return (
+            await client.query(
+                `SELECT id FROM suggestions WHERE message_id = $1`,
+                [temp_id]
+            )
+        ).rows[0].id;
+    };
+
+    exports.set_suggestion = async function (id, message_id) {
+        await client.query(
+            `UPDATE suggestions SET message_id = $1 WHERE id = $2`,
+            [message_id, id]
+        );
+    };
+
+    exports.get_suggestion = async function (id) {
+        return (
+            await client.query(
+                `SELECT message_id FROM suggestions WHERE id = $1`,
+                [id]
+            )
+        ).rows[0].message_id;
+    };
+
+    exports.get_vote = get_vote = async function (id, user_id) {
+        const results = (
+            await client.query(
+                `SELECT up FROM suggestion_votes WHERE id = $1 AND user_id = $2`,
+                [id, user_id]
+            )
+        ).rows;
+        return results.length > 0 ? (results[0].up ? 1 : -1) : 0;
+    };
+
+    exports.set_vote = async function (id, user_id, up) {
+        if ((await get_vote(id, user_id)) == 0) {
+            await client.query(
+                `INSERT INTO suggestion_votes (id, user_id, up) VALUES ($1, $2, $3)`,
+                [id, user_id, up]
+            );
+        } else {
+            await client.query(
+                `UPDATE suggestion_votes SET up = $1 WHERE id = $2 AND user_id = $3`,
+                [up, id, user_id]
+            );
+        }
     };
 }

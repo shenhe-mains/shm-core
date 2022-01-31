@@ -3,7 +3,11 @@ delete require.cache[require.resolve("./utils")];
 const { DMChannel, ButtonInteraction } = require("discord.js");
 const { config } = require("../../core/config");
 const { has_permission } = require("../../core/privileges");
-const { is_modmail_channel, get_modmail_for_channel } = require("../../db");
+const {
+    is_modmail_channel,
+    get_modmail_for_channel,
+    is_closed_modmail,
+} = require("../../db");
 const { PermissionError, Success, Info, UserError } = require("../../errors");
 const { checkCount } = require("../../utils");
 const {
@@ -91,7 +95,11 @@ function close(announce) {
 }
 
 async function delete_channel(ctx, args) {
-    await assert_modmail(ctx);
+    if (!(await is_closed_modmail(ctx.channel.id))) {
+        throw new UserError(
+            "This command can only be used on modmail channels that are closed."
+        );
+    }
     checkCount(args, 0);
     await ctx.channel.delete(`modmail thread closed by ${ctx.author.id}`);
 }
