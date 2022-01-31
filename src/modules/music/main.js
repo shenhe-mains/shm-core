@@ -572,8 +572,8 @@ async function radio(ctx, args) {
     return {
         title: `Radio: ${server.radio ? "On" : "Off"}`,
         description: server.radio
-            ? "Radio mode is now off."
-            : "Radio mode is now on. When I reach the end of the queue, I will randomly select a related song and keep going.",
+            ? "Radio mode is now on. When I reach the end of the queue, I will randomly select a related song and keep going."
+            : "Radio mode is now off.",
     };
 }
 
