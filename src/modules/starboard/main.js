@@ -39,9 +39,8 @@ async function check_stars(client, item) {
     const count = reactions ? reactions.count : 0;
     const msg = await get_star_link(message.id);
     if (
-        count < public
-            ? config.public_star_threshold
-            : config.private_star_threshold
+        count <
+        (public ? config.public_star_threshold : config.private_star_threshold)
     ) {
         if (msg) {
             await msg.delete();
