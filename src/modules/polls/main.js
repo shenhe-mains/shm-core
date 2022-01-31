@@ -51,6 +51,35 @@ const footers = [
     "You may only select one option, and cannot change it later. Once you lock in your vote, you will be able to see the results.",
 ];
 
+const grouping = [
+    [],
+    [1],
+    [2],
+    [3],
+    [4],
+    [5],
+    [3, 3],
+    [4, 3],
+    [4, 4],
+    [5, 4],
+    [5, 5],
+    [4, 4, 3],
+    [4, 4, 4],
+    [5, 5, 3],
+    [5, 5, 4],
+    [5, 5, 5],
+    [4, 4, 4, 4],
+    [5, 5, 5, 2],
+    [5, 5, 5, 3],
+    [5, 5, 5, 4],
+    [5, 5, 5, 5],
+    [5, 5, 5, 5, 1],
+    [5, 5, 5, 5, 2],
+    [5, 5, 5, 5, 3],
+    [5, 5, 5, 5, 4],
+    [5, 5, 5, 5, 5],
+];
+
 async function setup_poll(ctx, args) {
     if (!has_permission(ctx.author, "poll")) {
         throw new PermissionError(
@@ -77,31 +106,41 @@ async function setup_poll(ctx, args) {
             "The poll body and poll options must be non-empty."
         );
     }
-    if (values.slice(1).some((s) => s.length > 100)) {
+    const body = values.shift();
+    if (values.some((s) => s.length > 100)) {
         throw new ArgumentError(
             "Poll options must be at most 100 characters long."
         );
+    }
+    if (values.length > 25) {
+        throw new ArgumentError("Polls can only contain at most 25 options.");
+    }
+    if (new Set(values).size != values.length) {
+        throw new ArgumentError("Duplicate options are not allowed.");
+    }
+    const buttons = values.map((value) => ({
+        type: "BUTTON",
+        style: "PRIMARY",
+        customId: value,
+        label: value,
+    }));
+    const rows = [];
+    for (const size of grouping[buttons.length]) {
+        rows.push({
+            type: "ACTION_ROW",
+            components: buttons.splice(0, size),
+        });
     }
     const message = await channel.send({
         embeds: [
             {
                 title: "Poll",
-                description: values[0],
+                description: body,
                 color: config.color,
                 footer: { text: footers[type] },
             },
         ],
-        components: values.slice(1).map((value) => ({
-            type: "ACTION_ROW",
-            components: [
-                {
-                    type: "BUTTON",
-                    style: "PRIMARY",
-                    customId: value,
-                    label: value,
-                },
-            ],
-        })),
+        components: rows,
     });
     await create_poll(message.id, channel.id, type, values.slice(1));
 }
@@ -196,19 +235,6 @@ async function disclose(ctx, args) {
     await message.edit({ embeds: [embed] });
 }
 
-const cooldown = {};
-
-function ratelimit(message) {
-    if (
-        cooldown.hasOwnProperty(message.id) &&
-        +new Date() - cooldown[message.id] < 2000
-    ) {
-        return false;
-    }
-    cooldown[message.id] = +new Date();
-    return true;
-}
-
 async function observe_vote(client, interaction) {
     if (!(interaction instanceof ButtonInteraction)) return;
     var type;
@@ -285,7 +311,6 @@ async function observe_vote(client, interaction) {
         type == poll_types.unique ||
         type == poll_types.commit
     ) {
-        if (!ratelimit(interaction.message)) return;
         const embed = interaction.message.embeds[0];
         embed.fields = [
             {
