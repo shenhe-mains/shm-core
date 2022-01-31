@@ -8,7 +8,7 @@ const {
     ArgumentError,
     UserError,
 } = require("../../errors");
-const { checkCount } = require("../../utils");
+const { checkCount, inline_code } = require("../../utils");
 const { shell } = require("./utils");
 
 exports.commands = {
@@ -19,6 +19,8 @@ exports.commands = {
     "log-unignore": log_unignore,
     protect: protect,
     unprotect: unprotect,
+    "close-team": team_status(false),
+    "open-team": team_status(true),
 };
 
 function assert_perms(ctx) {
@@ -133,4 +135,24 @@ async function unprotect(ctx, args) {
     for (var id of parse_channel_ids(ctx, args)) {
         await remove_protect(id);
     }
+}
+
+function team_status(open) {
+    return async (ctx, args) => {
+        checkCount(args, 1, Infinity);
+        assert_perms(ctx);
+        for (const arg of args) {
+            if (!config.staff_teams.hasOwnProperty(arg)) {
+                throw new ArgumentError(
+                    `${inline_code(arg)} is not a valid team ID.`
+                );
+            }
+        }
+        for (const arg of args) {
+            config.staff_teams[arg].open = open;
+        }
+        modify({
+            staff_teams: config.staff_teams,
+        });
+    };
 }
