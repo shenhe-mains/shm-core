@@ -558,10 +558,12 @@ async function role_rename(ctx, args) {
     const role = await ctx.parse_role(args.shift());
     const old = role.name;
     const name = args.join(" ");
-    await role.edit({
-        name: name,
-        reason: `edited via command by ${ctx.author.id}`,
-    });
+    await role.edit(
+        {
+            name: name,
+        },
+        `edited via command by ${ctx.author.id}`
+    );
     return {
         title: "Role Renamed",
         description: `${role} was renamed from ${inline_code(
@@ -580,10 +582,12 @@ async function role_recolor(ctx, args) {
     const role = await ctx.parse_role(args[0]);
     const old = role.color;
     const color = args[1] || "0";
-    await role.edit({
-        color: color.toUpperCase(),
-        reason: `edited via command by ${ctx.author.id}`,
-    });
+    await role.edit(
+        {
+            color: color.toUpperCase(),
+        },
+        `edited via command by ${ctx.author.id}`
+    );
     return {
         title: "Role Recolored",
         description: `${role} was recolored from ${old} to ${color}`,
