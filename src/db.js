@@ -1050,7 +1050,8 @@ exports.client = client;
     client.query(
         `CREATE TABLE IF NOT EXISTS suggestions (
             id SERIAL PRIMARY KEY,
-            message_id VARCHAR(32)
+            message_id VARCHAR(32),
+            user_id VARCHAR(32)
         )`
     );
 
@@ -1062,10 +1063,11 @@ exports.client = client;
         )`
     );
 
-    exports.create_suggestion = async function (temp_id) {
-        await client.query(`INSERT INTO suggestions (message_id) VALUES $1`, [
-            temp_id,
-        ]);
+    exports.create_suggestion = async function (temp_id, user_id) {
+        await client.query(
+            `INSERT INTO suggestions (message_id, user_id) VALUES ($1, $2)`,
+            [temp_id, user_id]
+        );
         return (
             await client.query(
                 `SELECT id FROM suggestions WHERE message_id = $1`,
@@ -1084,10 +1086,10 @@ exports.client = client;
     exports.get_suggestion = async function (id) {
         return (
             await client.query(
-                `SELECT message_id FROM suggestions WHERE id = $1`,
+                `SELECT message_id, user_id FROM suggestions WHERE id = $1`,
                 [id]
             )
-        ).rows[0].message_id;
+        ).rows[0];
     };
 
     exports.get_vote = get_vote = async function (id, user_id) {
@@ -1100,17 +1102,35 @@ exports.client = client;
         return results.length > 0 ? (results[0].up ? 1 : -1) : 0;
     };
 
-    exports.set_vote = async function (id, user_id, up) {
-        if ((await get_vote(id, user_id)) == 0) {
+    exports.set_vote = async function (id, user_id, val) {
+        if (val == 0) {
+            await client.query(
+                `DELETE FROM suggestion_votes WHERE id = $1 AND user_id = $2`,
+                [id, user_id]
+            );
+        } else if ((await get_vote(id, user_id)) == 0) {
             await client.query(
                 `INSERT INTO suggestion_votes (id, user_id, up) VALUES ($1, $2, $3)`,
-                [id, user_id, up]
+                [id, user_id, val > 0]
             );
         } else {
             await client.query(
                 `UPDATE suggestion_votes SET up = $1 WHERE id = $2 AND user_id = $3`,
-                [up, id, user_id]
+                [val > 0, id, user_id]
             );
         }
+    };
+
+    exports.get_scores = async function (id) {
+        return (
+            await Promise.all(
+                [true, false].map((up) =>
+                    client.query(
+                        `SELECT COUNT(1) FROM suggestion_votes WHERE id = $1 AND up = $2`,
+                        [id, up]
+                    )
+                )
+            )
+        ).map((x) => x.rows[0].count);
     };
 }

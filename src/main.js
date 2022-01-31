@@ -68,6 +68,7 @@ client.on("messageCreate", async (message) => {
     if (
         message.guild !== undefined &&
         message.author != client.user &&
+        message.webhookId === null &&
         message.content.startsWith(config.prefix)
     ) {
         const text = message.content.substring(config.prefix.length).trim();
