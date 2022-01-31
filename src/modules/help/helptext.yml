@@ -173,7 +173,7 @@ text:
 
 
             Commands in this module: `slowmode`, `verbal`, `warn`, `mute`, `kick`, `ban`, `unmute`, `unban`, `massban`, `massban-from-url`, `remove`,
-            `clear-history`, `history`, `nick`, `purge`
+            `clear-history`, `history`, `nick`, `purge`, `role-add`, `role-remove`, `set-role-name`, `set-role-color`
     slowmode:
         title: Slowmode
         body: >
@@ -296,6 +296,38 @@ text:
 
             Purge `N` messages. This command will prompt for confirmation.
         footer: Requires Moderator
+    role-add:
+        title: Add Role to Member
+        body: >
+            `{prefix}role-add <user> <roles...>`
+
+
+            Add the specified roles to the target user. All roles must be below your highest role, and you must outrank the user.
+        footer: Requires Moderator
+    role-remove:
+        title: Remove Role from Member
+        body: >
+            `{prefix}role-remove <user> <roles...>`
+
+
+            Remove the specified roles from the target user. All roles must be below your highest role, and you must outrank the user. A.K.A. `{prefix}role-rm`.
+        footer: Requires Moderator
+    set-role-name:
+        title: Rename Role
+        body: >
+            `{prefix}set-role-name <role> <name>`
+
+
+            Rename the specified role.
+        footer: Requires Bot Owner / Admin
+    set-role-color:
+        title: Recolor Role
+        body: >
+            `{prefix}set-role-color <role> <name>`
+
+
+            Recolor the specified role. A.K.A. `{prefix}set-role-colour`.
+        footer: Requires Bot Owner / Admin
     modmail:
         title: Modmail / Ticket System
         body: >

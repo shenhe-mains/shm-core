@@ -194,6 +194,20 @@
             "tcmod",
             "trial"
         ],
+        "role_grant": [
+            "owner",
+            "admin",
+            "bot",
+            "bypass",
+            "mod",
+            "tcmod"
+        ],
+        "role_modify": [
+            "owner",
+            "admin",
+            "bot",
+            "bypass"
+        ],
         "clear": [
             "owner",
             "admin",

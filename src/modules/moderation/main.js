@@ -43,6 +43,13 @@ exports.commands = {
     history: history,
     nick: nick,
     purge: purge,
+    role: role_add,
+    "role-add": role_add,
+    "role-remove": role_rm,
+    "role-rm": role_rm,
+    "set-role-name": role_rename,
+    "set-role-color": role_recolor,
+    "set-role-colour": role_recolor,
 };
 
 async function slowmode(ctx, args) {
@@ -505,4 +512,80 @@ async function purge(ctx, args) {
     setTimeout(() => {
         reply.delete();
     }, 2500);
+}
+
+async function role_add(ctx, args) {
+    checkCount(args, 2, Infinity);
+    if (!has_permission(ctx.author, "role_grant")) {
+        throw new PermissionError("You do not have permission to grant roles.");
+    }
+    const member = await ctx.parse_member(args.shift());
+    const roles = await Promise.all(args.map(ctx.parse_role.bind(ctx)));
+    await member.roles.add(roles, `added via command by ${ctx.author.id}`);
+    return {
+        title: "Roles Granted",
+        description: `Gave ${roles
+            .map((role) => role.toString())
+            .join(", ")} to ${member}`,
+    };
+}
+
+async function role_rm(ctx, args) {
+    checkCount(args, 2, Infinity);
+    if (!has_permission(ctx.author, "role_grant")) {
+        throw new PermissionError(
+            "You do not have permission to remove roles."
+        );
+    }
+    const member = await ctx.parse_member(args.shift());
+    const roles = await Promise.all(args.map(ctx.parse_role.bind(ctx)));
+    await member.roles.remove(roles, `removed via command by ${ctx.author.id}`);
+    return {
+        title: "Roles Removed",
+        description: `Took ${roles
+            .map((role) => role.toString())
+            .join(", ")} from ${member}`,
+    };
+}
+
+async function role_rename(ctx, args) {
+    checkCount(args, 2, Infinity);
+    if (!has_permission(ctx.author, "role_modify")) {
+        throw new PermissionError(
+            "You do not have permission to modify roles."
+        );
+    }
+    const role = await ctx.parse_role(args.shift());
+    const old = role.name;
+    const name = args.join(" ");
+    await role.edit({
+        name: name,
+        reason: `edited via command by ${ctx.author.id}`,
+    });
+    return {
+        title: "Role Renamed",
+        description: `${role} was renamed from ${inline_code(
+            old
+        )} to ${inline_code(name)}`,
+    };
+}
+
+async function role_recolor(ctx, args) {
+    checkCount(args, 2);
+    if (!has_permission(ctx.author, "role_modify")) {
+        throw new PermissionError(
+            "You do not have permission to modify roles."
+        );
+    }
+    const role = await ctx.parse_role(args[0]);
+    const old = role.color;
+    const color = args[1];
+    await role.edit({
+        color: color.toUpperCase(),
+        reason: `edited via command by ${ctx.author.id}`,
+    });
+    return {
+        title: "Role Recolored",
+        description: `${role} was recolored from ${old} to ${color}`,
+    };
 }
