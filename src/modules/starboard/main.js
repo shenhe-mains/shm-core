@@ -33,10 +33,16 @@ function normalize(user) {
 async function check_stars(client, item) {
     const message = item instanceof Message ? item : item.message;
     if (message.content == null) await message.fetch();
+    const public =
+        config.private_categories.indexOf(message.channel.parentId) == -1;
     const reactions = message.reactions.cache.get("⭐");
     const count = reactions ? reactions.count : 0;
     const msg = await get_star_link(message.id);
-    if (count < config.star_threshold) {
+    if (
+        count < public
+            ? config.public_star_threshold
+            : config.private_star_threshold
+    ) {
         if (msg) {
             await msg.delete();
         }
@@ -82,8 +88,7 @@ async function check_stars(client, item) {
                 color: config.color,
             };
             const channel = await client.channels.fetch(
-                config.private_categories.indexOf(message.channel.parentId) ==
-                    -1
+                public
                     ? config.channels.public_starboard
                     : config.channels.private_starboard
             );
