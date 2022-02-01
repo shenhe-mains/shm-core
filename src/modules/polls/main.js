@@ -142,7 +142,7 @@ async function setup_poll(ctx, args) {
         ],
         components: rows,
     });
-    await create_poll(message.id, channel.id, type, values.slice(1));
+    await create_poll(message.id, channel.id, type, values);
 }
 
 async function open_poll(ctx, args) {
