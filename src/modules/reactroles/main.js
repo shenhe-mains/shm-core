@@ -1,12 +1,19 @@
 const { ButtonInteraction } = require("discord.js");
 const { config } = require("../../core/config");
+const { PermissionError } = require("../../errors");
 const { parse_int_or_fail, parse_bool_or_fail } = require("../../utils");
+const { has_permission } = require("../../core/privileges");
 
 exports.commands = { "setup-react-roles": setup };
 
 exports.listeners = { interactionCreate: [check_react_role] };
 
 async function setup(ctx, args) {
+    if (!has_permission(ctx.author, "reactroles")) {
+        throw new PermissionError(
+            "You do not have permission to set up reaction roles."
+        );
+    }
     const bar = await ctx.parse_role(config.reactrole_block);
     const channel = await ctx.user_input({
         title: "Welcome to the reaction role builder",

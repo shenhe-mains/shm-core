@@ -14,10 +14,14 @@ const { has_permission } = require("../../core/privileges");
 
 exports.commands = {
     suggest: suggest,
-    approve: mark_suggestion("Approved", "GREEN"),
-    consider: mark_suggestion("Considered", "YELLOW"),
-    deny: mark_suggestion("Denied", "RED"),
-    implement: mark_suggestion("Implemented", "BLUE"),
+    approve: mark_suggestion("Approved", "GREEN", true),
+    consider: mark_suggestion("Considered", "YELLOW", true),
+    deny: mark_suggestion("Denied", "RED", true),
+    implement: mark_suggestion("Implemented", "BLUE", true),
+    "approve-silent": mark_suggestion("Approved", "GREEN", false),
+    "consider-silent": mark_suggestion("Considered", "YELLOW", false),
+    "deny-silent": mark_suggestion("Denied", "RED", false),
+    "implement-silent": mark_suggestion("Implemented", "BLUE", false),
 };
 
 exports.listeners = { interactionCreate: [check_suggestion_vote] };
@@ -70,7 +74,7 @@ async function suggest(ctx, args, body) {
     await set_suggestion(suggestion_id, message.id);
 }
 
-function mark_suggestion(status, color) {
+function mark_suggestion(status, color, dm) {
     return async (ctx, args, body) => {
         checkCount(args, 1, Infinity);
         if (!has_permission(ctx.author, "suggestions")) {
@@ -103,32 +107,34 @@ function mark_suggestion(status, color) {
                 },
             ];
             await message.edit({ embeds: [embed] });
-            try {
-                await (
-                    await ctx.client.users.fetch(user_id)
-                ).send({
-                    embeds: [
-                        {
-                            title: `Suggestion ${status}`,
-                            description: `[Your suggestion](${
-                                message.url
-                            }) in ${
-                                ctx.guild.name
-                            }, suggestion #${id}, was ${status.toLowerCase()}. Thanks for the feedback!`,
-                            fields: reason
-                                ? [
-                                      {
-                                          name: "Details",
-                                          value: reason,
-                                      },
-                                  ]
-                                : [],
-                            color: color,
-                        },
-                    ],
-                });
-            } catch (error) {
-                console.error(error);
+            if (dm) {
+                try {
+                    await (
+                        await ctx.client.users.fetch(user_id)
+                    ).send({
+                        embeds: [
+                            {
+                                title: `Suggestion ${status}`,
+                                description: `[Your suggestion](${
+                                    message.url
+                                }) in ${
+                                    ctx.guild.name
+                                }, suggestion #${id}, was ${status.toLowerCase()}. Thanks for the feedback!`,
+                                fields: reason
+                                    ? [
+                                          {
+                                              name: "Details",
+                                              value: reason,
+                                          },
+                                      ]
+                                    : [],
+                                color: color,
+                            },
+                        ],
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
             }
         } catch {
             throw new ArgumentError("I cannot find that suggestion anymore.");

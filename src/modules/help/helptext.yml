@@ -23,6 +23,7 @@ text:
             You can get help for a particular module using `{prefix}help <module>`. The following modules exist:
 
             `automod` - Automoderation features (banned words, spam detection, etc.)
+            `autoroles` - Automatically grant roles to returning users
             `customroles` - Custom roles for server supporters
             `db` - Database commands
             `fun` - Fun / miscellaneous commands
@@ -33,9 +34,12 @@ text:
             `music` - Music Bot
             `nukeguard` - Anti-nuking features
             `polls` - Poll-related commands
+            `reactroles` - Self-assignable reaction roles
             `settings` - Bot settings
+            `starboard` - Starboard
             `statschannels` - Server stats channels like member count and boosters
             `sticky` - Sticky messages
+            `suggestions` - Feedback & Suggestions system
             `triggers` - Autoresponder triggers
             `utility` - Utility and info commands like user info
             `verification` - CAPTCHA verification system
@@ -103,6 +107,13 @@ text:
             List all terms currently matched by the automoderator. Due to the nature of the automod, this will contain inappropriate, offensive, and potentially
             triggering terms, and as such, it is restricted. Please only use this in private channels or where you are sure it will not be hurtful to anyone.
         footer: Requires Bot Owner / Admin
+    autoroles:
+        title: Autoroles
+        body: >
+            When users leave the server, their existing roles are saved by the bot. When a member rejoins the server, their roles will be restored, except for any
+            roles above a certain threshold (such as staff roles). This serves two purposes - firstly, it prevents muted users from clearing their mute by leaving
+            the server; secondly, it allows users who rejoin to have the same roles as before without needing to re-verify or set up their reaction roles again.
+            Users that are unmuted while absent will also have their mute role cleared for when they return.
     customroles:
         title: Custom Supporter Roles
         body: >
@@ -234,7 +245,8 @@ text:
             `{prefix}unmute <user> [reason]`
 
 
-            Unmutes a user, restoring their ability to send messages, add reactions, and connect to voice calls. `{prefix}unmute-silent` will not DM the user.
+            Unmutes a user, restoring their ability to send messages, add reactions, and connect to voice calls. `{prefix}unmute-silent` will not DM the user. If the
+            user is not in the server, it will remove the mute role from their autoroles so they will not be muted when returning to the server.
         footer: Requires Moderator
     unban:
         title: Unban
@@ -342,9 +354,14 @@ text:
 
             Modmail threads are logged to <#911071731265986560> when they are opened or closed, and can be viewed on the website via the staff dashboard. You can open
             a modmail thread with a user using `{prefix}modmali <user>`, which creates the modmail channel if it does not already exist. The user will not be notified of
-            this. To reply, use `{prefix}reply <message>` or `{prefix}anonreply <message>`. To close the thread, you can do `{prefix}close` or `{prefix}silentclose` to
-            not DM the user that the thread has been closed. Deleting the channel is not preferred, but will also silently close the thread.
-        footer: Requires Moderator to access modmail from the staff side
+            this. To reply, use `{prefix}reply <message>` or `{prefix}anonreply <message>`. To close the thread (does not delete the channel), you can do `{prefix}close`
+            or `{prefix}silentclose` to not DM the user that the thread has been closed. Once you are done with the channel entirely, `{prefix}delete` will delete a
+            channel that has been closed. It is not preferred to do this, but manually deleting an open modmail channel will silently close it.
+
+
+            Both `{prefix}close` and `{prefix}silentclose` will disconnect the modmail thread from the user, which essentially means the channel is just a normal channel.
+            This means you cannot `{prefix}reply` in it anymore and if the user DMs the bot, it will prompt them to open a new modmail thread. The only difference between
+            a closed modmail chanenl and a normal channel is that anyone can `{prefix}delete` it.
     music:
         title: Music Bot
         body: >
@@ -588,11 +605,23 @@ text:
             Edit a poll's results into the poll message. This command is not needed for normal polls as the editing is done automatically, only for hidden polls. Note
             that this action cannot be undone, and the results will not update automatically later if it is a hidden poll.
         footer: Requires Admin
+    reactroles:
+        title: Reaction Roles
+        body: >
+            Reaction roles allow a user to assign themselves roles by clicking a button, such as server region roles or pronoun roles. Use `{prefix}setup-react-roles` to
+            initiate the process, and the bot will guide you through the process (please use <#841866382840561705> for this as it generates a lot of messages).
     settings:
         title: Bot Settings
         body: >
-            This module contains commands used to modify the bot's settings. There is no help text or command list for this as it is only used by the dev team.
+            This module contains commands used to modify the bot's settings. There is no help text or command list for this as it is basically only used by the developer
+            who is way too lazy to keep the list updated.
         footer: Requires Bot Owner / Admin
+    starboard:
+        title: Starboard
+        body: >
+            React ⭐ to a post to star it. When a post reaches 5 stars (3 in staff channels), it is posted to <#805603604408827934> (<#937177440311189544> if in a staff
+            channel). If a post falls below the required threshold, it is removed from the starboard but may return later on. If a message is edited, the starboard
+            message will not be updated; however, if the post drops off the starboard and later returns, the new content will be copied.
     statschannels:
         title: Stats Channels
         body: >
@@ -621,6 +650,13 @@ text:
 
 
             Removes the current channel's sticky message if it has one.
+    suggestions:
+        title: Feedback & Suggestions system
+        body: >
+            To put your suggestions in <#805458033471782974>, head over to <#805458034251530262> and `{prefix}suggest <your suggestion>`. This will post your suggestion
+            to the channel where people can vote on it. Once it has been considered, approved, denied, or implemented by the staff, they will provide a status update to
+            your suggestion which will edit the public display and DM you a status update. `{prefix}consider [details]`, `{prefix}approve [details]`, `{prefix}deny [details]`,
+            and `{prefix}implement [details]` update the status of the suggestion. Appending `-silent` to the command name will skip DMing the user. Requires Moderator.
     triggers:
         title: Autoresponder Triggers
         body: >
@@ -736,7 +772,7 @@ text:
         body: >
             Useful commands for things like showing info or other uncategorized commands that don't belong to the `fun` module.
 
-            Commands in this module: `ranks`, `reload-config`
+            Commands in this module: `ranks`, `reload-config`, `clone`, `webhook`, `point`
     ranks:
         title: Show Ranks
         body: >
@@ -752,6 +788,36 @@ text:
 
             Reload `config.json`. Most things will be brought up-to-date by this command. This is only necessary if the file was edited manually, not if the
             configuration was modified via commands (unless otherwise specified).
+        footer: Requires Bot Owner / Admin
+    clone:
+        title: Clone Message
+        body: >
+            `{prefix}clone <channel> <message link>`
+
+
+            Clone a command, reposting its content verbatim, including embeds, interactions, files, etc. Conveniently, this is able to copy reaction role
+            prompts. This will not properly copy polls or most other interactions; reaction roles are a unique case. This is mostly useful for things like
+            cloning messages from a modmail thread to admin chat.
+        footer: Requires Bot Owner / Admin
+    webhook:
+        title: Set Webhook
+        body: >
+            `{prefix}webhook <id>`
+
+
+            Set this server's webhook, which can be altered with `{prefix}point`. Please paste the ID and not the URL, as giving out the URL will expose it to
+            everyone who can see it and the webhook will need to be reset. The ID is the first part after the domain in the URL (the number), not the token
+            afterwards.
+        footer: Requires Bot Owner / Admin
+    point:
+        title: Point Webhook
+        body: >
+            `{prefix}point <channel>`
+
+
+            Point this server's webhook, as set by `{prefix}webhook`, to the specified channel, and DM you the webhook URL. This is convenient because Discord
+            doesn't let you search through channels when changing a webhook's target which is extremely annoying, and also webhooks don't work well on mobile
+            because mobile Discord is really bad.
         footer: Requires Bot Owner / Admin
     verification:
         title: CAPTCHA Verification System
