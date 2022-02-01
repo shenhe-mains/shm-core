@@ -71,7 +71,10 @@ client.on("messageCreate", async (message) => {
         message.webhookId === null &&
         message.content.startsWith(config.prefix)
     ) {
-        const text = message.content.substring(config.prefix.length).trim();
+        const text = message.content
+            .substring(config.prefix.length)
+            .replaceAll("\u200b", "")
+            .trim();
         const [key] = text.split(/\s/, 1);
         const body = text.substring(key.length).trim();
         const args = body
