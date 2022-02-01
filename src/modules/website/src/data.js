@@ -107,7 +107,7 @@ exports.timezones = [
 exports.fields = {
     time_dedication: {
         type: "textarea",
-        title: "How much time would you be able to dedicate towards contributing to our server?",
+        title: "How much time would you be able to dedicate towards contributing to our server, and during what time of day will you be able to be active?",
         label: "Time Dedication (Feel free to provide some details)",
         maxlen: 1024,
         required: true,
