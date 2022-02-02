@@ -1134,3 +1134,59 @@ exports.client = client;
         ).map((x) => x.rows[0].count);
     };
 }
+
+// highlights
+{
+    client.query(
+        `CREATE TABLE IF NOT EXISTS highlights (
+            user_id VARCHAR(32),
+            match VARCHAR(100)
+        )`
+    );
+
+    exports.add_highlight = async function (user_id, match) {
+        await client.query(
+            `INSERT INTO highlights (user_id, match) VALUES ($1, $2)`,
+            [user_id, match]
+        );
+    };
+
+    exports.highlighting = async function (user_id, match) {
+        return (
+            (
+                await client.query(
+                    `SELECT COUNT(1) FROM highlights WHERE user_id = $1 AND match = $2`,
+                    [user_id, match]
+                )
+            ).rows[0].count > 0
+        );
+    };
+
+    exports.rm_highlight = async function (user_id, match) {
+        await client.query(
+            `DELETE FROM highlights WHERE user_id = $1 AND match = $2`,
+            [user_id, match]
+        );
+    };
+
+    exports.highlights_for = async function (user_id) {
+        return (
+            await client.query(
+                `SELECT match FROM highlights WHERE user_id = $1`,
+                [user_id]
+            )
+        ).rows.map((row) => row.match);
+    };
+
+    exports.clear_highlights = async function (user_id) {
+        await client.query(`DELETE FROM highlights WHERE user_id = $1`, [
+            user_id,
+        ]);
+    };
+
+    exports.highlighting_users = async function () {
+        return (
+            await client.query(`SELECT DISTINCT user_id FROM highlights`)
+        ).rows.map((row) => row.user_id);
+    };
+}

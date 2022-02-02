@@ -28,6 +28,7 @@ text:
             `db` - Database commands
             `fun` - Fun / miscellaneous commands
             `help` - This module
+            `highlight` - Highlight words so you are DM'd when they show up
             `messagelogs` - Logging for message edits / deletions
             `moderation` - Mod commands (muting, banning, etc.)
             `modmail` - Modmail / Ticket system
@@ -176,6 +177,14 @@ text:
         body: >
             This is the command you are using right now. `{prefix}help` to see the list of modules, or `{prefix}help <key>` if you have something in particular
             that you need help with.
+    highlight:
+        title: Highlights
+        body: >
+            `{prefix}highlight <add | remove | clear | list> [term to match]`
+
+
+            Highlights a term. When it is seen, the bot will DM you notifying you of the message and sending a bit of context. You will not be DM'd for the
+            same channel more than once every five minutes. Since this is a potentially expensive operation, this is currently restricted to staff.
     messagelogs:
         title: Message Logging
         body: >

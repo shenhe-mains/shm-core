@@ -7,6 +7,8 @@ exports.commands = {
     "co-op": coop,
 };
 
+exports.log_exclude = ["coop", "co-op"];
+
 const cooldown = {};
 
 const CD = 1800000;

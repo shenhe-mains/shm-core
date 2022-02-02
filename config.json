@@ -304,6 +304,23 @@
         "send": [
             "owner",
             "admin"
+        ],
+        "highlight": [
+            "owner",
+            "admin",
+            "bot",
+            "bypass",
+            "mod",
+            "tcmod",
+            "trial",
+            "art",
+            "dev",
+            "event",
+            "tl",
+            "tc",
+            "media",
+            "leak",
+            "staff"
         ]
     },
     "coop": {
