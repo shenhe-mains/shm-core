@@ -120,6 +120,7 @@ async function check_highlights(client, message) {
     if (!message.guild) return;
     if (message.webhookId !== null) return;
     if (message.author.bot) return;
+    const content = message.content.toLowerCase();
     const members = [];
     for (const user_id of await highlighting_users()) {
         if (message.author.id == user_id) continue;
@@ -132,21 +133,19 @@ async function check_highlights(client, message) {
             continue;
         }
         for (const match of await highlights_for(user_id)) {
-            if (message.content.startsWith(match)) {
+            if (content.startsWith(match)) {
                 members.push(member);
                 break;
-            } else if (message.content.endsWith(match)) {
+            } else if (content.endsWith(match)) {
                 members.push(member);
                 break;
             } else {
                 var index = 1;
                 var done = false;
-                while (
-                    (index = message.content.indexOf(match, index + 1)) != -1
-                ) {
+                while ((index = content.indexOf(match, index + 1)) != -1) {
                     if (
-                        !message.content[index - 1].match(/[A-Za-z]/) ||
-                        !message.content[index + match.length].match(/[A-Za-z]/)
+                        !content[index - 1].match(/[A-Za-z]/) ||
+                        !content[index + match.length].match(/[A-Za-z]/)
                     ) {
                         members.push(member);
                         done = true;
