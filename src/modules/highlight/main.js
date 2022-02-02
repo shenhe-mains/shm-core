@@ -118,6 +118,8 @@ async function highlight(ctx, args) {
 
 async function check_highlights(client, message) {
     if (!message.guild) return;
+    if (!message.channel) return;
+    if (!message.channel.members) return;
     if (message.webhookId !== null) return;
     if (message.author.bot) return;
     const content = message.content.toLowerCase();
