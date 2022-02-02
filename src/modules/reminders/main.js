@@ -84,7 +84,7 @@ async function remind(ctx, args) {
     return {
         title: `Reminder Set (#${reminder.id})`,
         description: `I will DM you <t:${Math.floor(now.getTime() / 1000)}:R>${
-            body ? `about ${inline_code(body)}` : ""
+            body ? ` about ${inline_code(body)}` : ""
         }.`,
     };
 }
