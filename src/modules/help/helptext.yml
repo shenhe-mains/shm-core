@@ -623,7 +623,10 @@ text:
     reminders:
         title: Reminders
         body: >
-            Set reminders for yourself for the future.
+            Module: Set reminders for yourself for the future.
+
+
+            Command: `{prefix}reminders` - list all of your reminders.
 
 
             Commands in this module: `remind`, `reminders`, `rm-remind`
@@ -634,13 +637,6 @@ text:
 
 
             Remind you after the specified duration, optionally specifying a message to include. The reminder will link back to where you called the command.
-    reminders:
-        title: List Reminders
-        body: >
-            `{prefix}reminders`
-
-            
-            List all of your reminders.
     rm-remind:
         title: Remove Reminder
         body: >
