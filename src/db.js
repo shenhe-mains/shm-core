@@ -1190,3 +1190,71 @@ exports.client = client;
         ).rows.map((row) => row.user_id);
     };
 }
+
+// reminders
+{
+    client.query(
+        `CREATE TABLE IF NOT EXISTS reminders (
+            id SERIAL PRIMARY KEY,
+            message_id VARCHAR(32),
+            user_id VARCHAR(32),
+            time TIMESTAMP,
+            content VARCHAR(4000),
+            origin VARCHAR(256)
+        )`
+    );
+
+    exports.add_reminder = async function (
+        message_id,
+        user_id,
+        time,
+        content,
+        origin
+    ) {
+        await client.query(
+            `INSERT INTO reminders (message_id, user_id, time, content, origin) VALUES ($1, $2, $3, $4, $5)`,
+            [message_id, user_id, time, content, origin]
+        );
+        return (
+            await client.query(
+                `SELECT * FROM reminders WHERE message_id = $1`,
+                [message_id]
+            )
+        ).rows[0];
+    };
+
+    exports.reminder_exists = async function (id) {
+        return (
+            (
+                await client.query(
+                    `SELECT COUNT(1) FROM reminders WHERE id = $1`,
+                    [id]
+                )
+            ).rows[0].count > 0
+        );
+    };
+
+    exports.reminder_owner = async function (id) {
+        return (
+            await client.query(`SELECT user_id FROM reminders WHERE id = $1`, [
+                id,
+            ])
+        ).rows[0].user_id;
+    };
+
+    exports.get_reminders = async function (user_id) {
+        return (
+            await client.query(`SELECT * FROM reminders WHERE user_id = $1`, [
+                id,
+            ])
+        ).rows;
+    };
+
+    exports.all_reminders = async function () {
+        return (await client.query(`SELECT * FROM reminders`)).rows;
+    };
+
+    exports.rm_reminder = async function (id) {
+        await client.query(`DELETE FROM reminders WHERE id = $1`, [id]);
+    };
+}
