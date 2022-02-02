@@ -583,7 +583,7 @@ async function remove(ctx, args) {
     const server = get_server(ctx);
     const vals = args.map((arg) => parseInt(arg));
     const min = -server.index;
-    const max = server.queue.length - server.index;
+    const max = server.queue.length - server.index - 1;
     if (
         vals.some(
             (x) =>
