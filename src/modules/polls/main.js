@@ -109,7 +109,7 @@ async function setup_poll(ctx, args, body) {
             "The poll body and poll options must be non-empty."
         );
     }
-    const body = values.shift();
+    const desc = values.shift();
     if (values.some((s) => s.length > 100)) {
         throw new ArgumentError(
             "Poll options must be at most 100 characters long."
@@ -138,7 +138,7 @@ async function setup_poll(ctx, args, body) {
         embeds: [
             {
                 title: "Poll",
-                description: body,
+                description: desc,
                 color: config.color,
                 footer: { text: footers[type] },
             },
