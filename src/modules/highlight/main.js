@@ -97,13 +97,15 @@ async function highlight(ctx, args) {
             }
         case "clear":
             const count = (await highlights_for(ctx.author.id)).length;
-            await ctx.confirmOrCancel({
-                title: "Clear all highlights?",
-                description: `This will clear ${count} highlight${pluralize(
-                    count
-                )}.`,
-                color: "AQUA",
-            });
+            await (
+                await ctx.confirmOrCancel({
+                    title: "Clear all highlights?",
+                    description: `This will clear ${count} highlight${pluralize(
+                        count
+                    )}.`,
+                    color: "AQUA",
+                })
+            ).delete();
             await clear_highlights(ctx.author.id);
             return {
                 title: "Highlights Cleared",
