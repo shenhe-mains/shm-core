@@ -124,6 +124,7 @@ async function check_highlights(client, message) {
     if (!message.channel.members) return;
     if (message.webhookId !== null) return;
     if (message.author.bot) return;
+    apply_ping(message.channel, message.author);
     const content = message.content.toLowerCase();
     const members = [];
     for (const user_id of await highlighting_users()) {
