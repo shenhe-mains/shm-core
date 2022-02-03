@@ -125,6 +125,11 @@ function moderate(t, d) {
                 duration = parse_duration(args);
             }
             const reason = args.join(" ");
+            if (reason.length > 512) {
+                throw new ArgumentError(
+                    "Maximum 512 characters for the reason."
+                );
+            }
             await (
                 await ctx.confirmOrCancel({
                     title: `Confirm ${type}`,
@@ -220,6 +225,11 @@ function unmoderate(t, d) {
             }
             const user = await (type == "mute" ? data.user : data);
             const reason = body.substring(args[0].length).trim();
+            if (reason.length > 512) {
+                throw new ArgumentError(
+                    "Maximum 512 characters for the reason."
+                );
+            }
             var fail = false;
             try {
                 await (type == "mute" ? ctx.unmute : ctx.unban).bind(ctx)(
