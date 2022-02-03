@@ -127,11 +127,13 @@ async function check_highlights(client, message) {
     for (const user_id of await highlighting_users()) {
         if (message.author.id == user_id) continue;
         if (!can_ping(message.channel, { id: user_id })) continue;
-        if (!message.channel.members.has(user_id)) continue;
         var member;
         try {
             member = await message.guild.members.fetch(user_id);
         } catch {
+            continue;
+        }
+        if (!message.channel.permissionsFor(member).has("VIEW_CHANNEL")) {
             continue;
         }
         for (const match of await highlights_for(user_id)) {
@@ -158,15 +160,19 @@ async function check_highlights(client, message) {
         }
     }
     if (members.length > 0) {
-        const messages = message.channel.messages.cache.toJSON().slice(-5);
-        const context = messages
-            .map(
-                (m) =>
+        const cache = message.channel.messages.cache;
+        const messages = [];
+        for (var x = -5; x <= -1; ++x) {
+            const m = cache.at(x);
+            if (m) {
+                messages.push(
                     `[<t:${Math.floor(m.createdTimestamp / 1000)}>] ${
                         m.author
                     }: ${m.content}`
-            )
-            .join("\n");
+                );
+            }
+        }
+        const context = messages.join("\n");
         for (const member of members) {
             try {
                 await member.send({
