@@ -80,20 +80,23 @@ const grouping = [
     [5, 5, 5, 5, 5],
 ];
 
-async function setup_poll(ctx, args) {
+async function setup_poll(ctx, args, body) {
     if (!has_permission(ctx.author, "poll")) {
         throw new PermissionError(
             "You do not have permission to create polls."
         );
     }
     checkCount(args, 2, Infinity);
-    const channel = await ctx.parse_channel(args.shift());
-    const type = poll_types[args.shift()];
+    const channel = await ctx.parse_channel(args[0]);
+    const type = poll_types[args[1]];
     if (type === undefined) {
         throw new ArgumentError("Invalid poll type.");
     }
-    const values = args
-        .join(" ")
+    const values = body
+        .substring(args[0].length)
+        .trim()
+        .substring(args[1].length)
+        .trim()
         .split(";;")
         .map((s) => s.trim());
     if (values.length < 2) {
