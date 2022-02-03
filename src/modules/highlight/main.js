@@ -105,7 +105,7 @@ async function highlight(ctx, args) {
                     )}.`,
                     color: "AQUA",
                 })
-            ).delete();
+            ).message.delete();
             await clear_highlights(ctx.author.id);
             return {
                 title: "Highlights Cleared",
