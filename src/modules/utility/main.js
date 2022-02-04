@@ -1,7 +1,13 @@
-const { Info, PermissionError, UserError } = require("../../errors");
+const {
+    Info,
+    PermissionError,
+    UserError,
+    ArgumentError,
+} = require("../../errors");
 const { checkCount, censor_attachments } = require("../../utils");
 const { ranks, has_permission } = require("../../core/privileges");
 const { reload, modify, config } = require("../../core/config");
+const { pagify } = require("../../pages");
 
 exports.commands = {
     ranks: _ranks,
@@ -9,7 +15,20 @@ exports.commands = {
     clone: clone,
     webhook: webhook,
     point: point,
+    find: find(),
+    "find-user": find("user"),
+    "find-role": find("role"),
+    "find-channel": find("channel"),
+    info: info,
 };
+
+exports.log_exclude = [
+    "find",
+    "find-user",
+    "find-role",
+    "find-channel",
+    "info",
+];
 
 async function _ranks(ctx, args) {
     checkCount(args, 0, 1);
@@ -89,3 +108,62 @@ async function point(ctx, args) {
         await ctx.author.send(webhook.url);
     } catch {}
 }
+
+function find(type) {
+    return async (ctx, args, body) => {
+        body = body.toLowerCase();
+        if (body.length < 3) {
+            throw new ArgumentError(
+                "Please enter a search query of at least 3 characters to find."
+            );
+        }
+        const items = [];
+        if (type === undefined || type == "user") {
+            for (const member of ctx.guild.members.cache.values()) {
+                if (
+                    member.displayName.toLowerCase().match(body) ||
+                    member.user.username.toLowerCase().match(body)
+                ) {
+                    items.push(
+                        `\`user ${member.id}\`: ${member} (${inline_code(
+                            `${member.user.username}#${member.user.discriminator}`
+                        )})`
+                    );
+                }
+            }
+        }
+        if (type === undefined || type == "role") {
+            for (const role of ctx.guild.roles.cache.values()) {
+                if (role.name.toLowerCase().match(body)) {
+                    items.push(`\`role ${role.id}\`: ${role}`);
+                }
+            }
+        }
+        if (type === undefined || type == "channel") {
+            for (const channel of ctx.guild.channels.cache.values()) {
+                if (channel.name.toLowerCase().match(body)) {
+                    items.push(`\`chnl ${channel.id}\`: ${channel}`);
+                }
+            }
+        }
+        if (items.length == 0) {
+            throw new Info(
+                "No matches found",
+                "Nothing was found for that query."
+            );
+        }
+        await pagify(
+            ctx,
+            {
+                title: "Matches",
+                color: "GREY",
+            },
+            items,
+            10,
+            true
+        );
+        throw new Info();
+    };
+}
+
+async function info(ctx, args) {}
