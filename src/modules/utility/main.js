@@ -40,7 +40,7 @@ async function clone(ctx, args) {
     checkCount(args, 2);
     if (!has_permission(ctx.author, "send")) {
         throw new PermissionError(
-            "You do not have permission to command the bot to send message."
+            "You do not have permission to command the bot to send messages."
         );
     }
     const channel = await ctx.parse_channel(args[0]);
