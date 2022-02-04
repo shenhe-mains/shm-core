@@ -19,7 +19,7 @@ exports.createError = function (status, message) {
     return error;
 };
 
-exports.flash = function (req, message, category) {
+exports.flash = flash = function (req, message, category) {
     req.session.flashes ||= [];
     req.session.flashes.push({
         category: category,
@@ -70,6 +70,14 @@ exports.discordAuth = (redirect) =>
                     .then((json) => {
                         req.discord_id = json.user.id;
                         next();
+                    })
+                    .catch((error) => {
+                        flash(
+                            req,
+                            "Unknown failure fetching your user account; please login again.",
+                            "ERROR"
+                        );
+                        res.redirect("/logout/");
                     });
             }
         }
