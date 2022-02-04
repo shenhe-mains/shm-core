@@ -182,12 +182,23 @@ exports.parse_int_or_fail = function (text, min, max) {
     const number = parseInt(text);
     if (isNaN(number)) {
         throw new ArgumentError("Expected an integer.");
-    } else if (number < min) {
+    } else if (min !== undefined && number < min) {
         throw new ArgumentError(`Expected at least ${min}.`);
-    } else if (number > max) {
+    } else if (max !== undefined && number > max) {
         throw new ArgumentError(`Expected at most ${max}.`);
     }
     return number;
+};
+
+exports.parse_float_or_fail = function (text, min, max) {
+    const number = parseFloat(text);
+    if (isNaN(number)) {
+        throw new ArgumentError("Expected a float.");
+    } else if (min !== undefined && number < min) {
+        throw new ArgumentError(`Expected at least ${min}.`);
+    } else if (max !== undefined && number > max) {
+        throw new ArgumentError(`Expected at most ${max}.`);
+    }
 };
 
 const yes_responses = new Set(["true", "yes", "y"]);

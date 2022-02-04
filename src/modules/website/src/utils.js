@@ -74,7 +74,7 @@ exports.discordAuth = (redirect) =>
                     .catch((error) => {
                         flash(
                             req,
-                            "Unknown failure fetching your user account; please login again.",
+                            "Unknown failure fetching your user account. Your access token may have expired; please login again.",
                             "ERROR"
                         );
                         res.redirect("/logout/");

@@ -1,5 +1,5 @@
 const { ButtonInteraction } = require("discord.js");
-const { ArgumentError, Success } = require("../../errors");
+const { ArgumentError } = require("../../errors");
 const { checkCount } = require("../../utils");
 
 exports.commands = { choose: choose, fight: fight, rps: rps };
