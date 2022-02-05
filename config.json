@@ -3,7 +3,7 @@
     "guild": "805458032908959804",
     "mute": "805458032908959805",
     "verify": "805458032929538061",
-    "prefix": "s#",
+    "prefix": "#",
     "private_star_threshold": 3,
     "public_star_threshold": 5,
     "webhook": "916020798903418890",
