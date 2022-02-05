@@ -15,6 +15,9 @@ aliases:
     dc: disconnect
     leave: disconnect
     q: queue
+    find-user: find
+    find-role: find
+    find-channel: find
 text:
     __all:
         title: Shenhe Bot Help
@@ -806,7 +809,7 @@ text:
         body: >
             Useful commands for things like showing info or other uncategorized commands that don't belong to the `fun` module.
 
-            Commands in this module: `ranks`, `reload-config`, `clone`, `webhook`, `point`
+            Commands in this module: `ranks`, `reload-config`, `clone`, `webhook`, `point`, `find`, `find-user`, `find-role`, `find-channel`
     ranks:
         title: Show Ranks
         body: >
@@ -853,6 +856,14 @@ text:
             doesn't let you search through channels when changing a webhook's target which is extremely annoying, and also webhooks don't work well on mobile
             because mobile Discord is really bad.
         footer: Requires Bot Owner / Admin
+    find:
+        title: Find User / Role / Channel
+        body: >
+            `{prefix}find <name>`
+
+
+            Find a user, role, or channel by name. Requires at least three characters to search. `{prefix}find-user`, `{prefix}find-role`, or
+            `{prefix}find-channel` to filter for a specific category.
     verification:
         title: CAPTCHA Verification System
         body: >

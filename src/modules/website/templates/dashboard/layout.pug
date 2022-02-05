@@ -38,7 +38,7 @@ html
             center
                 p
                     | Logged in as 
-                    span(style="color: #aae") #{req.member.user.username}##{req.member.user.discriminator}
+                    span(style="color: #aae")= req.member.user.tag
                     | . 
                     a(href="/logout/") Log Out
                 p

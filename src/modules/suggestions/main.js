@@ -43,7 +43,7 @@ async function suggest(ctx, args, body) {
                 description: body,
                 color: config.color,
                 author: {
-                    name: `${ctx.author.user.username}#${ctx.author.user.discriminator}`,
+                    name: ctx.author.user.tag,
                     iconURL: ctx.author.user.avatarURL({ dynamic: true }),
                 },
                 footer: {
@@ -102,7 +102,7 @@ function mark_suggestion(status, color, dm) {
             const embed = message.embeds[0];
             embed.fields = [
                 {
-                    name: `${status} by ${ctx.author.user.username}#${ctx.author.user.discriminator}`,
+                    name: `${status} by ${ctx.author.user.tag}`,
                     value: reason || "_ _",
                 },
             ];

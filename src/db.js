@@ -683,14 +683,7 @@ exports.client = client;
     ) {
         await client.query(
             `INSERT INTO modmail_messages (user_id, time, sender_id, sender_name, message_type, content) VALUES ($1, $2, $3, $4, $5, $6)`,
-            [
-                user_id,
-                new Date(),
-                sender.id,
-                `${sender.username}#${sender.discriminator}`,
-                message_type,
-                content,
-            ]
+            [user_id, new Date(), sender.id, sender.tag, message_type, content]
         );
     };
 

@@ -33,7 +33,7 @@ exports.Context = class {
     async init() {
         const message = this.message;
 
-        this.author = await message.guild.members.fetch(message.author.id);
+        this.author = message.member;
         this.channel = message.channel;
         this.guild = message.guild;
         this.url = message.url;

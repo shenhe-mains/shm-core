@@ -79,7 +79,7 @@ async function check_stars(client, item) {
                         : [],
                 ].flat(),
                 author: {
-                    name: `${user.username}#${user.discriminator}`,
+                    name: user.tag,
                     iconURL: user.avatarURL({ dynamic: true }),
                 },
                 footer: { text: message.id },

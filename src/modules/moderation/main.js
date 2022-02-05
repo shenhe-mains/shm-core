@@ -184,7 +184,7 @@ function moderate(t, d) {
                 await schedule_undo(type, ctx.guild, member.id);
             }
             throw new (fail ? PartialSuccess : Success)(
-                `${user.username}#${user.discriminator} has been ${past_tense}${
+                `${user.tag} has been ${past_tense}${
                     duration === undefined ? "" : for_duration(duration)
                 }${fail ? " (DM failed)" : ""}`,
                 reason
@@ -245,7 +245,7 @@ function unmoderate(t, d) {
                 }
             }
             throw new (fail ? PartialSuccess : Success)(
-                `${user.username}#${user.discriminator} has been ${
+                `${user.tag} has been ${
                     type == "mute" ? "unmuted" : "unbanned"
                 }`,
                 reason
@@ -402,10 +402,7 @@ async function history(ctx, args) {
     }));
 
     const title =
-        "History for " +
-        (user === undefined
-            ? user_id
-            : `${user.username}#${user.discriminator}`);
+        "History for " + (user === undefined ? user_id : `${user.tag}`);
 
     if (entries.length == 0) {
         throw new Info(

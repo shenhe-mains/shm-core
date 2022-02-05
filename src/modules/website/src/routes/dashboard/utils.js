@@ -25,12 +25,11 @@ exports.staffData = async function (req, res, next) {
         for (var [team, entry] of await get_open_applications()) {
             try {
                 const member = await guild.members.fetch(entry.user_id);
-                const key = `${member.user.username}#${member.user.discriminator}`;
-                req.applications[key] ||= {
+                req.applications[member.user.tag] ||= {
                     id: member.id,
                     teams: [],
                 };
-                req.applications[key].teams.push(team);
+                req.applications[member.user.tag].teams.push(team);
             } catch {}
         }
     }

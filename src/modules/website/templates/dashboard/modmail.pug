@@ -2,7 +2,7 @@ extends layout
 
 block main
     if modmail_target
-        h3 Modmail with #{modmail_target.username}##{modmail_target.discriminator}
+        h3 Modmail with #{modmail_target.tag}
     else
         h3 Modmail with Unknown User
     if !messages.length
@@ -20,4 +20,4 @@ block main
                     when 0
                     when 1
                     when 2
-                        p!= message.content.replaceAll("\n", "<br />")
+                        p!= message.content.replaceAll("\r\n", "<br />").replaceAll("\r\f", "<br />").replaceAll("\n", "<br />")

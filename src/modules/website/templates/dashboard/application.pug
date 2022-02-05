@@ -1,7 +1,7 @@
 extends layout
 
 block main
-    +dashboard-card((applicant ? `${applicant.user.username}#${applicant.user.discriminator}` : "Unknown Member") + "'s application to the " + info.title)
+    +dashboard-card((applicant ? applicant.user.tag : "Unknown Member") + "'s application to the " + info.title)
         div(style="padding: 4em")
             .row
                 | Submitted #{application.time}
@@ -13,7 +13,7 @@ block main
                     b!= field_data[field].title
                     br
                     br
-                    .response!= application[field].replaceAll("<", "&lt;").replace("\n", "<br />")
+                    .response!= application[field].replaceAll("<", "&lt;").replaceAll("\r\n", "<br />").replaceAll("\r\f", "<br />").replaceAll("\n", "<br />")
         if applicant && application.status == 0
             a.btn.green.waves-effect.waves-light.z-depth-2(href=`/dashboard/resolve-application/${team}/${applicant.id}/accept`) ACCEPT
             | 

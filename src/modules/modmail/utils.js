@@ -72,7 +72,7 @@ exports.get_modmail_channel = _get_modmail_channel = async function (
                             title: "New Modmail Channel",
                             description: `This is a modmail channel for ${user}. Use \`${config.prefix}reply <message>\` or \`${config.prefix}anonreply <message>\`, and once you're done, \`${config.prefix}close\` to close the thread (this will alert the user that the thread has been closed; use \`${config.prefix}silentclose\` if you wish to avoid that). Call \`${config.prefix}delete\` to delete the channel once it's closed.`,
                             author: {
-                                name: `${user.username}#${user.discriminator}`,
+                                name: user.tag,
                                 iconURL: user.avatarURL({ dynamic: true }),
                             },
                             color: "GREEN",
@@ -153,7 +153,7 @@ exports.relay_incoming = async function (client, guild, message) {
                 title: "Incoming Message",
                 description: message.content,
                 author: {
-                    name: `${message.author.username}#${message.author.discriminator}`,
+                    name: message.author.tag,
                     iconURL: message.author.avatarURL({ dynamic: true }),
                 },
                 color: "AQUA",
@@ -194,7 +194,7 @@ exports.relay_outgoing = async function (
         color: config.color,
         author: show_identity
             ? {
-                  name: `${sender.user.username}#${sender.user.discriminator}`,
+                  name: sender.user.tag,
                   iconURL: sender.user.avatarURL({ dynamic: true }),
               }
             : null,

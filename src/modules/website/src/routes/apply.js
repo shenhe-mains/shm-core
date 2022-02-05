@@ -178,9 +178,7 @@ app.post(
                     {
                         embeds: [
                             {
-                                title: `${req.member.user.username}#${
-                                    req.member.user.discriminator
-                                } ${
+                                title: `${req.member.user.tag} ${
                                     req.application
                                         ? "updated their"
                                         : "submitted an"

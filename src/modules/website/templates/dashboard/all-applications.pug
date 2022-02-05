@@ -2,9 +2,9 @@ extends layout
 
 block main
     if applicant_member
-        h3 Application history for #{applicant_member.user.username}##{applicant_member.user.discriminator}
+        h3 Application history for #{applicant_member.user.tag}
     else if applicant_user
-        h3 Application history for #{applicant_user.username}##{applicant_user.discriminator} (user is no longer a member)
+        h3 Application history for #{applicant_user.tag} (user is no longer a member)
     else
         h3 Application history for Unknown User (id #{applicant_id})
     if applications.length == 0

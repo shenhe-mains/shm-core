@@ -1,10 +1,29 @@
 const {
+    Guild,
+    GuildMember,
+    User,
+    Role,
+    GuildChannel,
+    TextChannel,
+    VoiceChannel,
+    CategoryChannel,
+    NewsChannel,
+    StageChannel,
+    ThreadChannel,
+} = require("discord.js");
+const { get_custom_role } = require("../../db");
+const {
     Info,
     PermissionError,
     UserError,
     ArgumentError,
 } = require("../../errors");
-const { checkCount, censor_attachments } = require("../../utils");
+const {
+    checkCount,
+    censor_attachments,
+    pluralize,
+    for_duration,
+} = require("../../utils");
 const { ranks, has_permission } = require("../../core/privileges");
 const { reload, modify, config } = require("../../core/config");
 const { pagify } = require("../../pages");
@@ -19,7 +38,10 @@ exports.commands = {
     "find-user": find("user"),
     "find-role": find("role"),
     "find-channel": find("channel"),
-    info: info,
+    info: async (ctx, args) => info(ctx, args, ctx.guild),
+    "user-info": async (ctx, args) => info(ctx, args, ctx.author),
+    "role-info": async (ctx, args) => info(ctx, args, ctx.author.roles.highest),
+    "channel-info": async (ctx, args) => info(ctx, args, ctx.channel),
 };
 
 exports.log_exclude = [
@@ -28,6 +50,9 @@ exports.log_exclude = [
     "find-role",
     "find-channel",
     "info",
+    "user-info",
+    "role-info",
+    "channel-info",
 ];
 
 async function _ranks(ctx, args) {
@@ -40,7 +65,7 @@ async function _ranks(ctx, args) {
     }
 
     throw new Info(
-        `${member.user.username}#${member.user.discriminator}'s ranks:`,
+        `${member.user.tag}'s ranks:`,
         ranks(member).join(", ") || "(none)"
     );
 }
@@ -126,7 +151,7 @@ function find(type) {
                 ) {
                     items.push(
                         `\`user ${member.id}\`: ${member} (${inline_code(
-                            `${member.user.username}#${member.user.discriminator}`
+                            `${member.user.tag}`
                         )})`
                     );
                 }
@@ -166,4 +191,452 @@ function find(type) {
     };
 }
 
-async function info(ctx, args) {}
+function timestamp(ts, flag) {
+    return `<t:${Math.floor(ts / 1000)}${flag ? `:${flag}` : ""}>`;
+}
+
+function timedisplay(ts) {
+    return `${timestamp(ts)} (${timestamp(ts, "R")})`;
+}
+
+async function _info(ctx, item) {
+    const creation = {
+        name: "Creation Date",
+        value: timedisplay(item.createdTimestamp || item.user.createdTimestamp),
+    };
+    const ID = { name: "ID", value: `\`${item.id}\` ${item}` };
+    if (item instanceof Guild) {
+        return {
+            title: `Guild info for ${item.name}`,
+            description: item.description,
+            color: config.color,
+            image: {
+                url: item.bannerURL({ size: 4096 }),
+            },
+            footer: {
+                iconURL: item.iconURL({ dynamic: true }),
+                text: item.name,
+            },
+            fields: [
+                ID,
+                {
+                    name: "Owner",
+                    value: `<@${item.ownerId}>`,
+                },
+                creation,
+                {
+                    name: "Channels",
+                    value: ((channels) => {
+                        var count = 0;
+                        var text = 0;
+                        var voice = 0;
+                        var category = 0;
+                        var news = 0;
+                        var stage = 0;
+                        var thread = 0;
+                        for (const channel of channels.values()) {
+                            ++count;
+                            if (channel instanceof TextChannel) ++text;
+                            if (channel instanceof VoiceChannel) ++voice;
+                            if (channel instanceof CategoryChannel) ++category;
+                            if (channel instanceof NewsChannel) ++news;
+                            if (channel instanceof StageChannel) ++stage;
+                            if (channel instanceof ThreadChannel) ++thread;
+                        }
+                        return `${count} (${[
+                            text ? `${text} text` : [],
+                            voice ? `${voice} voice` : [],
+                            category
+                                ? `${category} categor${pluralize(
+                                      category,
+                                      "ies",
+                                      "y"
+                                  )}`
+                                : [],
+                            news ? `${news} news` : [],
+                            stage ? `${stage} stage` : [],
+                            thread
+                                ? `${thread} thread${pluralize(thread)}`
+                                : [],
+                        ]
+                            .flat()
+                            .join(", ")})`;
+                    })(await item.channels.fetch()),
+                },
+                {
+                    name: "Members",
+                    value: item.memberCount.toString(),
+                    inline: true,
+                },
+                {
+                    name: "Default Notifications",
+                    value: item.defaultMessageNotifications,
+                    inline: true,
+                },
+                {
+                    name: "Content Filter",
+                    value: item.explicitContentFilter,
+                    inline: true,
+                },
+                {
+                    name: "NSFW Level",
+                    value: item.nsfwLevel,
+                    inline: true,
+                },
+                {
+                    name: "2FA Level",
+                    value: item.mfaLevel,
+                    inline: true,
+                },
+                {
+                    name: "Verification Level",
+                    value: item.verificationLevel,
+                    inline: true,
+                },
+                {
+                    name: "Invites",
+                    value: (await item.invites.fetch()).size.toString(),
+                    inline: true,
+                },
+                {
+                    name: "Maximum Bitrate",
+                    value: item.maximumBitrate.toString(),
+                    inline: true,
+                },
+                {
+                    name: "Maximum Members",
+                    value: item.maximumMembers.toString(),
+                    inline: true,
+                },
+                {
+                    name: "Bans",
+                    value: (await item.bans.fetch()).size.toString(),
+                    inline: true,
+                },
+                {
+                    name: "Preferred Locale",
+                    value: item.preferredLocale,
+                    inline: true,
+                },
+                {
+                    name: "Roles",
+                    value: (await item.roles.fetch()).size.toString(),
+                    inline: true,
+                },
+                {
+                    name: "Boosters",
+                    value: item.premiumSubscriptionCount.toString(),
+                    inline: true,
+                },
+                {
+                    name: "Events",
+                    value: (await item.scheduledEvents.fetch()).size.toString(),
+                    inline: true,
+                },
+                item.vanityURLCode
+                    ? {
+                          name: "Vanity Code",
+                          value: ((data) =>
+                              `https://discord.gg/${data.code} (used ${
+                                  data.uses
+                              } time${pluralize(data.uses)})`)(
+                              await item.fetchVanityData()
+                          ),
+                      }
+                    : [],
+                item.systemChannel
+                    ? {
+                          name: "System Channel",
+                          value: item.systemChannel.toString(),
+                          inline: true,
+                      }
+                    : [],
+                item.publicUpdatesChannel
+                    ? {
+                          name: "Public Updates",
+                          value: item.publicUpdatesChannel.toString(),
+                          inline: true,
+                      }
+                    : [],
+                item.rulesChannel
+                    ? {
+                          name: "Rules Channel",
+                          value: item.rulesChannel.toString(),
+                          inline: true,
+                      }
+                    : [],
+                item.afkChannel
+                    ? [
+                          {
+                              name: "AFK Channel",
+                              value: item.afkChannel.toString(),
+                              inline: true,
+                          },
+                          {
+                              name: "AFK Timeout",
+                              value:
+                                  item.afkTimeout === undefined
+                                      ? "N/A"
+                                      : `${item.afkTimeout}s`,
+                              inline: true,
+                          },
+                      ]
+                    : [],
+            ].flat(),
+        };
+    } else if (item instanceof GuildMember) {
+        const custom = await get_custom_role(item.id);
+        console.log(custom);
+        return {
+            title: `Member info for ${item.user.tag}`,
+            description: item.user.bot ? "**This user is a bot**" : "",
+            color: item.displayColor,
+            thumbnail: {
+                url:
+                    item.avatarURL({ dynamic: true }) ||
+                    item.user.avatarURL({ dynamic: true }),
+            },
+            fields: [
+                ID,
+                creation,
+                {
+                    name: "Join Date",
+                    value: timedisplay(item.joinedTimestamp),
+                },
+                {
+                    name: "Display Name",
+                    value: item.displayName,
+                },
+                {
+                    name: "Display Color",
+                    value: `\`${item.displayHexColor}\``,
+                },
+                item.communicationDisabledUntilTimestamp &&
+                has_permission(ctx.author, "history")
+                    ? {
+                          name: "Timed Out Until",
+                          value: timedisplay(
+                              item.communicationDisabledUntilTimestamp
+                          ),
+                      }
+                    : [],
+                item.premiumSinceTimestamp
+                    ? {
+                          name: "Boosting Since",
+                          value: timedisplay(item.premiumSinceTimestamp),
+                      }
+                    : [],
+                custom
+                    ? {
+                          name: "Custom Role",
+                          value: `<@&${custom}>`,
+                      }
+                    : [],
+                {
+                    name: "Roles",
+                    value:
+                        item.roles.cache
+                            .toJSON()
+                            .sort((a, b) => b.comparePositionTo(a))
+                            .slice(0, -1)
+                            .map((x) => x.toString())
+                            .join(", ") || "(none)",
+                },
+                {
+                    name: "Permissions",
+                    value:
+                        item.permissions
+                            .toArray()
+                            .map((x) => `\`${x}\``)
+                            .join(", ") || "(none)",
+                },
+                {
+                    name: "User Flags",
+                    value: item.user.flags.toArray().join(", ") || "(none)",
+                },
+            ].flat(),
+        };
+    } else if (item instanceof User) {
+        item = await item.fetch();
+        return {
+            title: `User info for ${item.tag}`,
+            description: item.bot ? "**This user is a bot**" : "",
+            color: item.accentColor,
+            thumbnail: {
+                url: item.avatarURL({ dynamic: true }),
+            },
+            fields: [
+                ID,
+                creation,
+                has_permission(ctx.author, "history")
+                    ? {
+                          name: "Ban Status",
+                          value: await (async () => {
+                              try {
+                                  await ctx.guild.bans.fetch(item.id);
+                                  return "This user is banned from this server.";
+                              } catch {
+                                  return "This user is not banned from this server.";
+                              }
+                          })(),
+                      }
+                    : [],
+                {
+                    name: "User Flags",
+                    value: item.flags.toArray().join(", ") || "(none)",
+                },
+            ].flat(),
+        };
+    } else if (item instanceof Role) {
+        return {
+            title: `Role info for ${item.name}`,
+            description: "",
+            color: item.color,
+            thumbnail: {
+                url: item.iconURL(),
+            },
+            fields: [
+                ID,
+                creation,
+                {
+                    name: "Display Color",
+                    value: item.hexColor,
+                    inline: true,
+                },
+                {
+                    name: "Members",
+                    value: item.members.size.toString(),
+                    inline: true,
+                },
+                {
+                    name: "Position",
+                    value: item.position.toString(),
+                    inline: true,
+                },
+                {
+                    name: "Hoist",
+                    value: `Members with this role are ${
+                        item.hoist ? "" : "not "
+                    }displayed separately from other members.`,
+                },
+                {
+                    name: "Mentionable",
+                    value: `This role is ${
+                        item.mentionable ? "" : "not "
+                    }mentionable by everyone.`,
+                },
+                item.tags
+                    ? [
+                          item.tags.botId
+                              ? {
+                                    name: "Bot",
+                                    value: `This role is managed by <@${item.tags.botId}>.`,
+                                }
+                              : [],
+                          item.tags.integrationId
+                              ? {
+                                    name: "Integration",
+                                    value: `This role is managed by integration \`${item.tags.integrationId}\`.`,
+                                }
+                              : [],
+                          item.tags.premiumSubscriberRole
+                              ? {
+                                    name: "Booster Role",
+                                    value: "This role is this server's premium subscriber role.",
+                                }
+                              : [],
+                      ].flat()
+                    : [],
+                {
+                    name: "Permissions",
+                    value: item.permissions
+                        .toArray()
+                        .map((x) => `\`${x}\``)
+                        .join(", "),
+                },
+            ].flat(),
+        };
+    } else if (item instanceof TextChannel) {
+        return {
+            title: `Text channel info for ${item.name}`,
+            description: "",
+            fields: [
+                ID,
+                creation,
+                {
+                    name: "Position",
+                    value: item.position.toString(),
+                    inline: true,
+                },
+                item.parent
+                    ? {
+                          name: "Category",
+                          value: item.parent.name,
+                          inline: true,
+                      }
+                    : [],
+                {
+                    name: "Members",
+                    value: item.members.size.toString(),
+                },
+                {
+                    name: item.nsfw ? "NSFW" : "SFW",
+                    value: item.nsfw
+                        ? "This channel is NSFW. Only members aged 18+ are allowed. It is still subject to Discord's ToS."
+                        : "This channel is SFW. All members are allowed. Refrain from posting explicit content.",
+                },
+                {
+                    name: "Thread Auto-Archive Duration",
+                    value:
+                        {
+                            60: "1 hour",
+                            1440: "1 day",
+                            4320: "3 days",
+                            10080: "7 days",
+                            MAX: "maximum",
+                        }[item.defaultAutoArchiveDuration] || "1 day",
+                },
+            ].flat(),
+        };
+    }
+}
+
+async function show_info(ctx, item) {
+    const res = await _info(ctx, item);
+    if (res.fields) {
+        res.fields = res.fields.map(
+            (field) => ((field.name = `**※ ${field.name}**`), field)
+        );
+    }
+    await ctx.replyEmbed(res);
+    throw new Info();
+}
+
+async function parse(ctx, arg) {
+    try {
+        return ctx, await ctx.parse_member(arg);
+    } catch {}
+    try {
+        return ctx, await ctx.parse_user(arg);
+    } catch {}
+    try {
+        return ctx, await ctx.parse_role(arg);
+    } catch {}
+    try {
+        return ctx, await ctx.parse_channel(arg);
+    } catch {}
+    throw new ArgumentError(
+        `${inline_code(
+            arg
+        )} is not a valid representation of a member, role, or channel.`
+    );
+}
+
+async function info(ctx, args, df) {
+    checkCount(args, 0, 1);
+    if (args.length == 0) {
+        await show_info(ctx, df);
+    } else {
+        await show_info(ctx, await parse(ctx, args[0]));
+    }
+}

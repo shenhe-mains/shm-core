@@ -8,7 +8,7 @@ block main
         +header("staff-applications")
         .row
             h4
-                | You are logged in as #{req.member.user.username}##{req.member.user.discriminator}. 
+                | You are logged in as #{req.member.user.tag}
                 a(href="/logout/", style="color: #55a") Log Out
         for team in team_keys
             .row
