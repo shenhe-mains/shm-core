@@ -3,7 +3,6 @@ const {
     GuildMember,
     User,
     Role,
-    GuildChannel,
     TextChannel,
     VoiceChannel,
     CategoryChannel,
@@ -22,7 +21,7 @@ const {
     checkCount,
     censor_attachments,
     pluralize,
-    for_duration,
+    display_duration,
 } = require("../../utils");
 const { ranks, has_permission } = require("../../core/privileges");
 const { reload, modify, config } = require("../../core/config");
@@ -199,12 +198,50 @@ function timedisplay(ts) {
     return `${timestamp(ts)} (${timestamp(ts, "R")})`;
 }
 
+function channel_breakdown(channels) {
+    var count = 0;
+    var text = 0;
+    var voice = 0;
+    var category = 0;
+    var news = 0;
+    var stage = 0;
+    var thread = 0;
+    for (const channel of channels.values()) {
+        ++count;
+        if (channel instanceof TextChannel) ++text;
+        if (channel instanceof VoiceChannel) ++voice;
+        if (channel instanceof CategoryChannel) ++category;
+        if (channel instanceof NewsChannel) ++news;
+        if (channel instanceof StageChannel) ++stage;
+        if (channel instanceof ThreadChannel) ++thread;
+    }
+    return `${count} (${[
+        text ? `${text} text` : [],
+        voice ? `${voice} voice` : [],
+        category ? `${category} categor${pluralize(category, "ies", "y")}` : [],
+        news ? `${news} news` : [],
+        stage ? `${stage} stage` : [],
+        thread ? `${thread} thread${pluralize(thread)}` : [],
+    ]
+        .flat()
+        .join(", ")})`;
+}
+
 async function _info(ctx, item) {
     const creation = {
         name: "Creation Date",
         value: timedisplay(item.createdTimestamp || item.user.createdTimestamp),
     };
-    const ID = { name: "ID", value: `\`${item.id}\` ${item}` };
+    const ID = {
+        name: "ID",
+        value: `\`${item.id}\` ${item}`,
+    };
+    const category = item.parent
+        ? {
+              name: "Category",
+              value: item.parent.name,
+          }
+        : [];
     if (item instanceof Guild) {
         return {
             title: `Guild info for ${item.name}`,
@@ -226,42 +263,7 @@ async function _info(ctx, item) {
                 creation,
                 {
                     name: "Channels",
-                    value: ((channels) => {
-                        var count = 0;
-                        var text = 0;
-                        var voice = 0;
-                        var category = 0;
-                        var news = 0;
-                        var stage = 0;
-                        var thread = 0;
-                        for (const channel of channels.values()) {
-                            ++count;
-                            if (channel instanceof TextChannel) ++text;
-                            if (channel instanceof VoiceChannel) ++voice;
-                            if (channel instanceof CategoryChannel) ++category;
-                            if (channel instanceof NewsChannel) ++news;
-                            if (channel instanceof StageChannel) ++stage;
-                            if (channel instanceof ThreadChannel) ++thread;
-                        }
-                        return `${count} (${[
-                            text ? `${text} text` : [],
-                            voice ? `${voice} voice` : [],
-                            category
-                                ? `${category} categor${pluralize(
-                                      category,
-                                      "ies",
-                                      "y"
-                                  )}`
-                                : [],
-                            news ? `${news} news` : [],
-                            stage ? `${stage} stage` : [],
-                            thread
-                                ? `${thread} thread${pluralize(thread)}`
-                                : [],
-                        ]
-                            .flat()
-                            .join(", ")})`;
-                    })(await item.channels.fetch()),
+                    value: channel_breakdown(await item.channels.fetch()),
                 },
                 {
                     name: "Members",
@@ -556,25 +558,17 @@ async function _info(ctx, item) {
                 },
             ].flat(),
         };
-    } else if (item instanceof TextChannel) {
+    } else if (item instanceof TextChannel || item instanceof NewsChannel) {
         return {
-            title: `Text channel info for ${item.name}`,
-            description: "",
+            title: `${
+                item instanceof TextChannel ? "Text" : "News"
+            } channel info for ${item.name}`,
+            description: item.topic,
+            color: "GREY",
             fields: [
                 ID,
                 creation,
-                {
-                    name: "Position",
-                    value: item.position.toString(),
-                    inline: true,
-                },
-                item.parent
-                    ? {
-                          name: "Category",
-                          value: item.parent.name,
-                          inline: true,
-                      }
-                    : [],
+                category,
                 {
                     name: "Members",
                     value: item.members.size.toString(),
@@ -584,6 +578,12 @@ async function _info(ctx, item) {
                     value: item.nsfw
                         ? "This channel is NSFW. Only members aged 18+ are allowed. It is still subject to Discord's ToS."
                         : "This channel is SFW. All members are allowed. Refrain from posting explicit content.",
+                },
+                {
+                    name: "Active Threads",
+                    value: (
+                        await item.threads.fetchActive()
+                    ).threads.size.toString(),
                 },
                 {
                     name: "Thread Auto-Archive Duration",
@@ -596,7 +596,55 @@ async function _info(ctx, item) {
                             MAX: "maximum",
                         }[item.defaultAutoArchiveDuration] || "1 day",
                 },
+                item.rateLimitPerUser
+                    ? {
+                          name: "Slowmode",
+                          value: display_duration(item.rateLimitPerUser),
+                      }
+                    : [],
             ].flat(),
+        };
+    } else if (item instanceof VoiceChannel || item instanceof StageChannel) {
+        return {
+            title: `${
+                item instanceof VoiceChannel ? "Voice" : "Stage"
+            } channel info for ${item.name}`,
+            description: "",
+            color: "GREY",
+            fields: [
+                ID,
+                creation,
+                category,
+                {
+                    name: "Bitrate",
+                    value: item.bitrate.toString(),
+                    inline: true,
+                },
+                {
+                    name: "RTC Region",
+                    value: item.rtcRegion || "auto",
+                    inline: true,
+                },
+                {
+                    name: "User Limit",
+                    value: (item.userLimit || "none").toString(),
+                    inline: true,
+                },
+            ],
+        };
+    } else if (item instanceof CategoryChannel) {
+        return {
+            title: `Category channel info for ${item.name}`,
+            description: "",
+            color: "GREY",
+            fields: [
+                ID,
+                creation,
+                {
+                    name: "Channels",
+                    value: channel_breakdown(item.children),
+                },
+            ],
         };
     }
 }

@@ -22,7 +22,7 @@ exports.inline_code = inline_code = function (string, max_length) {
           )}\n\`\`\``;
 };
 
-exports.for_duration = for_duration = function (duration) {
+exports.display_duration = display_duration = function (duration) {
     if (duration <= 0) {
         return "";
     }
@@ -41,7 +41,14 @@ exports.for_duration = for_duration = function (duration) {
     if (duration > 0) {
         components.push(`${duration} day${pluralize(duration)}`);
     }
-    return " for " + english_list(components);
+    return english_list(components);
+};
+
+exports.for_duration = for_duration = function (duration) {
+    if (duration <= 0) {
+        return "";
+    }
+    return " for " + display_duration(duration);
 };
 
 exports.english_list = english_list = function (values, joiner) {
