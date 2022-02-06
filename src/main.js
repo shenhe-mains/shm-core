@@ -51,6 +51,7 @@ for (var key of [
     "messageReactionRemoveEmoji",
     "messageUpdate",
     "roleDelete",
+    "voiceStateUpdate",
 ]) {
     client.on(
         key,

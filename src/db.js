@@ -1251,3 +1251,71 @@ exports.client = client;
         await client.query(`DELETE FROM reminders WHERE id = $1`, [id]);
     };
 }
+
+// xp
+{
+    client.query(
+        `CREATE TABLE IF NOT EXISTS xp (
+            user_id VARCHAR(32) PRIMARY KEY,
+            text_xp FLOAT,
+            voice_xp FLOAT
+        )`
+    );
+
+    exports.increase_xp = async function (
+        user_id,
+        text_amount,
+        voice_amount,
+        skip_check
+    ) {
+        if (!skip_check) {
+            if (
+                (
+                    await client.query(
+                        `SELECT COUNT(1) FROM xp WHERE user_id = $1`,
+                        [user_id]
+                    )
+                ).rows[0].count == 0
+            ) {
+                await client.query(
+                    `INSERT INTO xp (user_id, text_xp, voice_xp) VALUES ($1, 0, 0)`,
+                    [user_id]
+                );
+            }
+        }
+        if (text_amount == 0 && voice_amount == 0) return;
+        await client.query(
+            `UPDATE xp SET text_xp = text_xp + $1, voice_xp = voice_xp + $2 WHERE user_id = $3`,
+            [text_amount, voice_amount, user_id]
+        );
+    };
+
+    exports.xp_rank_for = async function (type, user_id) {
+        const result = (
+            await client.query(`SELECT ${type}_xp FROM xp WHERE user_id = $1`, [
+                user_id,
+            ])
+        ).rows;
+        const xp = result.length == 0 ? 0 : result[0][type + "_xp"];
+        return {
+            xp: xp,
+            rank: parseInt(
+                (
+                    await client.query(
+                        `SELECT COUNT(1) FROM xp WHERE ${type}_xp > $1`,
+                        [xp]
+                    )
+                ).rows[0].count
+            ),
+        };
+    };
+
+    exports.leaderboard = async function (type, limit, offset) {
+        return (
+            await client.query(
+                `SELECT user_id, ${type}_xp as xp FROM xp WHERE ${type}_xp != 0 ORDER BY ${type}_xp DESC LIMIT $1 OFFSET $2`,
+                [limit, offset]
+            )
+        ).rows;
+    };
+}
