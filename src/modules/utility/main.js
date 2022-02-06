@@ -671,7 +671,7 @@ async function _info(ctx, item) {
                       },
                 {
                     name: "Members",
-                    value: item.members.cache.size.toString(),
+                    value: (await item.members.fetch()).size.toString(),
                 },
                 item.rateLimitPerUser
                     ? {
