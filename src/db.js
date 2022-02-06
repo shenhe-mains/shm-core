@@ -1302,8 +1302,8 @@ exports.client = client;
             rank: parseInt(
                 (
                     await client.query(
-                        `SELECT COUNT(1) FROM xp WHERE ${type}_xp > $1`,
-                        [xp]
+                        `SELECT COUNT(1) FROM xp WHERE ${type}_xp > $1 OR ${type}_xp = $1 AND user_id < $2`,
+                        [xp, user_id]
                     )
                 ).rows[0].count
             ),
@@ -1313,7 +1313,7 @@ exports.client = client;
     exports.leaderboard = async function (type, limit, offset) {
         return (
             await client.query(
-                `SELECT user_id, ${type}_xp as xp FROM xp WHERE ${type}_xp != 0 ORDER BY ${type}_xp DESC LIMIT $1 OFFSET $2`,
+                `SELECT user_id, ${type}_xp as xp FROM xp WHERE ${type}_xp != 0 ORDER BY ${type}_xp DESC, user_id ASC LIMIT $1 OFFSET $2`,
                 [limit, offset]
             )
         ).rows;
