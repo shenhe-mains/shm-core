@@ -646,6 +646,41 @@ async function _info(ctx, item) {
                 },
             ],
         };
+    } else if (item instanceof ThreadChannel) {
+        return {
+            title: `Thread channel info for ${item.name}`,
+            description: "",
+            color: "GREY",
+            fields: [
+                ID,
+                creation,
+                {
+                    name: "Parent Channel",
+                    value: item.parent.toString(),
+                },
+                item.archived
+                    ? {
+                          name: "Archived At",
+                          value: timedisplay(item.archiveTimestamp),
+                      }
+                    : {
+                          name: "Auto-Archive Duration",
+                          value: display_duration(
+                              item.autoArchiveDuration * 60
+                          ),
+                      },
+                {
+                    name: "Members",
+                    value: item.members.cache.size.toString(),
+                },
+                item.rateLimitPerUser
+                    ? {
+                          name: "Slowmode",
+                          value: display_duration(item.rateLimitPerUser),
+                      }
+                    : [],
+            ],
+        };
     }
 }
 
