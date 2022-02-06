@@ -13,7 +13,7 @@ exports.listeners = {
 
 async function top_fields(type, user_id, limit, offset) {
     const data = (await leaderboard(type, limit, offset)).map(
-        (x, i) => ((x.rank = i), x)
+        (x, i) => ((x.rank = i + offset), x)
     );
     const user = await xp_rank_for(type, user_id);
     if (user.xp !== 0) {
@@ -32,7 +32,7 @@ async function top_fields(type, user_id, limit, offset) {
             .map(
                 ({ user_id, xp, rank, bold }) =>
                     `${bold ? "**" : ""}\`${
-                        rank + offset + 1
+                        rank + 1
                     }.\` <@${user_id}>: ${Math.floor(xp)}${bold ? "**" : ""}`
             )
             .join("\n") || "Nobody is on this leaderboard yet."
