@@ -107,6 +107,8 @@ async function text_activity(client, message) {
 }
 
 async function voice_activity(client, before, after) {
+    if (after.guild != config.guild) return;
+    if (after.member.user.bot) return;
     const id = after.member.id;
     if (after.channel) {
         if (voice_states.has(id)) return;
