@@ -1018,6 +1018,9 @@ exports.client = client;
     );
 
     exports.set_autoroles = async function (user_id, role_ids) {
+        await client.query(`DELETE FROM autoroles WHERE user_id = $1`, [
+            user_id,
+        ]);
         await client.query(
             `INSERT INTO autoroles (user_id, role_id) VALUES ${role_ids
                 .map(
