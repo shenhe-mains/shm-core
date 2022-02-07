@@ -63,6 +63,7 @@ async function check_channel_nuke(client, channel) {
 const locked = new Set();
 
 async function sync_user_roles(client, before, after) {
+    if (before.guild.id != config.guild) return;
     const roles_before = new Set(before.roles.cache.map((role) => role.id));
     const roles_after = new Set(after.roles.cache.map((role) => role.id));
 
@@ -86,6 +87,7 @@ async function sync_user_roles(client, before, after) {
 }
 
 async function check_role_nuke(client, role) {
+    if (role.guild.id != config.guild) return;
     locked.add(role.id);
     const user_ids = await get_users_by_role(role.id);
     await (
