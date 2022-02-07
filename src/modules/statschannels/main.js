@@ -16,6 +16,6 @@ async function check_boosters(client, before, after) {
 async function check_member_count(client, member) {
     const channel = await client.channels.fetch(config.channels.member_count);
     await channel.edit({
-        name: `✦・ Disciples: ${member.guild.memberCount}`,
+        name: `✦・ Disciples: ${(await member.guild.members.fetch()).size}`,
     });
 }
