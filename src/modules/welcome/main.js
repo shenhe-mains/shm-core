@@ -3,6 +3,7 @@ const { config } = require("../../core/config");
 exports.listeners = { guildMemberAdd: [welcome] };
 
 async function welcome(client, member) {
+    if (member.guild.id != config.guild) return;
     const channel = await client.channels.fetch(config.channels.welcome);
     await channel.send({
         content: `**Welcome to Shenhe Mains, ${member}!**`,
