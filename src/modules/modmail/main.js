@@ -169,19 +169,6 @@ async function check_modmail(client, message) {
                 });
                 return;
             }
-            if (!member.roles.cache.has(config.verify)) {
-                await message.reply({
-                    embeds: [
-                        {
-                            title: "Please verify yourself",
-                            description:
-                                "Hello! If you would like to use the modmail feature, please go to <#930568867602894878> and verify yourself first.",
-                            color: config.color,
-                        },
-                    ],
-                });
-                return;
-            }
             if (await has_modmail_channel(client, message.author)) {
                 await relay_incoming(client, guild, message);
                 try {
