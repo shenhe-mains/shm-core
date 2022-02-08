@@ -97,7 +97,6 @@ exports.parse_message = async function (ctx, string) {
         const guild_id = re.exec(string)[0];
         const channel_id = re.exec(string)[0];
         const message_id = re.exec(string)[0];
-        console.log(guild_id, channel_id, message_id);
         var guild, channel;
         try {
             guild = await ctx.client.guilds.fetch(guild_id);

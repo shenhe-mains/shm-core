@@ -388,7 +388,6 @@ async function _info(ctx, item) {
         };
     } else if (item instanceof GuildMember) {
         const custom = await get_custom_role(item.id);
-        console.log(custom);
         return {
             title: `Member info for ${item.user.tag}`,
             description: item.user.bot ? "**This user is a bot**" : "",
