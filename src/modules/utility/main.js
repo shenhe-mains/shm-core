@@ -41,6 +41,7 @@ exports.commands = {
     "user-info": async (ctx, args) => info(ctx, args, ctx.author),
     "role-info": async (ctx, args) => info(ctx, args, ctx.author.roles.highest),
     "channel-info": async (ctx, args) => info(ctx, args, ctx.channel),
+    avatar: avatar,
 };
 
 exports.log_exclude = [
@@ -52,6 +53,7 @@ exports.log_exclude = [
     "user-info",
     "role-info",
     "channel-info",
+    "avatar",
 ];
 
 async function _ranks(ctx, args) {
@@ -721,4 +723,18 @@ async function info(ctx, args, df) {
     } else {
         await show_info(ctx, await parse(ctx, args[0]));
     }
+}
+
+async function avatar(ctx, args) {
+    checkCount(args, 0, 1);
+    const member =
+        args.length == 0 ? ctx.author : await ctx.parse_member(args[0]);
+    const url = member.avatarURL({ dynamic: true });
+    await ctx.replyEmbed({
+        description: url,
+        image: {
+            url: member.avatarURL({ dynamic: true }),
+        },
+    });
+    throw new Info();
 }
