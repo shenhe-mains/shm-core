@@ -168,6 +168,10 @@
             "mod",
             "tcmod"
         ],
+        "bulkpurge": [
+            "owner",
+            "admin"
+        ],
         "slowmode": [
             "owner",
             "admin",

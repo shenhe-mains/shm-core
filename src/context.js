@@ -40,7 +40,11 @@ exports.Context = class {
     }
 
     async reply() {
-        return await this.message.reply(...arguments);
+        try {
+            return await this.message.reply(...arguments);
+        } catch {
+            return await this.channel.send(...arguments);
+        }
     }
 
     async replyEmbed(embed, ping) {
@@ -145,6 +149,7 @@ exports.Context = class {
             await interaction.update({ components: [] });
             return interaction;
         } catch (interaction) {
+            console.log(interaction);
             if (interaction instanceof Message) {
                 await interaction.edit({
                     embeds: [

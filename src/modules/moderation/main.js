@@ -12,6 +12,7 @@ const {
     Info,
     ArgumentError,
     CommandSyntaxError,
+    UserError,
 } = require("../../errors");
 const { pagify } = require("../../pages");
 const {
@@ -43,6 +44,7 @@ exports.commands = {
     history: history,
     nick: nick,
     purge: purge,
+    "purge-between": purge_between,
     role: role_add,
     "role-add": role_add,
     "role-remove": role_rm,
@@ -491,6 +493,9 @@ async function purge(ctx, args) {
     if (isNaN(count) || count <= 0 || count > 100) {
         throw new ArgumentError("Please enter a positive integer (max. 100).");
     }
+    if (count == 1) {
+        throw new ArgumentError("Just delete the message yourself...");
+    }
     await (
         await ctx.confirmOrCancel({
             title: "Confirm Purge",
@@ -500,7 +505,13 @@ async function purge(ctx, args) {
         })
     ).message.delete();
     await ctx.message.delete();
-    const messages = await ctx.channel.bulkDelete(count);
+    try {
+        const messages = await ctx.channel.bulkDelete(count);
+    } catch {
+        throw new UserError(
+            "Unexpected error purging. The messages may be too old."
+        );
+    }
     const reply = await ctx.send({
         embeds: [
             {
@@ -519,6 +530,86 @@ async function purge(ctx, args) {
     setTimeout(() => {
         reply.delete();
     }, 2500);
+}
+
+async function purge_between(ctx, args) {
+    checkCount(args, 2);
+    if (!has_permission(ctx.author, "purge")) {
+        throw new PermissionError(
+            "You do not have permission to purge messages."
+        );
+    }
+    const start = await ctx.parse_message(args[0]);
+    const end = await ctx.parse_message(args[1]);
+    if (start.id == end.id) {
+        throw new ArgumentError("Just delete the message yourself...");
+    }
+    if (start.channel.id != end.channel.id) {
+        throw new ArgumentError(
+            "These two messages are not in the same channel."
+        );
+    }
+    if (start.createdTimestamp > end.createdTimestamp) {
+        [start, end] = [end, start];
+    }
+    const messages = [start];
+    while (true) {
+        console.log(messages[messages.length - 1].id);
+        const block = (
+            await start.channel.messages.fetch({
+                after: messages[messages.length - 1].id,
+                limit: 100,
+            })
+        )
+            .toJSON()
+            .reverse();
+        console.log(
+            block[0].createdAt,
+            block[block.length - 1].createdAt,
+            block.length
+        );
+        const cmp =
+            block[block.length - 1].createdTimestamp - end.createdTimestamp;
+        if (cmp <= 0) {
+            for (const message of block) messages.push(message);
+        }
+        if (cmp >= 0) {
+            for (const message of block) {
+                if (message.createdTimestamp <= end.createdTimestamp) {
+                    messages.push(message);
+                } else {
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    if (messages.length > 100) {
+        if (!has_permission(ctx.author, "bulkpurge")) {
+            throw new PermissionError(
+                `You do not have permission to purge more than 100 messages (${messages.length} selected).`
+            );
+        }
+    }
+    await ctx.confirmOrCancel({
+        title: "Confirm Purge",
+        description: `Purge ${messages.length} messages?`,
+    });
+    const count = messages.length;
+    while (messages) {
+        if (
+            new Date() - messages[0].createdAt >
+            14 * 24 * 60 * 60 * 1000 - 20000
+        ) {
+            await messages.unshift().delete();
+        } else {
+            break;
+        }
+    }
+    while (messages.length > 0) {
+        await start.channel.bulkDelete(messages.splice(0, 100));
+    }
+    throw new Success("Purged Messages", `${count} messages were purged.`);
 }
 
 async function role_add(ctx, args) {
