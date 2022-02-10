@@ -734,6 +734,7 @@ async function avatar(ctx, args) {
         member.user.avatarURL({ dynamic: true, size: 4096 });
     await ctx.replyEmbed({
         title: "Avatar Link",
+        color: "GREY",
         url: url,
         image: { url: url },
         author: {
