@@ -555,7 +555,6 @@ async function purge_between(ctx, args) {
     }
     const messages = [start];
     while (true) {
-        console.log(messages[messages.length - 1].id);
         const block = (
             await start.channel.messages.fetch({
                 after: messages[messages.length - 1].id,
@@ -564,11 +563,6 @@ async function purge_between(ctx, args) {
         )
             .toJSON()
             .reverse();
-        console.log(
-            block[0].createdAt,
-            block[block.length - 1].createdAt,
-            block.length
-        );
         const cmp =
             block[block.length - 1].createdTimestamp - end.createdTimestamp;
         if (cmp <= 0) {
