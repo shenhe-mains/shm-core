@@ -730,11 +730,16 @@ async function avatar(ctx, args) {
     const member =
         args.length == 0 ? ctx.author : await ctx.parse_member(args[0]);
     const url =
-        member.avatarURL({ dynamic: true }) ||
-        member.user.avatarURL({ dynamic: true });
+        member.avatarURL({ dynamic: true, size: 4096 }) ||
+        member.user.avatarURL({ dynamic: true, size: 4096 });
     await ctx.replyEmbed({
-        description: url,
+        title: "Avatar Link",
+        url: url,
         image: { url: url },
+        author: {
+            name: member.user.tag,
+            url: url,
+        },
     });
     throw new Info();
 }
