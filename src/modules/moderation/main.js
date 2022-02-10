@@ -505,8 +505,9 @@ async function purge(ctx, args) {
         })
     ).message.delete();
     await ctx.message.delete();
+    var messages;
     try {
-        const messages = await ctx.channel.bulkDelete(count);
+        messages = await ctx.channel.bulkDelete(count);
     } catch {
         throw new UserError(
             "Unexpected error purging. The messages may be too old."
