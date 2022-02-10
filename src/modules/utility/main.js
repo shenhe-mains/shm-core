@@ -739,6 +739,7 @@ async function avatar(ctx, args) {
         author: {
             name: member.user.tag,
             url: url,
+            iconURL: url,
         },
     });
     throw new Info();
