@@ -9,13 +9,11 @@ exports.listeners = {
 async function check_boosters(client, before, after) {
     setTimeout(() => {
         if (before.guild.id != config.guild) return;
-        await client.channels
-            .fetch(config.channels.boost_count)
-            .then((channel) =>
-                channel.edit({
-                    name: `✧・ Boosts: ${before.guild.premiumSubscriptionCount}`,
-                })
-            );
+        client.channels.fetch(config.channels.boost_count).then((channel) =>
+            channel.edit({
+                name: `✧・ Boosts: ${before.guild.premiumSubscriptionCount}`,
+            })
+        );
     }, 10000);
 }
 
