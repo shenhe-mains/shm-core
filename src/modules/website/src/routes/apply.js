@@ -194,7 +194,8 @@ app.post(
                                 color: config.color,
                             },
                         ],
-                    }
+                    },
+                    !req.application
                 );
             } finally {
                 res.redirect(303, "/apply/");

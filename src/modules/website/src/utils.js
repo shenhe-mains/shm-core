@@ -128,12 +128,14 @@ exports.send_to_application_channel = async function (
     team,
     user,
     guild,
-    message
+    message,
+    pin
 ) {
     var channel;
     try {
         channel = await get_app_channel(team, user, guild);
-        await channel.send(message);
+        const msg = await channel.send(message);
+        if (pin) await msg.pin();
     } catch {}
     try {
         await (
