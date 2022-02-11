@@ -361,7 +361,7 @@
     "support_roles": {
         "817617933495697469": {
             "title": "`${member.guild.name} was just boosted!`",
-            "body": "`**${member.guild.name}** now has **${count}** boost${count == 1 ? '' : 's'}!\\n\\nThank you for supporting the server, ${member}! <:ShenheHeart:854344834244542484>\\n\\nYou can now claim a custom role in <#805458034251530262> with: \\`${config.prefix}role-claim <role name>\\``"
+            "body": "`**${member.guild.name}** now has **${count}** booster${count == 1 ? '' : 's'}!\\n\\nThank you for supporting the server, ${member}! <:ShenheHeart:854344834244542484>\\n\\nYou can now claim a custom role in <#805458034251530262> with: \\`${config.prefix}role-claim <role name>\\``"
         },
         "926279568980058183": {
             "title": "`Shenhe Mains was just supported on Ko-Fi!`",
