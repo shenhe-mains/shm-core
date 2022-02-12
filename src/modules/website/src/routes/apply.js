@@ -209,7 +209,7 @@ app.post(
                             : {
                                   title: "Thank you for applying!",
                                   description:
-                                      "We'll get back to you on it shortly.",
+                                      "Your application was successfully received. We'll get back to you on it shortly.",
                                   color: config.color,
                               },
                     ],
