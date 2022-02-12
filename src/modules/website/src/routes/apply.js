@@ -197,6 +197,23 @@ app.post(
                     },
                     !req.application
                 );
+                await req.member.send({
+                    embeds: [
+                        req.application
+                            ? {
+                                  title: "Your application was successfully updated!",
+                                  description:
+                                      "I've also notified staff to take a look again.",
+                                  color: config.color,
+                              }
+                            : {
+                                  title: "Thank you for applying!",
+                                  description:
+                                      "We'll get back to you on it shortly.",
+                                  color: config.color,
+                              },
+                    ],
+                });
             } finally {
                 res.redirect(303, "/apply/");
             }
