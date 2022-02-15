@@ -7,6 +7,7 @@ exports.listeners = {
     messageUpdate: [log_update],
     messageDelete: [log_delete],
     messageDeleteBulk: [log_delete_bulk],
+    voiceStateUpdate: [log_voice_change],
 };
 
 function is_loggable(message) {
@@ -135,6 +136,47 @@ async function log_delete_bulk(client, message_list) {
                     description: message,
                     url: url,
                     color: "RED",
+                },
+            ],
+        });
+    }
+}
+
+async function log_voice_change(client, before, after) {
+    if (after.guild != config.guild) return;
+    const user = after.member.user;
+    if (user.bot) return;
+    const c1 = before.channel;
+    const c2 = after.channel;
+    if ((c1 && c1.id) == (c2 && c2.id)) return;
+    const logs = await client.channels.fetch(config.channels.message_logs);
+    if (!c1) {
+        await logs.send({
+            embeds: [
+                {
+                    title: "User joined voice channel",
+                    description: `${user} (${user.tag}) joined ${c2}`,
+                    color: "GREEN",
+                },
+            ],
+        });
+    } else if (!c2) {
+        await logs.send({
+            embeds: [
+                {
+                    title: "User left voice channel",
+                    description: `${user} (${user.tag}) left ${c1}`,
+                    color: "RED",
+                },
+            ],
+        });
+    } else {
+        await logs.send({
+            embeds: [
+                {
+                    title: "User switched voice channels",
+                    description: `${user} (${user.tag}) moved from ${c1} to ${c2}`,
+                    color: "GOLD",
                 },
             ],
         });
