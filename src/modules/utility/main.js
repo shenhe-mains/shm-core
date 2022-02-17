@@ -455,9 +455,9 @@ async function _info(ctx, item) {
                 },
                 {
                     name: "User Flags",
-                    value:
-                        (item.user.flags || []).toArray().join(", ") ||
-                        "(none)",
+                    value: item.user.flags
+                        ? item.user.flags.toArray().join(", ") || "(none)"
+                        : "(none)",
                 },
             ].flat(),
         };
