@@ -1,8 +1,6 @@
 const { config } = require("../../core/config");
 const { is_protected, add_ban } = require("../../db");
 
-exports.commands = { "restore-role": restore_role };
-
 exports.listeners = {
     channelDelete: [check_channel_nuke],
 };
