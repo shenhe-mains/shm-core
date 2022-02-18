@@ -32,10 +32,10 @@
                 "829810417340514344"
             ]
         },
-        "bypass": {
+        "poller": {
             "level": 4,
             "ids": [
-                "912313526704562206"
+                "217014530549481472"
             ]
         },
         "mod": {
@@ -122,7 +122,6 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod",
             "trial"
@@ -131,7 +130,6 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod",
             "trial"
@@ -140,7 +138,6 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod",
             "trial"
@@ -149,7 +146,6 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod",
             "trial"
@@ -157,14 +153,12 @@
         "massban": [
             "owner",
             "admin",
-            "bot",
-            "bypass"
+            "bot"
         ],
         "purge": [
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod"
         ],
@@ -176,7 +170,6 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod",
             "trial"
@@ -185,7 +178,6 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod",
             "trial",
@@ -195,7 +187,6 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod",
             "trial"
@@ -204,27 +195,24 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod"
         ],
         "role_modify": [
             "owner",
             "admin",
-            "bot",
-            "bypass"
+            "bot"
         ],
         "clear": [
             "owner",
             "admin",
-            "bot",
-            "bypass"
+            "bot"
         ],
         "poll": [
             "owner",
             "admin",
             "bot",
-            "bypass"
+            "poller"
         ],
         "settings": [
             "owner",
@@ -234,7 +222,6 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod",
             "trial"
@@ -243,7 +230,6 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod",
             "trial",
@@ -260,7 +246,6 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod",
             "trial"
@@ -269,7 +254,6 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod",
             "trial"
@@ -278,21 +262,18 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "leader"
         ],
         "reactroles": [
             "owner",
             "admin",
-            "bot",
-            "bypass"
+            "bot"
         ],
         "suggestions": [
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod"
         ],
@@ -302,8 +283,7 @@
         "webhook": [
             "owner",
             "admin",
-            "bot",
-            "bypass"
+            "bot"
         ],
         "send": [
             "owner",
@@ -313,7 +293,6 @@
             "owner",
             "admin",
             "bot",
-            "bypass",
             "mod",
             "tcmod",
             "trial",
