@@ -155,6 +155,12 @@ async function scan(content, fake) {
 async function automod_scan(client, message) {
     if (!message.guild || message.guild.id != config.guild) return;
     if (message.author.id == client.user.id) return;
+    if (
+        config.automod_ignore.indexOf(message.channel.id) != -1 ||
+        (message.channel.parentId &&
+            config.automod_ignore.indexOf(message.channel.parentId) != -1)
+    )
+        return;
     var author;
     if (message.webhookId === null) {
         try {
