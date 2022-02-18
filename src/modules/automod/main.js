@@ -160,7 +160,6 @@ async function automod_scan(client, message) {
         (message.channel.parentId &&
             config.automod_ignore.indexOf(message.channel.parentId) != -1)
     ) {
-        console.log("ignored");
         return;
     }
     var author;
