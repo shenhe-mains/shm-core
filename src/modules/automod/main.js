@@ -159,8 +159,10 @@ async function automod_scan(client, message) {
         config.automod_ignore.indexOf(message.channel.id) != -1 ||
         (message.channel.parentId &&
             config.automod_ignore.indexOf(message.channel.parentId) != -1)
-    )
+    ) {
+        console.log("ignored");
         return;
+    }
     var author;
     if (message.webhookId === null) {
         try {
