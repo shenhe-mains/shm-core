@@ -90,7 +90,7 @@ async function top(ctx, args) {
 }
 
 async function reset(ctx, args) {
-    checkCout(args, 0);
+    checkCount(args, 0);
     if (!has_permission(ctx.author, "settings")) {
         throw new PermissionError(
             "You do not have permission to reset the leaderboards."
