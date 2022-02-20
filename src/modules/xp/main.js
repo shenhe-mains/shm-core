@@ -53,7 +53,7 @@ async function top_fields(type, user_id, limit, offset) {
         data
             .map(
                 ({ user_id, xp, rank }) =>
-                    `${rank + 1}.\` <@${user_id}>: ${Math.floor(xp)}`
+                    `\`${rank + 1}.\` <@${user_id}>: ${Math.floor(xp)}`
             )
             .join("\n") || "Nobody is on this leaderboard yet."
     );
