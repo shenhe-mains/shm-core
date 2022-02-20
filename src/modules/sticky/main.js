@@ -54,6 +54,8 @@ async function stickstop(ctx, args) {
     await delete_sticky(ctx.channel.id);
 }
 
+const ratelimit = new Map();
+
 async function update_stick(client, message) {
     if (message.guild === undefined) return;
     if (message.author.id == client.user.id) return;
@@ -63,6 +65,13 @@ async function update_stick(client, message) {
     )
         return;
     const channel = message.channel;
+    if (
+        ratelimit.has(channel.id) &&
+        new Date() - ratelimit.get(channel.id) < 5000
+    ) {
+        return;
+    }
+    ratelimit.set(channel.id, new Date());
     const sticky = await get_sticky(channel.id);
     if (sticky === undefined) return;
     await remove_sticky_message(channel, sticky);
