@@ -144,7 +144,8 @@ async function add_xp_role(ctx, args) {
             "You do not have permission to add roles to the event XP leaderboard role list."
         );
     }
-    await register_role(ctx.parse_role_id(args[0]));
+    const role_id = ctx.parse_role_id(args[0]);
+    await register_role(role_id);
     await get_roles();
     roles.add(role_id);
 }
