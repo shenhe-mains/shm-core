@@ -1,17 +1,39 @@
 const { config } = require("../../core/config");
 const { has_permission } = require("../../core/privileges");
-const { increase_xp, xp_rank_for, leaderboard, client } = require("../../db");
+const {
+    increase_xp,
+    xp_rank_for,
+    leaderboard,
+    client,
+    list_xp_roles,
+    add_role_xp,
+    register_role,
+    delist_role,
+    drop_xp_roles,
+} = require("../../db");
 const { Info, ArgumentError, PermissionError } = require("../../errors");
 
 exports.commands = {
     top: top,
     reset: reset,
+    "add-xp-role": add_xp_role,
+    "remove-xp-role": remove_xp_role,
+    "rm-xp-role": remove_xp_role,
 };
 
 exports.listeners = {
     messageCreate: [text_activity],
     voiceStateUpdate: [voice_activity],
 };
+
+var roles = undefined;
+
+async function get_roles() {
+    if (roles !== undefined) return roles;
+    return (roles = new Set(
+        (await list_xp_roles()).map((entry) => entry.role_id)
+    ));
+}
 
 async function top_fields(type, user_id, limit, offset) {
     const data = (await leaderboard(type, limit, offset)).map(
@@ -73,10 +95,15 @@ async function top(ctx, args) {
         );
     } else {
         const type = args[0];
-        if (type != "text" && type != "voice") {
+        if (type != "text" && type != "voice" && type != "event") {
             throw new ArgumentError(
-                "Expected `text` or `voice` as the leaderboard type."
+                "Expected `text`, `voice`, or `event` as the leaderboard type."
             );
+        }
+        if (type == "event") {
+            const roles = await list_xp_roles();
+            console.log(roles);
+            throw new Info("Event Leaderboard", "TODO");
         }
         const page = args.length > 1 ? parseInt(args[1]) - 1 : 0;
         if (isNaN(page) || page < 0) {
@@ -109,6 +136,59 @@ async function reset(ctx, args) {
     await client.query("DELETE FROM xp");
 }
 
+async function add_xp_role(ctx, args) {
+    checkCount(args, 1);
+    if (!has_permission(ctx.author, "settings")) {
+        throw new PermissionError(
+            "You do not have permission to add roles to the event XP leaderboard role list."
+        );
+    }
+    await register_role(ctx.parse_role_id(args[0]));
+    await get_roles();
+    roles.add(role_id);
+}
+
+async function remove_xp_role(ctx, args) {
+    checkCount(args, 1);
+    if (!has_permission(ctx.author, "settings")) {
+        throw new PermissionError(
+            "You do not have permission to drop roles from the event XP leaderboard role list."
+        );
+    }
+    const role_id = ctx.parse_role_id(args[0]);
+    await ctx.confirmOrCancel(
+        {
+            title: "Remove role XP?",
+            description: `Dropping the role from the leaderboard will remove <@&${role_id}>'s XP from the event leaderboard.`,
+            color: "ff0088",
+        },
+        "REMOVE",
+        "never mind"
+    );
+    await delist_role(role_id);
+    await get_roles();
+    roles.delete(role_id);
+}
+
+async function reset_event_xp(ctx, args) {
+    checkCount(args, 0);
+    if (!has_permission(ctx.author, "settings")) {
+        throw new PermissionError(
+            "You do not have permission to reset the event XP leaderboard."
+        );
+    }
+    await ctx.confirmOrCancel(
+        {
+            title: "Reset event leaderboard?",
+            description:
+                "This will remove all roles from the event leaderboard, thus resetting it entirely.",
+        },
+        "RESET",
+        "never mind"
+    );
+    await drop_xp_roles();
+}
+
 const last_active = new Map();
 const last_voice_update = new Map();
 const voice_states = new Map();
@@ -125,6 +205,10 @@ async function text_activity(client, message) {
             ? Math.min(60000, now - last_active.get(message.author.id))
             : 60000) / 1000;
     await increase_xp(message.author.id, xp_gain, 0, known);
+    const roles = await get_roles();
+    for (const role of message.member.roles.cache.keys()) {
+        if (roles.has(role)) await add_role_xp(role, xp_gain);
+    }
     last_active.set(message.author.id, now);
 }
 

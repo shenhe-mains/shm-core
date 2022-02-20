@@ -1265,6 +1265,44 @@ exports.client = client;
         )`
     );
 
+    client.query(
+        `CREATE TABLE IF NOT EXISTS role_xp (
+            role_id VARCHAR(32) PRIMARY KEY,
+            xp FLOAT
+        )`
+    );
+
+    exports.register_role = async function (role_id) {
+        await client.query(
+            `INSERT INTO role_xp (
+                role_id
+            ) VALUES ($1) ON CONFLICT (
+                role_id
+            ) DO UPDATE SET zp = role_xp.zp`,
+            [role_id]
+        );
+    };
+
+    exports.delist_role = async function (role_id) {
+        await client.query(`DELETE FROM role_xp WHERE role_id = $1`, [role_id]);
+    };
+
+    exports.drop_xp_roles = async function () {
+        await client.query(`DELETE FROM role_xp`);
+    };
+
+    exports.list_xp_roles = async function () {
+        return (await client.query(`SELECT * FROM role_xp ORDER BY xp DESC`))
+            .rows;
+    };
+
+    exports.add_role_xp = async function (role_id, xp) {
+        await client.query(
+            `UPDATE role_xp SET xp = xp + $1 WHERE role_id = $2`,
+            [xp, role_id]
+        );
+    };
+
     exports.increase_xp = async function (
         user_id,
         text_amount,
