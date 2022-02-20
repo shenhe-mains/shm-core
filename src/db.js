@@ -1275,8 +1275,8 @@ exports.client = client;
     exports.register_role = async function (role_id) {
         await client.query(
             `INSERT INTO role_xp (
-                role_id
-            ) VALUES ($1) ON CONFLICT (
+                role_id, xp
+            ) VALUES ($1, 0) ON CONFLICT (
                 role_id
             ) DO UPDATE SET xp = role_xp.xp`,
             [role_id]

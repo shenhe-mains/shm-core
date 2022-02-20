@@ -43,22 +43,17 @@ async function top_fields(type, user_id, limit, offset) {
     const user = await xp_rank_for(type, user_id);
     if (user.xp !== 0) {
         user.user_id = user_id;
-        user.bold = true;
         if (user.rank < offset) {
             data.unshift(user);
         } else if (user.rank >= offset + limit) {
             data.push(user);
-        } else {
-            data[user.rank - offset].bold = true;
         }
     }
     return (
         data
             .map(
-                ({ user_id, xp, rank, bold }) =>
-                    `${bold ? "**" : ""}\`${
-                        rank + 1
-                    }.\` <@${user_id}>: ${Math.floor(xp)}${bold ? "**" : ""}`
+                ({ user_id, xp, rank }) =>
+                    `${rank + 1}.\` <@${user_id}>: ${Math.floor(xp)}`
             )
             .join("\n") || "Nobody is on this leaderboard yet."
     );
@@ -209,6 +204,7 @@ async function text_activity(client, message) {
     await increase_xp(message.author.id, xp_gain, 0, known);
     const roles = await get_roles();
     for (const role of message.member.roles.cache.keys()) {
+        console.log(role, roles);
         if (roles.has(role)) await add_role_xp(role, xp_gain);
     }
     last_active.set(message.author.id, now);
