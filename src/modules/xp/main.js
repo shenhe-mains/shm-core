@@ -99,7 +99,15 @@ async function top(ctx, args) {
         if (type == "event") {
             const roles = await list_xp_roles();
             console.log(roles);
-            throw new Info("Event Leaderboard", "TODO");
+            throw new Info(
+                "Event Leaderboard",
+                roles
+                    .map(
+                        (entry) =>
+                            `<@&${entry.role_id}>: ${Math.floor(entry.xp)}`
+                    )
+                    .join("\n")
+            );
         }
         const page = args.length > 1 ? parseInt(args[1]) - 1 : 0;
         if (isNaN(page) || page < 0) {
@@ -204,7 +212,6 @@ async function text_activity(client, message) {
     await increase_xp(message.author.id, xp_gain, 0, known);
     const roles = await get_roles();
     for (const role of message.member.roles.cache.keys()) {
-        console.log(role, roles);
         if (roles.has(role)) await add_role_xp(role, xp_gain);
     }
     last_active.set(message.author.id, now);
