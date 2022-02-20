@@ -1,9 +1,11 @@
 const { config } = require("../../core/config");
-const { increase_xp, xp_rank_for, leaderboard } = require("../../db");
-const { Info, ArgumentError } = require("../../errors");
+const { has_permission } = require("../../core/privileges");
+const { increase_xp, xp_rank_for, leaderboard, client } = require("../../db");
+const { Info, ArgumentError, PermissionError } = require("../../errors");
 
 exports.commands = {
     top: top,
+    reset: reset,
 };
 
 exports.listeners = {
@@ -85,6 +87,26 @@ async function top(ctx, args) {
             await top_fields(type, ctx.author.id, 10, 10 * page)
         );
     }
+}
+
+async function reset(ctx, args) {
+    checkCout(args, 0);
+    if (!has_permission(ctx.author, "settings")) {
+        throw new PermissionError(
+            "You do not have permission to reset the leaderboards."
+        );
+    }
+    await ctx.confirmOrCancel(
+        {
+            title: "Reset XP?",
+            description:
+                "This will reset EVERYONE's activity experience for both text and voice.",
+            color: "ff0088",
+        },
+        "RESET",
+        "never mind"
+    );
+    await client.query("DELETE FROM xp");
 }
 
 const last_active = new Map();
