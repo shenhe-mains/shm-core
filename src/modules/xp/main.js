@@ -19,6 +19,7 @@ exports.commands = {
     "add-xp-role": add_xp_role,
     "remove-xp-role": remove_xp_role,
     "rm-xp-role": remove_xp_role,
+    "reset-event-xp": reset_event_xp,
 };
 
 exports.listeners = {

@@ -1278,7 +1278,7 @@ exports.client = client;
                 role_id
             ) VALUES ($1) ON CONFLICT (
                 role_id
-            ) DO UPDATE SET zp = role_xp.zp`,
+            ) DO UPDATE SET xp = role_xp.xp`,
             [role_id]
         );
     };
