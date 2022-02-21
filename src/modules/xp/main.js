@@ -10,6 +10,9 @@ const {
     register_role,
     delist_role,
     drop_xp_roles,
+    is_blocked,
+    block_channel,
+    unblock_channel,
 } = require("../../db");
 const { Info, ArgumentError, PermissionError } = require("../../errors");
 
@@ -20,6 +23,8 @@ exports.commands = {
     "remove-xp-role": remove_xp_role,
     "rm-xp-role": remove_xp_role,
     "reset-event-xp": reset_event_xp,
+    "xp-block": xp_block,
+    "xp-unblock": xp_unblock,
 };
 
 exports.listeners = {
@@ -194,6 +199,26 @@ async function reset_event_xp(ctx, args) {
     await drop_xp_roles();
 }
 
+async function xp_block(ctx, args) {
+    checkCount(args, 1);
+    if (!has_permission(ctx.author, "settings")) {
+        throw new PermissionError(
+            "You do not have permission to block channels from receiving XP."
+        );
+    }
+    await block_channel(ctx.parse_channel_id(args[0]));
+}
+
+async function xp_unblock(ctx, args) {
+    checkCount(args, 1);
+    if (!has_permission(ctx.author, "settings")) {
+        throw new PermissionError(
+            "You do not have permission to unblock channels from receiving XP."
+        );
+    }
+    await unblock_channel(ctx.parse_channel_id(args[0]));
+}
+
 const last_active = new Map();
 const last_voice_update = new Map();
 const voice_states = new Map();
@@ -202,6 +227,7 @@ async function text_activity(client, message) {
     if (message.guild != config.guild) return;
     if (message.webhookId !== null) return;
     if (message.author.bot) return;
+    if (await is_blocked(message.channel)) return;
 
     const now = new Date();
     const known = last_active.has(message.author.id);
@@ -222,6 +248,7 @@ async function voice_activity(client, before, after) {
     if (after.member.user.bot) return;
     const id = after.member.id;
     if (after.channel) {
+        if (await is_blocked(after.channel)) return;
         if (voice_states.has(id)) return;
         last_voice_update.set(id, new Date());
         increase_xp(id, 0, 0, false);

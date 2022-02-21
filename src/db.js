@@ -1272,6 +1272,45 @@ exports.client = client;
         )`
     );
 
+    client.query(
+        `CREATE TABLE IF NOT EXISTS no_xp_channels (
+            channel_id VARCHAR(32) PRIMARY KEY
+        )`
+    );
+
+    exports.is_blocked = async function (channel) {
+        for (const id of [channel.id, channel.parentId || []].flat()) {
+            if (
+                (
+                    await client.query(
+                        `SELECT COUNT(*) FROM no_xp_channels WHERE channel_id = $1`,
+                        [id]
+                    )
+                ).rows[0].count > 0
+            ) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    exports.block_channel = async function (channel_id) {
+        await client.query(
+            `INSERT INTO no_xp_channels (
+                channel_id
+            ) VALUES ($1) ON CONFLICT (
+                channel_id
+            ) DO UPDATE set channel_id = no_xp_channels.channel_id`,
+            [channel_id]
+        );
+    };
+
+    exports.unblock_channel = async function (channel_id) {
+        await client.query(`DELETE FROM no_xp_channels WHERE channel_id = $1`, [
+            channel_id,
+        ]);
+    };
+
     exports.register_role = async function (role_id) {
         await client.query(
             `INSERT INTO role_xp (
