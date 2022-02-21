@@ -137,30 +137,28 @@ async function check_react_role(client, interaction) {
             ephemeral: true,
         });
     } else {
+        const roles = interaction.message.components.flatMap((row) =>
+            row.components.map((button) => button.customId.split(".")[2])
+        );
         if (unique) {
-            const roles = interaction.message.components.flatMap((row) =>
-                row.components.map((button) => button.customId.split(".")[2])
-            );
-            console.log(roles, interaction.member.roles.cache.keys());
-            if (lock) {
-                if (roles.any((role) => interaction.member.roles.has(role))) {
-                    await interaction.reply({
-                        embeds: [
-                            {
-                                ttile: "Reaction Role Locked",
-                                description:
-                                    "You already have another role. It cannot be changed because the role is locked.",
-                                color: "RED",
-                            },
-                        ],
-                    });
-                    return;
-                }
-            }
             await interaction.member.roles.remove(
                 roles,
                 "unique reaction role removes other roles"
             );
+        } else if (lock) {
+            if (roles.any((role) => interaction.member.roles.has(role))) {
+                await interaction.reply({
+                    embeds: [
+                        {
+                            ttile: "Reaction Role Locked",
+                            description:
+                                "You already have another role. It cannot be changed because the role is locked.",
+                            color: "RED",
+                        },
+                    ],
+                });
+                return;
+            }
         }
         await interaction.member.roles.add(role, "reaction role");
         await interaction.reply({
