@@ -70,9 +70,16 @@ async function setup(ctx, args) {
     }
     const unique = await ctx.user_input({
         title: "Unique Roles",
-        prompt: "Lastly, do you want these roles to be unique? That is, if a user assigns a role to themselves, all other roles available in the prompt will be removed. (yes/no) [60s limit]",
+        prompt: "Do you want these roles to be unique? That is, if a user assigns a role to themselves, all other roles available in the prompt will be removed. (yes/no) [60s limit]",
         parse: parse_bool_or_fail,
     });
+    const lock =
+        unique &&
+        (await ctx.user_input({
+            title: "Lock Roles",
+            prompt: "On top of making roles unique, do you want users to lock in their roles? That is, if a user has a role that is available in the prompt, they will not be allowed to use the prompt again. (yes/no) [60s limit]",
+            parse: parse_bool_or_fail,
+        }));
     await channel.send({
         embeds: [
             {
@@ -87,7 +94,9 @@ async function setup(ctx, args) {
                 type: "BUTTON",
                 style: "PRIMARY",
                 label: label,
-                customId: `reactroles.${unique ? "unique" : "normal"}.${role}`,
+                customId: `reactroles.${
+                    lock ? "lock" : unique ? "unique" : "normal"
+                }.${role}`,
             })),
         })),
     });
@@ -97,10 +106,25 @@ async function check_react_role(client, interaction) {
     if (!(interaction instanceof ButtonInteraction)) return;
     if (!interaction.customId.startsWith("reactroles.")) return;
     var [_, unique, role] = interaction.customId.split(".");
+    const lock = unique == "lock";
     unique = unique == "unique";
     role = await interaction.guild.roles.fetch(role);
     if (role === null) return;
     if (interaction.member.roles.cache.has(role.id)) {
+        if (lock) {
+            await interaction.reply({
+                embeds: [
+                    {
+                        title: "Reaction Role Locked",
+                        description:
+                            "This role is locked and cannot be removed.",
+                        color: "RED",
+                    },
+                ],
+                ephemeral: true,
+            });
+            return;
+        }
         await interaction.member.roles.remove(role, "reaction role");
         await interaction.reply({
             embeds: [
@@ -114,12 +138,26 @@ async function check_react_role(client, interaction) {
         });
     } else {
         if (unique) {
+            const roles = interaction.message.components.flatMap((row) =>
+                row.components.map((button) => button.customId.split(".")[2])
+            );
+            if (lock) {
+                if (roles.any((role) => interaction.member.roles.has(role))) {
+                    await interaction.reply({
+                        embeds: [
+                            {
+                                ttile: "Reaction Role Locked",
+                                description:
+                                    "You already have another role. It cannot be changed because the role is locked.",
+                                color: "RED",
+                            },
+                        ],
+                    });
+                    return;
+                }
+            }
             await interaction.member.roles.remove(
-                interaction.message.components.flatMap((row) =>
-                    row.components.map(
-                        (button) => button.customId.split(".")[2]
-                    )
-                ),
+                roles,
                 "unique reaction role removes other roles"
             );
         }
