@@ -139,8 +139,7 @@
             "admin",
             "bot",
             "mod",
-            "tcmod",
-            "trial"
+            "tcmod"
         ],
         "ban": [
             "owner",
