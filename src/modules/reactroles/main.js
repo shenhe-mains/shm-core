@@ -158,6 +158,7 @@ async function check_react_role(client, interaction) {
                             color: "RED",
                         },
                     ],
+                    ephemeral: true,
                 });
                 return;
             }
