@@ -125,7 +125,6 @@ async function top(ctx, args) {
                 size = Math.max(size, role.members.size);
             }
             for (const entry of order) {
-                console.log(entry.role.name, size / entry.role.members.size);
                 entry.xp *= size / entry.role.members.size;
             }
             order.sort((a, b) => b.xp - a.xp);
