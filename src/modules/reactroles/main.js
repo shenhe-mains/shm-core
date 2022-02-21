@@ -137,9 +137,11 @@ async function check_react_role(client, interaction) {
             ephemeral: true,
         });
     } else {
-        const roles = interaction.message.components.flatMap((row) =>
-            row.components.map((button) => button.customId.split(".")[2])
-        );
+        const roles = [
+            ...interaction.message.components.flatMap((row) =>
+                row.components.map((button) => button.customId.split(".")[2])
+            ),
+        ];
         if (unique) {
             await interaction.member.roles.remove(
                 roles,
