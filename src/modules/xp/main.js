@@ -122,10 +122,10 @@ async function top(ctx, args) {
             }
             var size = 0;
             for (const { role } of order) {
-                size = Math.max(size, role.members.size());
+                size = Math.max(size, role.members.size);
             }
             for (const entry of order) {
-                entry.xp *= size / entry.role.members.size();
+                entry.xp *= size / entry.role.members.size;
             }
             order.sort((a, b) => a.xp - b.xp);
             throw new Info(
