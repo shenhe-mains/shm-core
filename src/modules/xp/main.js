@@ -131,10 +131,7 @@ async function top(ctx, args) {
             throw new Info(
                 "Event Leaderboard",
                 order
-                    .map(
-                        (entry) =>
-                            `<@&${entry.role_id}>: ${Math.floor(entry.xp)}`
-                    )
+                    .map((entry) => `${entry.role}: ${Math.floor(entry.xp)}`)
                     .join("\n")
             );
         }
