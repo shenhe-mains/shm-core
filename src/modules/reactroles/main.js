@@ -146,7 +146,9 @@ async function check_react_role(client, interaction) {
                 "unique reaction role removes other roles"
             );
         } else if (lock) {
-            if (roles.some((role) => interaction.member.roles.has(role))) {
+            if (
+                roles.some((role) => interaction.member.roles.cache.has(role))
+            ) {
                 await interaction.reply({
                     embeds: [
                         {
