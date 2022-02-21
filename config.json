@@ -147,8 +147,7 @@
             "admin",
             "bot",
             "mod",
-            "tcmod",
-            "trial"
+            "tcmod"
         ],
         "massban": [
             "owner",
