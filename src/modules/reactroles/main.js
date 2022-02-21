@@ -141,6 +141,7 @@ async function check_react_role(client, interaction) {
             const roles = interaction.message.components.flatMap((row) =>
                 row.components.map((button) => button.customId.split(".")[2])
             );
+            console.log(roles, interaction.member.roles.cache.keys());
             if (lock) {
                 if (roles.any((role) => interaction.member.roles.has(role))) {
                     await interaction.reply({
