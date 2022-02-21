@@ -152,7 +152,7 @@ async function check_react_role(client, interaction) {
                 await interaction.reply({
                     embeds: [
                         {
-                            ttile: "Reaction Role Locked",
+                            title: "Reaction Role Locked",
                             description:
                                 "You already have another role. It cannot be changed because the role is locked.",
                             color: "RED",
