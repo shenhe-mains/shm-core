@@ -103,10 +103,34 @@ async function top(ctx, args) {
         }
         if (type == "event") {
             const roles = await list_xp_roles();
-            console.log(roles);
+            const order = [];
+            for (const { role_id, xp } of roles) {
+                try {
+                    const role = await ctx.guild.roles.fetch(role_id);
+                    if (!role) throw 0;
+                    order.push({
+                        role,
+                        xp,
+                    });
+                } catch {}
+            }
+            if (order.length == 0) {
+                throw new Info(
+                    "Event Leaderboard",
+                    "This leaderboard is empty right now."
+                );
+            }
+            var size = 0;
+            for (const { role } of order) {
+                size = Math.max(size, role.members.size());
+            }
+            for (const entry of order) {
+                entry.xp *= size / entry.role.members.size();
+            }
+            order.sort((a, b) => a.xp - b.xp);
             throw new Info(
                 "Event Leaderboard",
-                roles
+                order
                     .map(
                         (entry) =>
                             `<@&${entry.role_id}>: ${Math.floor(entry.xp)}`

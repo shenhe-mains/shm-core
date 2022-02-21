@@ -1331,8 +1331,7 @@ exports.client = client;
     };
 
     exports.list_xp_roles = async function () {
-        return (await client.query(`SELECT * FROM role_xp ORDER BY xp DESC`))
-            .rows;
+        return (await client.query(`SELECT * FROM role_xp`)).rows;
     };
 
     exports.add_role_xp = async function (role_id, xp) {
