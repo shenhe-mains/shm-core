@@ -149,7 +149,6 @@ exports.Context = class {
             await interaction.update({ components: [] });
             return interaction;
         } catch (interaction) {
-            console.log(interaction);
             if (interaction instanceof Message) {
                 await interaction.edit({
                     embeds: [
