@@ -48,7 +48,7 @@ exports.pagify = async function (ctx, embed, fields, page_size, mini) {
 };
 
 exports.pageInteraction = async function (client, interaction) {
-    if (!interaction instanceof ButtonInteraction) return;
+    if (!(interaction instanceof ButtonInteraction)) return;
     if (items.hasOwnProperty(interaction.message.id)) {
         const item = items[interaction.message.id];
         switch (interaction.customId) {
