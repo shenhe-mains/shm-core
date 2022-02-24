@@ -45,8 +45,7 @@ async function post_verify(ctx, args) {
 async function check_verify(client, interaction) {
     if (!(interaction instanceof ButtonInteraction)) return;
     if (interaction.customId != "verification.verify") return;
-    const member = await interaction.guild.members.fetch(interaction.user.id);
-    if (member.roles.cache.has(config.verify)) {
+    if (interaction.member.roles.cache.has(config.verify)) {
         await interaction.reply({
             content: "You are already verified!",
             ephemeral: true,
@@ -64,7 +63,7 @@ async function check_verify(client, interaction) {
                     Math.floor(Math.random() * 62)
                 );
         }
-        link_user(key, member);
+        link_user(key, interaction.member);
     }
     await interaction.reply({
         embeds: [
