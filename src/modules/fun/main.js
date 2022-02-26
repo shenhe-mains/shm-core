@@ -4,8 +4,6 @@ exports.commands = { choose: choose };
 
 exports.log_exclude = ["choose"];
 
-exports.listeners = { interactionCreate: [checkFun] };
-
 async function choose(ctx, args, body) {
     var options;
     if (body.match(",")) {
