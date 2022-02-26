@@ -43,6 +43,7 @@ async function post_verify(ctx, args) {
 }
 
 async function check_verify(client, interaction) {
+    console.log("$", interaction.customId);
     if (interaction.customId != "verification.verify") return;
     if (interaction.member.roles.cache.has(config.verify)) {
         await interaction.reply({
