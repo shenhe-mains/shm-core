@@ -554,10 +554,11 @@ async function _info(ctx, item) {
                     : [],
                 {
                     name: "Permissions",
-                    value: item.permissions
-                        .toArray()
-                        .map((x) => `\`${x}\``)
-                        .join(", "),
+                    value:
+                        item.permissions
+                            .toArray()
+                            .map((x) => `\`${x}\``)
+                            .join(", ") || "(none)",
                 },
             ].flat(),
         };
