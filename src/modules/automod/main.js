@@ -155,7 +155,6 @@ async function scan(content, fake) {
 }
 
 async function automod_scan(client, message) {
-    perspective_scan(client, message);
     if (!message.guild || message.guild.id != config.guild) return;
     if (message.author.id == client.user.id) return;
     if (
@@ -173,6 +172,7 @@ async function automod_scan(client, message) {
             return;
         }
     }
+    perspective_scan(client, message);
     if (author !== undefined && has_permission(author, "automod_immunity")) {
         return;
     }
