@@ -1,6 +1,7 @@
 const { config } = require("../../core/config");
 const { mute, kick, ban } = require("../../core/moderation");
 const { has_permission } = require("../../core/privileges");
+const data = require("../data.json");
 const {
     add_warn,
     has_automod_term,
@@ -153,6 +154,7 @@ async function scan(content, fake) {
 }
 
 async function automod_scan(client, message) {
+    perspective_scan(client, message);
     if (!message.guild || message.guild.id != config.guild) return;
     if (message.author.id == client.user.id) return;
     if (
@@ -293,4 +295,70 @@ async function automod_scan(client, message) {
             await ban(log, author.id, 0, "automod action", true);
         }
     }
+}
+
+async function perspective_scan(client, message) {
+    try {
+        const response = await fetch(
+            `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${data.perspective_key}`,
+            {
+                method: "post",
+                body: JSON.stringify({
+                    comment: { text: message.content, type: "PLAIN_TEXT" },
+                    requestedAttributes: {
+                        TOXICITY: {
+                            scoreType: "PROBABILITY",
+                            scoreThreshold: 0.95,
+                        },
+                        SEVERE_TOXICITY: {
+                            scoreType: "PROBABILITY",
+                            scoreThreshold: 0.6,
+                        },
+                        IDENTITY_ATTACK: {
+                            scoreType: "PROBABILITY",
+                            scoreThreshold: 0.5,
+                        },
+                        INSULT: {
+                            scoreType: "PROBABILITY",
+                            scoreThreshold: 0.6,
+                        },
+                        THREAT: {
+                            scoreType: "PROBABILITY",
+                            scoreThreshold: 0.6,
+                        },
+                    },
+                }),
+            }
+        );
+        const json = await response.json();
+        const matches = [];
+        for (const type of Object.keys(json.attributeScores)) {
+            matches.push({
+                type: type,
+                score: json.attributeScores[type].summaryScore.value,
+            });
+        }
+        if (matches.length > 0) {
+            await (
+                await client.channels.fetch(config.channels.perspective)
+            ).send({
+                embeds: [
+                    {
+                        title: "Potentially bad message found",
+                        description: `[This message](${message.url}) from ${
+                            message.author
+                        } (${message.author.tag} - \`${
+                            message.author.id
+                        }\`) in ${
+                            message.channel
+                        } was detected as potentially problematic by the Perspective API:\n\n${matches
+                            .map(
+                                (match) => `- ${match.type}: \`${match.score}\``
+                            )
+                            .join("\n")}`,
+                    },
+                ],
+            });
+        }
+    } catch {}
 }
