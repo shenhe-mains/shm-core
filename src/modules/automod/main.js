@@ -356,9 +356,12 @@ async function perspective_scan(client, message) {
                                 (match) => `- ${match.type}: \`${match.score}\``
                             )
                             .join("\n")}`,
+                        color: "RED",
                     },
                 ],
             });
         }
-    } catch {}
+    } catch (error) {
+        console.error(error);
+    }
 }
