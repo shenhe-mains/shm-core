@@ -1,3 +1,4 @@
+const fetch = require("node-fetch");
 const { config } = require("../../core/config");
 const { mute, kick, ban } = require("../../core/moderation");
 const { has_permission } = require("../../core/privileges");
