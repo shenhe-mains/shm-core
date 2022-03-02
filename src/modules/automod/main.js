@@ -172,7 +172,7 @@ async function automod_scan(client, message) {
             return;
         }
     }
-    perspective_scan(client, message);
+    // perspective_scan(client, message);
     if (author !== undefined && has_permission(author, "automod_immunity")) {
         return;
     }
