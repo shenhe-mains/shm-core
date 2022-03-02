@@ -1,7 +1,7 @@
 const { config } = require("../../core/config");
 const { mute, kick, ban } = require("../../core/moderation");
 const { has_permission } = require("../../core/privileges");
-const data = require("../data.json");
+const data = require("../../data.json");
 const {
     add_warn,
     has_automod_term,
