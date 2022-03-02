@@ -309,23 +309,23 @@ async function perspective_scan(client, message) {
                     requestedAttributes: {
                         TOXICITY: {
                             scoreType: "PROBABILITY",
-                            scoreThreshold: 0.95,
+                            scoreThreshold: 0.98,
                         },
                         SEVERE_TOXICITY: {
                             scoreType: "PROBABILITY",
-                            scoreThreshold: 0.6,
+                            scoreThreshold: 0.8,
                         },
                         IDENTITY_ATTACK: {
                             scoreType: "PROBABILITY",
-                            scoreThreshold: 0.5,
+                            scoreThreshold: 0.8,
                         },
                         INSULT: {
                             scoreType: "PROBABILITY",
-                            scoreThreshold: 0.6,
+                            scoreThreshold: 0.8,
                         },
                         THREAT: {
                             scoreType: "PROBABILITY",
-                            scoreThreshold: 0.6,
+                            scoreThreshold: 0.8,
                         },
                     },
                 }),
@@ -362,7 +362,5 @@ async function perspective_scan(client, message) {
                 ],
             });
         }
-    } catch (error) {
-        console.error(error);
-    }
+    } catch {}
 }
