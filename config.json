@@ -302,6 +302,14 @@
             "media",
             "leak",
             "staff"
+        ],
+        "info": [
+            "owner",
+            "admin",
+            "bot",
+            "mod",
+            "tcmod",
+            "trial"
         ]
     },
     "coop": {

@@ -58,6 +58,11 @@ exports.log_exclude = [
 
 async function _ranks(ctx, args) {
     checkCount(args, 0, 1);
+    if (!has_permission(ctx.author, "info")) {
+        throw new PermissionError(
+            "You do not have permission to use info/utility commands."
+        );
+    }
     var member;
     if (args.length == 0) {
         member = ctx.author;
@@ -137,6 +142,11 @@ async function point(ctx, args) {
 
 function find(type) {
     return async (ctx, args, body) => {
+        if (!has_permission(ctx.author, "info")) {
+            throw new PermissionError(
+                "You do not have permission to use info/utility commands."
+            );
+        }
         body = body.toLowerCase();
         if (body.length < 3) {
             throw new ArgumentError(
@@ -721,6 +731,11 @@ async function parse(ctx, arg) {
 
 async function info(ctx, args, df) {
     checkCount(args, 0, 1);
+    if (!has_permission(ctx.author, "info")) {
+        throw new PermissionError(
+            "You do not have permission to use info/utility commands."
+        );
+    }
     if (args.length == 0) {
         await show_info(ctx, df);
     } else {
@@ -730,6 +745,11 @@ async function info(ctx, args, df) {
 
 async function avatar(ctx, args) {
     checkCount(args, 0, 1);
+    if (!has_permission(ctx.author, "info")) {
+        throw new PermissionError(
+            "You do not have permission to use info/utility commands."
+        );
+    }
     const member =
         args.length == 0 ? ctx.author : await ctx.parse_member(args[0]);
     const url =
