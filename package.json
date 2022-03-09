@@ -26,6 +26,7 @@
         "http-terminator": "^3.0.4",
         "js-yaml": "^4.1.0",
         "libsodium-wrappers": "^0.7.9",
+        "natural": "^5.1.13",
         "node-fetch": "^2.6.7",
         "optionator": "^0.9.1",
         "pg": "^8.7.1",

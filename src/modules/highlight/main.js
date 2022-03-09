@@ -1,3 +1,4 @@
+const natural = require("natural");
 const { config } = require("../../core/config");
 const { has_permission } = require("../../core/privileges");
 const {
@@ -8,12 +9,7 @@ const {
     clear_highlights,
     highlighting_users,
 } = require("../../db");
-const {
-    Info,
-    PermissionError,
-    ArgumentError,
-    UserError,
-} = require("../../errors");
+const { Info, PermissionError, ArgumentError } = require("../../errors");
 const { pagify } = require("../../pages");
 const { checkCount, inline_code } = require("../../utils");
 
@@ -25,6 +21,8 @@ exports.log_exclude = ["highlight", "hl"];
 
 const last_ping = {};
 const threshold = 300000;
+
+const tokenizer = new natural.WordTokenizer();
 
 function can_ping(channel, user) {
     if (!last_ping.hasOwnProperty(channel.id)) return true;
@@ -44,7 +42,10 @@ async function highlight(ctx, args) {
             "You do not have permission to use highlights."
         );
     }
-    const term = args.slice(1).join(" ").toLowerCase();
+    const terms = args
+        .slice(1)
+        .map((term) => tokenizer.tokenize(term)[0])
+        .map((word) => natural.PorterStemmer.stem(word));
     switch (args[0]) {
         case "list":
             const matches = await highlights_for(ctx.author.id);
@@ -67,34 +68,36 @@ async function highlight(ctx, args) {
                 throw new Info();
             }
         case "add":
-            if (await highlighting(ctx.author.id, term)) {
-                throw new UserError("You are already highlighting that term.");
-            } else if (term.length == 0) {
-                throw new ArgumentError("Please enter something to highlight.");
-            } else if (term.length > 100) {
-                throw new ArgumentError(
-                    "You cannot watch terms longer than 100 characters."
-                );
-            } else {
-                await add_highlight(ctx.author.id, term);
-                return {
-                    title: "Highlight Added",
-                    description: `When I see ${inline_code(
-                        term
-                    )}, I will DM you (up to once every 5 minutes per channel).`,
-                };
+            const highlighted = [];
+            for (const term of terms) {
+                if (
+                    term.length >= 3 &&
+                    term.length <= 100 &&
+                    !(await highlighting(ctx.author.id, term))
+                ) {
+                    highlighted.push(term);
+                    await add_highlight(ctx.author.id, term);
+                }
             }
+            return {
+                title: "Highlight(s) Added",
+                description: highlighted
+                    .map((term) => `\`${term}\``)
+                    .join(", "),
+            };
         case "rm":
         case "remove":
-            if (!(await highlighting(ctx.author.id, term))) {
-                throw new UserError("You aren't highlighting that term yet.");
-            } else {
-                await rm_highlight(ctx.author.id, term);
-                return {
-                    title: "Highlight Removed",
-                    description: "I will no longer DM you for that term.",
-                };
+            const removed = [];
+            for (const term of terms) {
+                if (await highlighting(ctx.author.id, term)) {
+                    removed.push(term);
+                    await rm_highlight(ctx.author.id, term);
+                }
             }
+            return {
+                title: "Highlight(s) Removed",
+                description: removed.map((term) => `\`${term}\``).join(", "),
+            };
         case "clear":
             const count = (await highlights_for(ctx.author.id)).length;
             await (
@@ -122,14 +125,16 @@ async function check_highlights(client, message) {
     if (!message.guild) return;
     if (!message.channel) return;
     if (!message.channel.members) return;
-    if (message.webhookId !== null) return;
-    if (message.author.bot) return;
     apply_ping(message.channel, message.author);
-    const content = message.content.toLowerCase();
     const members = [];
+    const words = new Set(
+        tokenizer
+            .tokenize(message.content)
+            .map((word) => natural.PorterStemmer.stem(word))
+    );
     for (const user_id of await highlighting_users()) {
         if (message.author.id == user_id) continue;
-        if (!can_ping(message.channel, { id: user_id })) continue;
+        // if (!can_ping(message.channel, { id: user_id })) continue;
         var member;
         try {
             member = await message.guild.members.fetch(user_id);
@@ -139,26 +144,11 @@ async function check_highlights(client, message) {
         if (!message.channel.permissionsFor(member).has("VIEW_CHANNEL")) {
             continue;
         }
+        console.log(await highlights_for(user_id), words);
         for (const match of await highlights_for(user_id)) {
-            if (content.startsWith(match)) {
+            if (words.has(match)) {
                 members.push(member);
                 break;
-            } else if (content.endsWith(match)) {
-                members.push(member);
-                break;
-            } else {
-                var index = 1;
-                var done = false;
-                while ((index = content.indexOf(match, index + 1)) != -1) {
-                    if (
-                        !content[index - 1].match(/[A-Za-z]/) ||
-                        !content[index + match.length].match(/[A-Za-z]/)
-                    ) {
-                        members.push(member);
-                        done = true;
-                        break;
-                    }
-                }
             }
         }
     }
