@@ -144,7 +144,6 @@ async function check_highlights(client, message) {
         if (!message.channel.permissionsFor(member).has("VIEW_CHANNEL")) {
             continue;
         }
-        console.log(await highlights_for(user_id), words);
         for (const match of await highlights_for(user_id)) {
             if (words.has(match)) {
                 members.push(member);
