@@ -81,9 +81,9 @@ async function highlight(ctx, args) {
             }
             return {
                 title: "Highlight(s) Added",
-                description: highlighted
-                    .map((term) => `\`${term}\``)
-                    .join(", "),
+                description:
+                    highlighted.map((term) => `\`${term}\``).join(", ") +
+                    "\n\nDon't worry if these terms don't look right. It should still work properly.",
             };
         case "rm":
         case "remove":
@@ -96,7 +96,9 @@ async function highlight(ctx, args) {
             }
             return {
                 title: "Highlight(s) Removed",
-                description: removed.map((term) => `\`${term}\``).join(", "),
+                description:
+                    removed.map((term) => `\`${term}\``).join(", ") +
+                    "\n\nDon't worry if these terms don't look right. It should still work properly.",
             };
         case "clear":
             const count = (await highlights_for(ctx.author.id)).length;
@@ -134,7 +136,7 @@ async function check_highlights(client, message) {
     );
     for (const user_id of await highlighting_users()) {
         if (message.author.id == user_id) continue;
-        // if (!can_ping(message.channel, { id: user_id })) continue;
+        if (!can_ping(message.channel, { id: user_id })) continue;
         var member;
         try {
             member = await message.guild.members.fetch(user_id);
