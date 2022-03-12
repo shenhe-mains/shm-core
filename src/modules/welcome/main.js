@@ -10,7 +10,7 @@ async function welcome(client, member) {
         embeds: [
             {
                 title: `✧・ **__Welcome to Shenhe Mains!__** ・✧`,
-                description: `Hi, ${member}! We hope you enjoy your stay! To get started, make sure to read <#930568867602894878> and follow the instructions there.\n\nDon't forget to pick up your roles in <#930870584609492992> as well!`,
+                description: `Hi, ${member}! We hope you enjoy your stay! To get started, make sure to read <#805458033252892789> and follow the instructions there.\n\nDon't forget to pick up your roles in <#901510802727636992> as well!`,
                 thumbnail: { url: member.user.avatarURL({ dynamic: true }) },
                 image: {
                     url: "https://shenhemains.com/static/images/animated-banner.gif",
