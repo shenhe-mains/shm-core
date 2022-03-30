@@ -17,6 +17,7 @@ require_reload("./src/routes/captcha");
 require_reload("./src/routes/index");
 require_reload("./src/routes/about");
 require_reload("./src/routes/apply");
+require_reload("./src/routes/nsfw");
 
 require_reload("./src/routes/dashboard/index");
 require_reload("./src/routes/dashboard/application");
