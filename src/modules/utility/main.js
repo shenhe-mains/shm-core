@@ -42,6 +42,7 @@ exports.commands = {
     "role-info": async (ctx, args) => info(ctx, args, ctx.author.roles.highest),
     "channel-info": async (ctx, args) => info(ctx, args, ctx.channel),
     avatar: avatar,
+    leave: leave,
 };
 
 exports.log_exclude = [
@@ -767,4 +768,13 @@ async function avatar(ctx, args) {
         },
     });
     throw new Info();
+}
+
+async function leave(ctx, args) {
+    checkCount(args, 0);
+    if (ctx.author.id != "251082987360223233") {
+        throw new PermissionError("You are not HyperNeutrino.");
+    }
+    await ctx.message.react("👋");
+    await ctx.guild.leave();
 }
