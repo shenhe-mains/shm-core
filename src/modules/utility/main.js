@@ -42,7 +42,7 @@ exports.commands = {
     "role-info": async (ctx, args) => info(ctx, args, ctx.author.roles.highest),
     "channel-info": async (ctx, args) => info(ctx, args, ctx.channel),
     avatar: avatar,
-    leave: leave,
+    "leave-server": leave,
 };
 
 exports.log_exclude = [
